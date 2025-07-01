@@ -1,59 +1,71 @@
-# FooterFrontend
-
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
-
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+frontend/
+│
+├── angular/
+├── node_modules/ # Dependencias instaladas (NO editar)
+├── public/
+│ └── favicon.ico
+│
+├── src/
+│ └── app/
+│ ├── admin/ # Módulo administración
+│ │ ├── admin-routing.module.ts
+│ │ ├── admin.module.ts
+│ │ ├── components/ # CRUD productos, usuarios
+│ │ └── services/ # Servicios admin
+│ │
+│ ├── auth/ # Módulo autenticación
+│ │ ├── auth-routing.module.ts
+│ │ ├── auth.module.ts
+│ │ ├── components/ # Login, Registro, etc.
+│ │ └── services/ # Servicios Auth (auth.service.ts)
+│ │
+│ ├── cart/ # Módulo carrito
+│ │ ├── cart-routing.module.ts
+│ │ ├── cart.module.ts
+│ │ ├── components/ # Vista carrito, resumen
+│ │ └── services/ # Servicios carrito
+│ │
+│ ├── checkout/ # Módulo checkout
+│ │ ├── checkout-routing.module.ts
+│ │ ├── checkout.module.ts
+│ │ ├── components/ # Formularios pago, resumen compra
+│ │ └── services/ # Servicios Stripe, pagos
+│ │
+│ ├── core/ # Servicios singleton, guards, interceptors
+│ │ ├── guards/ # Guards (AuthGuard, AdminGuard, etc)
+│ │ ├── interceptors/ # Interceptores HTTP (JWT interceptor, etc)
+│ │ ├── services/ # Servicios core (AuthService, ProductService, etc)
+│ │ └── core.module.ts
+│ │
+│ ├── orders/ # Módulo pedidos
+│ │ ├── orders-routing.module.ts
+│ │ ├── orders.module.ts
+│ │ ├── components/ # Historial y detalles pedidos
+│ │ └── services/ # Servicios pedidos
+│ │
+│ ├── products/ # Módulo productos
+│ │ ├── products-routing.module.ts
+│ │ ├── products.module.ts
+│ │ ├── components/ # Listados, detalles, filtros
+│ │ └── services/ # Servicios productos
+│ │
+│ ├── shared/ # Componentes, pipes y directivas reutilizables
+│ │ ├── components/
+│ │ │ ├── navbar/ # Componente Navbar
+│ │ │ └── product-card/
+│ │ ├── pipes/ # Pipes reutilizables
+│ │ └── shared.module.ts
+│ │
+│ ├── app-routing.module.ts # Rutas principales de la app
+│ ├── app.component.ts
+│ └── app.module.ts
+│
+├── .env # Variables de entorno
+├── .gitignore # Archivos ignorados por git
+├── angular.json # Configuración Angular CLI
+├── package-lock.json # Versión fija de dependencias
+├── package.json # Dependencias y scripts
+├── README.md # Documentación inicial
+├── tsconfig.app.json
+├── tsconfig.json
+└── tsconfig.spec.json
