@@ -1,71 +1,77 @@
 frontend/
 │
-├── angular/
-├── node_modules/ # Dependencias instaladas (NO editar)
+├── angular/ # (¿uso no especificado?)
+├── node_modules/ # Dependencias (no editar)
 ├── public/
 │ └── favicon.ico
 │
 ├── src/
 │ └── app/
 │ ├── admin/ # Módulo administración
-│ │ ├── admin-routing.module.ts
-│ │ ├── admin.module.ts
 │ │ ├── components/ # CRUD productos, usuarios
-│ │ └── services/ # Servicios admin
-│ │
-│ ├── auth/ # Módulo autenticación
-│ │ ├── auth-routing.module.ts
-│ │ ├── auth.module.ts
-│ │ ├── components/ # Login, Registro, etc.
-│ │ └── services/ # Servicios Auth (auth.service.ts)
-│ │
-│ ├── cart/ # Módulo carrito
-│ │ ├── cart-routing.module.ts
-│ │ ├── cart.module.ts
-│ │ ├── components/ # Vista carrito, resumen
-│ │ └── services/ # Servicios carrito
-│ │
-│ ├── checkout/ # Módulo checkout
-│ │ ├── checkout-routing.module.ts
-│ │ ├── checkout.module.ts
-│ │ ├── components/ # Formularios pago, resumen compra
-│ │ └── services/ # Servicios Stripe, pagos
-│ │
-│ ├── core/ # Servicios singleton, guards, interceptors
-│ │ ├── guards/ # Guards (AuthGuard, AdminGuard, etc)
-│ │ ├── interceptors/ # Interceptores HTTP (JWT interceptor, etc)
-│ │ ├── services/ # Servicios core (AuthService, ProductService, etc)
-│ │ └── core.module.ts
-│ │
-│ ├── orders/ # Módulo pedidos
-│ │ ├── orders-routing.module.ts
-│ │ ├── orders.module.ts
-│ │ ├── components/ # Historial y detalles pedidos
-│ │ └── services/ # Servicios pedidos
-│ │
-│ ├── products/ # Módulo productos
-│ │ ├── products-routing.module.ts
-│ │ ├── products.module.ts
-│ │ ├── components/ # Listados, detalles, filtros
-│ │ └── services/ # Servicios productos
-│ │
-│ ├── shared/ # Componentes, pipes y directivas reutilizables
-│ │ ├── components/
-│ │ │ ├── navbar/ # Componente Navbar
-│ │ │ └── product-card/
-│ │ ├── pipes/ # Pipes reutilizables
-│ │ └── shared.module.ts
-│ │
-│ ├── app-routing.module.ts # Rutas principales de la app
-│ ├── app.component.ts
-│ └── app.module.ts
+│ │ ├── services/ # Servicios admin
+│ │ └── admin.routes.ts ✅
 │
-├── .env # Variables de entorno
-├── .gitignore # Archivos ignorados por git
-├── angular.json # Configuración Angular CLI
-├── package-lock.json # Versión fija de dependencias
-├── package.json # Dependencias y scripts
-├── README.md # Documentación inicial
+│ ├── auth/ # Módulo autenticación
+│ │ ├── components/ # Login, Registro, etc.
+│ │ ├── services/ # Servicios Auth
+│ │ └── auth.routes.ts ✅
+│
+│ ├── cart/ # Módulo carrito
+│ │ ├── components/ # Vista carrito, resumen
+│ │ ├── services/ # Servicios carrito
+│ │ └── cart.routes.ts ✅
+│
+│ ├── checkout/ # Módulo checkout
+│ │ ├── components/ # Formularios pago, resumen compra
+│ │ ├── services/ # Servicios Stripe, pagos
+│ │ └── checkout.routes.ts ✅
+│
+│ ├── core/ # Servicios singleton, guards, interceptors
+│ │ ├── guards/
+│ │ ├── interceptors/
+│ │ └── services/
+│
+│ ├── orders/ # Módulo pedidos
+│ │ ├── components/ # Historial y detalles pedidos
+│ │ ├── services/ # Servicios pedidos
+│ │ └── orders.routes.ts ✅
+│
+│ ├── products/ # Módulo productos
+│ │ ├── components/
+│ │ │ └── products-list/
+│ │ │ ├── products-list.component.ts
+│ │ │ ├── products-list.component.html
+│ │ │ ├── products-list.component.scss
+│ │ ├── services/
+│ │ │ └── products.service.ts
+│ │ └── products.module.ts
+│ │ └── products.routes.ts
+│
+│ ├── shared/ # Componentes y pipes reutilizables
+│ │ ├── components/
+│ │ │ ├── navbar/
+│ │ │ │ ├── navbar.component.ts
+│ │ │ │ ├── navbar.component.html
+│ │ │ │ ├── navbar.component.scss
+│ │ │ │ └── navbar.component.spec.ts
+│ │ │ └── product-card/
+│ │ │ ├── product-card.component.ts
+│ │ │ ├── product-card.component.html
+│ │ │ ├── product-card.component.scss
+│ │ │ └── product-card.component.spec.ts
+│ │ ├── pipes/ # (vacío por ahora)
+│
+│ ├── app.component.ts
+│ ├── app.routes.ts ✅ # 🔁 Rutas principales (standalone)
+│ └── main.ts # Actualizado para standalone
+│
+├── .env
+├── .gitignore
+├── angular.json
+├── package-lock.json
+├── package.json
+├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.json
 └── tsconfig.spec.json
