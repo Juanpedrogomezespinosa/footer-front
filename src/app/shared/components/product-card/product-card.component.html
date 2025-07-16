@@ -1,6 +1,18 @@
-<!-- src/app/shared/components/product-card/product-card.component.html -->
-
 <div class="product-card">
-  <h2>{{ product.name }}</h2>
-  <p>Precio: {{ product.price }} €</p>
+  <img
+    class="product-image"
+    [src]="getProductImage()"
+    [alt]="product.name"
+    (error)="onImageError($event)"
+  />
+
+  <div class="product-info">
+    <h2>{{ product.name }}</h2>
+    <p class="price">
+      {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
+    </p>
+    <button (click)="addToCart()" class="add-to-cart-btn">
+      Agregar al carrito
+    </button>
+  </div>
 </div>

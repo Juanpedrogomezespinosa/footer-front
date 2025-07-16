@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { Observable, map } from "rxjs";
 
 export interface Product {
   id: number;
   name: string;
   price: number;
+  image?: string; // opcional si no siempre hay
 }
 
 @Injectable({
@@ -17,6 +18,14 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    return this.http.get<{ products: Product[] }>(this.apiUrl).pipe(
+      map((response) => {
+        if (!Array.isArray(response.products)) {
+          console.error("getProducts no devolvió un array", response);
+          return [];
+        }
+        return response.products;
+      })
+    );
   }
 }
