@@ -1,18 +1,15 @@
+// src/app/app.routes.ts
+
 import { Routes } from "@angular/router";
-import { productsRoutes } from "./products/products.routes";
+import { ProductsListComponent } from "./products/components/products-list/products-list.component";
 
 export const routes: Routes = [
   {
-    path: "products",
-    children: productsRoutes,
-  },
-  {
     path: "",
-    redirectTo: "products",
-    pathMatch: "full",
+    component: ProductsListComponent,
   },
   {
     path: "**",
-    redirectTo: "products",
+    redirectTo: "",
   },
 ];

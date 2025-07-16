@@ -1,1 +1,12 @@
-<h1>Aquí irá la lista de productos</h1>
+<!-- src/app/products/components/products-list/products-list.component.html -->
+
+<app-navbar></app-navbar>
+
+<div class="product-grid" *ngIf="products() && products().length > 0">
+  <app-product-card
+    *ngFor="let product of products()"
+    [product]="product"
+  ></app-product-card>
+</div>
+
+<app-footer></app-footer>

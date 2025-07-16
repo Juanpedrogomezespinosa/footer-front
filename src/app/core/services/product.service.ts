@@ -6,14 +6,13 @@ export interface Product {
   id: number;
   name: string;
   price: number;
-  // Agrega otros campos que necesites según el backend
 }
 
 @Injectable({
   providedIn: "root",
 })
 export class ProductService {
-  private apiUrl = "http://localhost:3000/api/products"; // Cambia según tu backend
+  private apiUrl = "http://localhost:3000/api/products";
 
   constructor(private http: HttpClient) {}
 

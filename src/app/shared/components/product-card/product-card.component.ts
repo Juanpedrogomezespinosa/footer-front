@@ -1,6 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
-
+import { Product } from "app/core/services/product.service";
 @Component({
   selector: "app-product-card",
   standalone: true,
@@ -8,4 +8,6 @@ import { CommonModule } from "@angular/common";
   templateUrl: "./product-card.component.html",
   styleUrls: ["./product-card.component.scss"],
 })
-export class ProductCardComponent {}
+export class ProductCardComponent {
+  @Input() product!: Product;
+}

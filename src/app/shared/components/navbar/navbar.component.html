@@ -1,1 +1,116 @@
-<p>navbar works!</p>
+<nav
+  class="navbar"
+  role="navigation"
+  aria-label="Navegación principal"
+  (document:click)="handleDocumentClick($event)"
+>
+  <!-- Sección izquierda: Logo -->
+  <div class="navbar__left">
+    <a
+      href="/products"
+      class="navbar__logo"
+      (click)="$event.preventDefault(); reloadPage()"
+      aria-label="Ir a la página principal"
+    >
+      <img src="/assets/logo-negro.png" alt="Logo de la aplicación" />
+    </a>
+  </div>
+
+  <!-- Sección derecha: iconos en escritorio -->
+  <div class="navbar__right desktop-only">
+    <!-- Barra de búsqueda -->
+    <div
+      class="search-wrapper"
+      [class.active]="searchActive"
+      role="search"
+      aria-label="Buscar productos"
+    >
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Buscar productos..."
+        aria-label="Buscar productos"
+        (keydown.enter)="submitSearch()"
+        #searchInput
+      />
+      <button
+        class="icon-button search-icon"
+        type="button"
+        (click)="searchActive ? submitSearch() : toggleSearch()"
+        [attr.aria-label]="
+          searchActive ? 'Cerrar búsqueda' : 'Buscar productos'
+        "
+        [attr.aria-expanded]="searchActive"
+        [attr.aria-controls]="'search-input'"
+      >
+        <img src="/assets/icons/lupa.png" alt="Buscar" />
+      </button>
+    </div>
+
+    <!-- Iconos de usuario -->
+    <a href="/cart" class="icon-button" aria-label="Ir al carrito de la compra">
+      <img src="/assets/icons/carrito.png" alt="Carrito" aria-hidden="true" />
+    </a>
+
+    <a href="/profile" class="icon-button" aria-label="Ir al perfil de usuario">
+      <img src="/assets/icons/perfil.png" alt="Perfil" aria-hidden="true" />
+    </a>
+
+    <a href="/login" class="icon-button" aria-label="Iniciar sesión">
+      <img src="/assets/icons/login.png" alt="Login" aria-hidden="true" />
+    </a>
+  </div>
+
+  <!-- Sección móvil: barra de búsqueda y menú -->
+  <div class="navbar__mobile mobile-only">
+    <div
+      class="search-wrapper"
+      [class.active]="searchActive"
+      role="search"
+      aria-label="Buscar productos"
+    >
+      <input
+        id="search-input-mobile"
+        type="search"
+        placeholder="Buscar productos..."
+        aria-label="Buscar productos"
+        (keydown.enter)="submitSearch()"
+        #searchInputMobile
+      />
+      <button
+        class="icon-button search-icon"
+        type="button"
+        (click)="searchActive ? submitSearch() : toggleSearch()"
+        [attr.aria-label]="
+          searchActive ? 'Cerrar búsqueda' : 'Buscar productos'
+        "
+        [attr.aria-expanded]="searchActive"
+        [attr.aria-controls]="'search-input-mobile'"
+      >
+        <img src="/assets/icons/lupa.png" alt="Buscar" />
+      </button>
+    </div>
+
+    <button
+      class="icon-button"
+      aria-label="Abrir menú"
+      (click)="toggleMobileMenu()"
+      *ngIf="!searchActive"
+      #menuToggleButton
+    >
+      <img src="/assets/icons/menu.png" alt="Menú" />
+    </button>
+  </div>
+
+  <!-- Menú desplegable móvil -->
+  <div class="mobile-menu" *ngIf="mobileMenuActive" #mobileMenu>
+    <a href="/cart" aria-label="Ir al carrito">🛒 Carrito</a>
+    <a href="/profile" aria-label="Ir al perfil">👤 Perfil</a>
+    <a href="/login" *ngIf="!isLoggedIn" aria-label="Iniciar sesión"
+      >🔓 Login</a
+    >
+    <a href="/logout" *ngIf="isLoggedIn" aria-label="Cerrar sesión"
+      >🔒 Logout</a
+    >
+  </div>
+</nav>
