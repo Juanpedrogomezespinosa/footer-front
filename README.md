@@ -63,6 +63,9 @@ footer-front/
 │ │ │ ├── lupa.png
 │ │ │ ├── menu.png
 │ │ │ └── perfil.png
+│ │ │ └── star-empty.svg
+│ │ │ └── star-full.svg
+│ │ │ └── star-half.svg
 │ │ ├── products/ # Vacía actualmente
 │ │ ├── logo-blanco.png
 │ │ └── logo-negro.png

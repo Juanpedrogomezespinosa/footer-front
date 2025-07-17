@@ -12,24 +12,20 @@ import { Product } from "app/core/services/product.service";
 export class ProductCardComponent {
   @Input() product!: Product;
 
-  // URL base del backend donde están las imágenes
   backendUrl: string = "http://localhost:3000";
-
-  // Ruta de la imagen por defecto cuando no hay imagen o falla la carga
   defaultImage: string = "assets/icons/agregar-carrito.png";
 
   /**
-   * Construye la URL completa de la imagen del producto.
-   * Si no tiene imagen, devuelve la imagen por defecto local.
+   * Devuelve la URL de la imagen del producto si está disponible.
+   * En caso contrario, devuelve la imagen por defecto.
    */
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
-      // Mostrar en consola para debug
-      console.log("Cargando imagen de producto:", this.product.image);
+      console.log("Cargando imagen del producto:", this.product.image);
       return `${this.backendUrl}/uploads/${this.product.image}`;
     } else {
       console.warn(
-        "Producto sin imagen, usando imagen por defecto",
+        "Producto sin imagen. Usando imagen por defecto:",
         this.product
       );
       return this.defaultImage;
@@ -37,19 +33,37 @@ export class ProductCardComponent {
   }
 
   /**
-   * Manejador del error en la carga de la imagen.
-   * Cambia la imagen por la imagen por defecto si la carga falla.
+   * Maneja el error al cargar la imagen. Reemplaza con imagen por defecto.
    */
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
-    console.error("Error al cargar la imagen del producto:", target.src);
+    console.error("Error al cargar imagen:", target.src);
     target.src = this.defaultImage;
   }
 
   /**
-   * Acción al agregar un producto al carrito.
+   * Agrega el producto al carrito (por ahora muestra en consola).
    */
   addToCart(): void {
     console.log(`Producto agregado al carrito: ${this.product.name}`);
+  }
+
+  /**
+   * Genera un array para mostrar estrellas completas, medias o vacías en el template.
+   */
+  getStars(): ("full" | "half" | "empty")[] {
+    const stars: ("full" | "half" | "empty")[] = [];
+    let rating = this.product.rating ?? 0;
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= 1) {
+        stars.push("full");
+      } else if (rating >= 0.5) {
+        stars.push("half");
+      } else {
+        stars.push("empty");
+      }
+      rating -= 1;
+    }
+    return stars;
   }
 }

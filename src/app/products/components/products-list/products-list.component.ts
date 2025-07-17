@@ -31,7 +31,10 @@ export class ProductsListComponent {
       if (Array.isArray(productsList)) {
         this.products.set(productsList);
       } else {
-        console.error("getProducts no devolvió un array", productsList);
+        console.error(
+          "El método getProducts no devolvió un arreglo válido:",
+          productsList
+        );
         this.products.set([]);
       }
     });

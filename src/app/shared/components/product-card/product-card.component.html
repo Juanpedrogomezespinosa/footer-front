@@ -1,18 +1,31 @@
 <div class="product-card">
-  <img
-    class="product-image"
-    [src]="getProductImage()"
-    [alt]="product.name"
-    (error)="onImageError($event)"
-  />
+  <div class="image-container">
+    <img
+      class="product-image"
+      [src]="getProductImage()"
+      [alt]="product.name"
+      (error)="onImageError($event)"
+    />
+  </div>
 
   <div class="product-info">
-    <h2>{{ product.name }}</h2>
+    <h2 class="product-name">{{ product.name }}</h2>
+
+    <div class="product-rating-container" *ngIf="product.rating !== undefined">
+      <div class="product-rating">
+        <ng-container *ngFor="let star of getStars()">
+          <span class="star" [ngClass]="star"></span>
+        </ng-container>
+        <span class="rating-count" *ngIf="product.ratingCount !== undefined">
+          ({{ product.ratingCount }} valoración{{
+            product.ratingCount > 1 ? "es" : ""
+          }})
+        </span>
+      </div>
+    </div>
+
     <p class="price">
       {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
     </p>
-    <button (click)="addToCart()" class="add-to-cart-btn">
-      Agregar al carrito
-    </button>
   </div>
 </div>

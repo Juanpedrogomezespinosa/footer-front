@@ -1,0 +1,11 @@
+/* src/app/products/components/products-list/products-list.component.scss */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  padding: 2rem;
+  padding-top: 6rem; // separa bien del navbar fijo
+  justify-items: center;
+  background-color: #ffffff;
+}
