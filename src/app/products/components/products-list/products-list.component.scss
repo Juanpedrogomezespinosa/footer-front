@@ -1,11 +1,32 @@
 /* src/app/products/components/products-list/products-list.component.scss */
 
+:host {
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 24px;
   padding: 2rem;
-  padding-top: 6rem; // separa bien del navbar fijo
+  padding-top: 6rem;
   justify-items: center;
   background-color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .product-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    padding-top: 6rem;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }

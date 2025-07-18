@@ -21,7 +21,6 @@ export class ProductCardComponent {
    */
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
-      console.log("Cargando imagen del producto:", this.product.image);
       return `${this.backendUrl}/uploads/${this.product.image}`;
     } else {
       console.warn(

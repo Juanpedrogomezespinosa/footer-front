@@ -1,3 +1,4 @@
+/* src/app/products/components/product-card/product-card.component.scss */
 .product-card {
   width: 215px;
   height: 380px;
@@ -7,7 +8,6 @@
   background-color: #ffffff;
   cursor: pointer;
 
-  // Quitamos cualquier animación o movimiento
   transform: none !important;
   transition: none !important;
 
@@ -43,7 +43,7 @@
     height: 200px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Aquí el cambio */
+    justify-content: center;
     align-items: center;
     text-align: center;
     padding: 0;
@@ -52,7 +52,7 @@
     .product-name {
       font-size: 1.05rem;
       font-weight: 600;
-      margin-bottom: 8px; /* Más espacio debajo */
+      margin-bottom: 8px;
       margin-top: 0;
       color: #000000;
       width: 100%;
@@ -60,7 +60,7 @@
 
     .product-rating-container {
       width: 100%;
-      margin-bottom: 12px; /* Más espacio debajo para separar del precio */
+      margin-bottom: 12px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -106,6 +106,53 @@
       font-size: 1rem;
       color: #000000;
       margin: 0;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .product-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 0;
+    box-sizing: border-box;
+
+    // Eliminamos borde en estados :hover, :focus y :active para móvil
+    &:hover,
+    &:focus,
+    &:active {
+      border: 1px solid transparent !important;
+      box-shadow: none !important;
+    }
+
+    .image-container {
+      height: 180px;
+    }
+
+    .product-info {
+      height: auto;
+      padding: 1rem;
+
+      .product-name {
+        font-size: 1.1rem;
+      }
+
+      .product-rating {
+        .star {
+          width: 14px;
+          height: 14px;
+        }
+
+        .rating-count {
+          font-size: 0.8rem;
+        }
+      }
+
+      .price {
+        font-size: 1rem;
+      }
     }
   }
 }

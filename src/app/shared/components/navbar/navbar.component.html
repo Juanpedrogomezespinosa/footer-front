@@ -103,14 +103,34 @@
   </div>
 
   <!-- Menú desplegable móvil -->
-  <div class="mobile-menu" *ngIf="mobileMenuActive" #mobileMenu>
-    <a href="/cart" aria-label="Ir al carrito">🛒 Carrito</a>
-    <a href="/profile" aria-label="Ir al perfil">👤 Perfil</a>
-    <a href="/login" *ngIf="!isLoggedIn" aria-label="Iniciar sesión"
-      >🔓 Login</a
+  <div
+    class="mobile-menu"
+    *ngIf="mobileMenuActive"
+    #mobileMenu
+    role="menu"
+    aria-label="Menú móvil"
+  >
+    <a href="/cart" aria-label="Ir al carrito" role="menuitem" tabindex="0"
+      >Ir al carrito</a
     >
-    <a href="/logout" *ngIf="isLoggedIn" aria-label="Cerrar sesión"
-      >🔒 Logout</a
+    <a href="/profile" aria-label="Ir al perfil" role="menuitem" tabindex="0"
+      >Perfil de usuario</a
+    >
+    <a
+      href="/login"
+      *ngIf="!isLoggedIn"
+      aria-label="Iniciar sesión"
+      role="menuitem"
+      tabindex="0"
+      >Login</a
+    >
+    <a
+      href="/logout"
+      *ngIf="isLoggedIn"
+      aria-label="Cerrar sesión"
+      role="menuitem"
+      tabindex="0"
+      >Logout</a
     >
   </div>
 </nav>
