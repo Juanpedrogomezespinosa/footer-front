@@ -9,19 +9,17 @@
 
 <div class="pagination-controls">
   <button
-    class="outlined-button ripple"
+    class="outlined-button"
     (click)="goToPreviousPage()"
     [disabled]="currentPage() === 1"
   >
     Anterior
   </button>
-
-  <span class="page-indicator">
-    Página {{ currentPage() }} de {{ totalPages() }}
-  </span>
-
+  <span class="page-indicator"
+    >Página {{ currentPage() }} de {{ totalPages() }}</span
+  >
   <button
-    class="outlined-button ripple"
+    class="outlined-button"
     (click)="goToNextPage()"
     [disabled]="currentPage() === totalPages()"
   >

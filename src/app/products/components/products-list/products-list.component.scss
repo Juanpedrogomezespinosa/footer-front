@@ -32,7 +32,7 @@
   color: #222222;
   background-color: transparent;
   border: 1px solid #dddddd;
-  border-radius: 3px;
+  border-radius: 8px;
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.3s ease, color 0.3s ease;
@@ -49,7 +49,6 @@
   pointer-events: none;
 }
 
-/* Ripple effect para botones habilitados únicamente */
 .outlined-button:not(:disabled) {
   --ripple-size: 120px;
   --ripple-color: rgba(0, 0, 0, 0.15);
@@ -86,6 +85,7 @@
   color: #444444;
 }
 
+/* Versión móvil: paginación en fila horizontal y ocultar texto */
 @media (max-width: 600px) {
   .product-grid {
     display: flex;
@@ -99,7 +99,13 @@
   }
 
   .pagination-controls {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: nowrap;
+  }
+
+  .page-indicator {
+    display: none; /* Oculta texto en móvil */
   }
 }
