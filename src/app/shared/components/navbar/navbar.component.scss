@@ -170,7 +170,7 @@
         flex: 1 1 auto;
         border: none;
         outline: none;
-        font-size: 1rem;
+        font-size: auto;
         padding: 0.4rem 0.6rem;
         border-radius: 20px 0 0 20px;
         width: 100%;
@@ -295,7 +295,7 @@
 .mobile-only {
   display: none;
   margin-right: 2rem;
-
+  margin-left: 1.3rem;
   @media (max-width: 600px) {
     display: flex !important;
   }
