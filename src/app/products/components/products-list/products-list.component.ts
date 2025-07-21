@@ -1,5 +1,3 @@
-// src/app/products/components/products-list/products-list.component.ts
-
 import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
@@ -21,22 +19,56 @@ import { ProductService, Product } from "app/core/services/product.service";
 })
 export class ProductsListComponent {
   products = signal<Product[]>([]);
+  currentPage = signal(1);
+  totalPages = signal(1);
+  readonly itemsPerPage = 18;
 
   constructor(private productService: ProductService) {
-    this.loadProducts();
+    this.fetchProducts();
   }
 
-  loadProducts(): void {
-    this.productService.getProducts().subscribe((productsList: Product[]) => {
-      if (Array.isArray(productsList)) {
-        this.products.set(productsList);
-      } else {
-        console.error(
-          "El método getProducts no devolvió un arreglo válido:",
-          productsList
-        );
+  fetchProducts(): void {
+    const pageNumber = this.currentPage();
+
+    this.productService.getProducts(pageNumber, this.itemsPerPage).subscribe({
+      next: (response) => {
+        const mappedProducts = response.products.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: Number(product.price),
+          image: product.image,
+          rating: product.averageRating ?? 0,
+          ratingCount: product.ratingCount ?? 0,
+        }));
+
+        this.products.set(mappedProducts);
+        this.totalPages.set(response.totalPages);
+      },
+      error: (error) => {
+        console.error("Error al cargar los productos:", error);
         this.products.set([]);
-      }
+      },
     });
+  }
+
+  goToPage(pageNumber: number): void {
+    if (pageNumber >= 1 && pageNumber <= this.totalPages()) {
+      this.currentPage.set(pageNumber);
+      this.fetchProducts();
+    }
+  }
+
+  goToNextPage(): void {
+    const nextPage = this.currentPage() + 1;
+    if (nextPage <= this.totalPages()) {
+      this.goToPage(nextPage);
+    }
+  }
+
+  goToPreviousPage(): void {
+    const previousPage = this.currentPage() - 1;
+    if (previousPage >= 1) {
+      this.goToPage(previousPage);
+    }
   }
 }

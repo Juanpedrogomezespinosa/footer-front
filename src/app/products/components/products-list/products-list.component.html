@@ -7,4 +7,26 @@
   ></app-product-card>
 </div>
 
+<div class="pagination-controls">
+  <button
+    class="outlined-button ripple"
+    (click)="goToPreviousPage()"
+    [disabled]="currentPage() === 1"
+  >
+    Anterior
+  </button>
+
+  <span class="page-indicator">
+    Página {{ currentPage() }} de {{ totalPages() }}
+  </span>
+
+  <button
+    class="outlined-button ripple"
+    (click)="goToNextPage()"
+    [disabled]="currentPage() === totalPages()"
+  >
+    Siguiente
+  </button>
+</div>
+
 <app-footer></app-footer>
