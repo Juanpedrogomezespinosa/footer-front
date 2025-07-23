@@ -31,6 +31,11 @@ footer-front/
 │ │ │ └── products.routes.ts
 │ │ ├── shared/
 │ │ │ ├── components/
+│ │ │ │ ├── filters/
+│ │ │ │ │ ├── products-filters.component.html
+│ │ │ │ │ ├── products-filters.component.scss
+│ │ │ │ │ ├── products-filters.component.spec.ts
+│ │ │ │ │ └── products-filters.component.ts
 │ │ │ │ ├── footer/
 │ │ │ │ │ ├── footer.component.html
 │ │ │ │ │ ├── footer.component.scss
@@ -47,7 +52,7 @@ footer-front/
 │ │ │ │ ├── product-card.component.spec.ts
 │ │ │ │ └── product-card.component.ts
 │ │ │ ├── pipes/
-│ │ │ └── shared.module.ts
+│ │ │ └──
 │ │ ├── app.component.html
 │ │ ├── app.component.scss
 │ │ ├── app.component.spec.ts
@@ -81,14 +86,3 @@ footer-front/
 ├── tsconfig.app.json
 ├── tsconfig.json
 └── tsconfig.spec.json
-
-Tareas por orden:
-
-| Nº  | Tarea                                                                             | Estado             |
-| --- | --------------------------------------------------------------------------------- | ------------------ |
-| 1   | Corregir `footer.component.ts` para que sea `standalone`                          | 🔧 Vamos a hacerlo |
-| 2   | Corregir los imports innecesarios no usados en templates                          | 🔧 Vamos a hacerlo |
-| 3   | Crear o corregir el sistema de rutas principal (dado que eliminaste `.routes.ts`) | 🔧 Vamos a hacerlo |
-| 4   | Conectar correctamente `main.ts` con las rutas                                    | 🔧 Vamos a hacerlo |
-| 5   | Hacer fetch de productos desde API en vez de usar array mock                      | 🔜 Próximo paso    |
-| 6   | Crear endpoints según necesidades                                                 | 🔜 Próximo paso    |

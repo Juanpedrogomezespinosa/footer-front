@@ -1,30 +1,91 @@
 <app-navbar></app-navbar>
 
-<div class="product-grid" *ngIf="products() && products().length > 0">
-  <app-product-card
-    *ngFor="let product of products()"
-    [product]="product"
-  ></app-product-card>
+<!-- Botón para abrir filtros en móviles -->
+<button
+  class="filters-toggle-button"
+  *ngIf="isMobile"
+  (click)="toggleFilters()"
+>
+  <span class="filters-icon">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      fill-rule="evenodd"
+      aria-hidden="true"
+      width="1rem"
+      height="1rem"
+    >
+      <path
+        d="M18.9 1.2c-.3-.7-1-1.2-1.8-1.2s-1.5.5-1.8 1.2H0v1.5h15.2c.3.8 1 1.3 1.9 1.3s1.6-.5 1.9-1.3h5V1.2zM6.8 10.1c-.8 0-1.5.5-1.8 1.2H0v1.5h4.9c.3.8 1 1.3 1.9 1.3s1.6-.5 1.9-1.3H24v-1.5H8.6c-.3-.8-1-1.2-1.8-1.2m8.5 11.1c.3-.7 1-1.2 1.8-1.2s1.5.5 1.8 1.2H24v1.5h-5c-.3.8-1 1.3-1.9 1.3s-1.6-.5-1.9-1.3H0v-1.5z"
+      ></path>
+    </svg>
+  </span>
+  <span class="filters-label">Filtrar</span>
+</button>
+
+<!-- Contenedor principal -->
+<div class="products-container">
+  <!-- Sidebar de filtros (escritorio) -->
+  <div class="filters-column" *ngIf="!isMobile">
+    <div class="filters-scroll">
+      <app-products-filters
+        (filtersChanged)="onFiltersChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      ></app-products-filters>
+    </div>
+  </div>
+
+  <!-- Contenido de productos -->
+  <div class="content-column">
+    <div class="product-grid" *ngIf="products() && products().length > 0">
+      <app-product-card
+        *ngFor="let product of products()"
+        [product]="product"
+      ></app-product-card>
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        *ngIf="currentPage() > 1"
+        class="outlined-button"
+        (click)="goToPreviousPage()"
+      >
+        Anterior
+      </button>
+
+      <span class="page-indicator">
+        Página {{ currentPage() }} de {{ totalPages() }}
+      </span>
+
+      <button
+        *ngIf="currentPage() < totalPages()"
+        class="outlined-button"
+        (click)="goToNextPage()"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
 </div>
 
-<div class="pagination-controls">
-  <button
-    *ngIf="currentPage() > 1"
-    class="outlined-button"
-    (click)="goToPreviousPage()"
-  >
-    Anterior
-  </button>
-  <span class="page-indicator">
-    Página {{ currentPage() }} de {{ totalPages() }}
-  </span>
-  <button
-    *ngIf="currentPage() < totalPages()"
-    class="outlined-button"
-    (click)="goToNextPage()"
-  >
-    Siguiente
-  </button>
+<!-- Modal de filtros para móviles -->
+<div
+  class="filters-modal"
+  *ngIf="showMobileFilters && isMobile"
+  (click)="toggleFilters()"
+>
+  <div class="filters-modal-content" (click)="$event.stopPropagation()">
+    <div class="filters-modal-body">
+      <app-products-filters
+        (filtersChanged)="onFiltersChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      ></app-products-filters>
+    </div>
+    <div class="filters-modal-footer">
+      <button class="outlined-button" (click)="toggleFilters()">Aplicar</button>
+    </div>
+  </div>
 </div>
 
 <app-footer></app-footer>

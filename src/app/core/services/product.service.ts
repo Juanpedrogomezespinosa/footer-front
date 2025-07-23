@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable, map } from "rxjs";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
 
 interface ProductApiResponse {
   id: number;
@@ -37,8 +37,35 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getProducts(page: number, limit: number): Observable<PaginatedResponse> {
-    const url = `${this.apiUrl}?stock=true&page=${page}&limit=${limit}`;
-    return this.http.get<PaginatedResponse>(url);
+  getProducts(
+    page: number,
+    limit: number,
+    filters: Record<string, string[]> = {},
+    sort: string = ""
+  ): Observable<PaginatedResponse> {
+    let params = new HttpParams()
+      .set("page", page)
+      .set("limit", limit)
+      .set("stock", "true");
+
+    // Añadir filtros múltiples (arrays en query string)
+    for (const key in filters) {
+      filters[key].forEach((value) => {
+        params = params.append(key, value);
+      });
+    }
+
+    // Parseo de orden
+    if (sort === "price_asc") {
+      params = params.set("sortBy", "price").set("order", "ASC");
+    } else if (sort === "price_desc") {
+      params = params.set("sortBy", "price").set("order", "DESC");
+    } else if (sort === "rating_desc") {
+      params = params.set("sortBy", "averageRating").set("order", "DESC");
+    } else if (sort === "rating_count_desc") {
+      params = params.set("sortBy", "ratingCount").set("order", "DESC");
+    }
+
+    return this.http.get<PaginatedResponse>(this.apiUrl, { params });
   }
 }

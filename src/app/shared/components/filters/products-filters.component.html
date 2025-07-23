@@ -1,0 +1,27 @@
+<h3>Filtrar productos</h3>
+
+<div class="filter-group" *ngFor="let filter of filters">
+  <label>{{ filter.label }}</label>
+  <div class="checkbox-list">
+    <label *ngFor="let option of filter.options">
+      <input
+        type="checkbox"
+        [value]="option"
+        (change)="onFilterChange(filter.key, $event)"
+        [checked]="selectedFilters[filter.key]?.includes(option) || false"
+      />
+      {{ option }}
+    </label>
+  </div>
+</div>
+
+<div class="sort-group">
+  <label for="sort">Ordenar por:</label>
+  <select id="sort" (change)="onSortChange($event)">
+    <option value="">Sin orden</option>
+    <option value="price_asc">Precio: menor a mayor</option>
+    <option value="price_desc">Precio: mayor a menor</option>
+    <option value="rating_desc">Valoración: más alta</option>
+    <option value="rating_count_desc">Valoración: más baja</option>
+  </select>
+</div>

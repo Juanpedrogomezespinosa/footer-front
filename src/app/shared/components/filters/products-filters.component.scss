@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+/* Título */
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #111111;
+}
+
+/* Secciones de filtros y orden */
+.filter-group,
+.sort-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+
+  label {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #212529;
+  }
+}
+
+/* Lista de checkboxes */
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #495057;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      accent-color: #333333;
+      cursor: pointer;
+    }
+  }
+}
+
+/* Select de ordenamiento */
+select {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #212529;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #495057;
+    outline: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .checkbox-list {
+    gap: 0.75rem;
+  }
+}
