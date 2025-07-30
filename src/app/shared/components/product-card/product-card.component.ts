@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Product } from "app/core/services/product.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-product-card",
@@ -15,10 +16,8 @@ export class ProductCardComponent {
   backendUrl: string = "http://localhost:3000";
   defaultImage: string = "assets/icons/agregar-carrito.png";
 
-  /**
-   * Devuelve la URL de la imagen del producto si está disponible.
-   * En caso contrario, devuelve la imagen por defecto.
-   */
+  constructor(private router: Router) {}
+
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
       return `${this.backendUrl}/uploads/${this.product.image}`;
@@ -31,25 +30,33 @@ export class ProductCardComponent {
     }
   }
 
-  /**
-   * Maneja el error al cargar la imagen. Reemplaza con imagen por defecto.
-   */
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     console.error("Error al cargar imagen:", target.src);
     target.src = this.defaultImage;
   }
 
-  /**
-   * Agrega el producto al carrito (por ahora muestra en consola).
-   */
+  goToProductDetail(): void {
+    console.log("Click en producto:", this.product);
+    if (!this.product || !this.product.id) {
+      console.error("Producto o ID inválido, no se puede navegar.");
+      return;
+    }
+    console.log(`Navegando a /products/${this.product.id}`);
+    this.router.navigate(["/products", this.product.id]).then(
+      (success) => {
+        console.log("Navegación completada:", success);
+      },
+      (error) => {
+        console.error("Error en navegación:", error);
+      }
+    );
+  }
+
   addToCart(): void {
     console.log(`Producto agregado al carrito: ${this.product.name}`);
   }
 
-  /**
-   * Genera un array para mostrar estrellas completas, medias o vacías en el template.
-   */
   getStars(): ("full" | "half" | "empty")[] {
     const stars: ("full" | "half" | "empty")[] = [];
     let rating = this.product.rating ?? 0;

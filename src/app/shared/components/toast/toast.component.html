@@ -1,0 +1,24 @@
+<div class="toast-container">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast"
+    [ngClass]="toast.type"
+    [@fadeAnimation]
+  >
+    <img
+      *ngIf="toast.type === 'success'"
+      src="assets/icons/check.svg"
+      alt="Success"
+      class="icon"
+      aria-hidden="true"
+    />
+    <img
+      *ngIf="toast.type === 'error'"
+      src="assets/icons/error.svg"
+      alt="Error"
+      class="icon"
+      aria-hidden="true"
+    />
+    <span [innerHTML]="toast.message"></span>
+  </div>
+</div>

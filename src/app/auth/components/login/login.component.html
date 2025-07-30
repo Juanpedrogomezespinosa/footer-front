@@ -1,0 +1,11 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label>
+    Email:
+    <input type="email" formControlName="email" />
+  </label>
+  <label>
+    Contraseña:
+    <input type="password" formControlName="password" />
+  </label>
+  <button type="submit" [disabled]="form.invalid">Iniciar sesión</button>
+</form>

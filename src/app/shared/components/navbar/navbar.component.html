@@ -125,8 +125,9 @@
       >Login</a
     >
     <a
-      href="/logout"
+      href="#"
       *ngIf="isLoggedIn"
+      (click)="$event.preventDefault(); logout()"
       aria-label="Cerrar sesión"
       role="menuitem"
       tabindex="0"

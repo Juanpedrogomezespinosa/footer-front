@@ -1,85 +1,70 @@
 import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { NgIf } from "@angular/common";
+import { AuthService } from "../../../core/services/auth.service"; // importar el servicio
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-navbar",
-  templateUrl: "./navbar.component.html",
-  styleUrls: ["./navbar.component.scss"],
   standalone: true,
   imports: [NgIf],
+  templateUrl: "./navbar.component.html",
+  styleUrls: ["./navbar.component.scss"],
 })
 export class NavbarComponent {
-  searchActive: boolean = false;
-  mobileMenuActive: boolean = false;
-  isLoggedIn: boolean = false; // Sustituir por lógica real de autenticación
+  public searchActive = false;
+  public mobileMenuActive = false;
+  public isLoggedIn = false;
 
   @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild("searchInputMobile")
   searchInputMobile!: ElementRef<HTMLInputElement>;
 
-  toggleSearch(): void {
+  constructor(private authService: AuthService, private router: Router) {
+    this.authService.user$.subscribe((user) => {
+      this.isLoggedIn = !!user;
+    });
+  }
+
+  public toggleSearch(): void {
     this.searchActive = !this.searchActive;
     this.mobileMenuActive = false;
-
     setTimeout(() => {
-      if (this.searchActive) {
-        const isMobileDevice = window.innerWidth <= 600;
-        if (isMobileDevice && this.searchInputMobile) {
-          this.searchInputMobile.nativeElement.focus();
-        } else if (!isMobileDevice && this.searchInput) {
-          this.searchInput.nativeElement.focus();
-        }
-      }
+      const target =
+        window.innerWidth <= 600 ? this.searchInputMobile : this.searchInput;
+      target?.nativeElement.focus();
     }, 100);
   }
 
-  submitSearch(): void {
-    const isMobileDevice = window.innerWidth <= 600;
-    const searchInputElement = isMobileDevice
-      ? this.searchInputMobile.nativeElement
-      : this.searchInput.nativeElement;
-
-    const searchValue = searchInputElement.value.trim();
-
-    if (searchValue) {
-      console.log("Buscar:", searchValue);
-      this.searchActive = false;
-
-      // Limpiar el valor del input después de buscar
-      searchInputElement.value = "";
-    }
+  public submitSearch(): void {
+    // lógica de búsqueda…
+    this.searchActive = false;
   }
 
-  toggleMobileMenu(): void {
+  public toggleMobileMenu(): void {
     this.mobileMenuActive = !this.mobileMenuActive;
-
     if (this.mobileMenuActive) {
       this.searchActive = false;
     }
   }
 
   @HostListener("document:click", ["$event"])
-  handleDocumentClick(event: MouseEvent): void {
-    const clickedElement = event.target as HTMLElement;
-
-    const clickedInsideSearch =
-      this.searchInput?.nativeElement.contains(clickedElement) ||
-      this.searchInputMobile?.nativeElement.contains(clickedElement) ||
-      clickedElement.closest(".search-wrapper") !== null;
-
-    const clickedOnMenuToggle =
-      clickedElement.closest('button[aria-label="Abrir menú"]') !== null;
-
-    if (!clickedInsideSearch && !clickedOnMenuToggle) {
-      this.searchActive = false;
-    }
-
-    if (!clickedOnMenuToggle && !clickedElement.closest(".mobile-menu")) {
+  public handleDocumentClick(event: MouseEvent): void {
+    const clicked = event.target as HTMLElement;
+    if (!clicked.closest(".search-wrapper")) this.searchActive = false;
+    if (
+      !clicked.closest('button[aria-label="Abrir menú"]') &&
+      !clicked.closest(".mobile-menu")
+    ) {
       this.mobileMenuActive = false;
     }
   }
 
-  reloadPage(): void {
+  public logout(): void {
+    this.authService.logout();
+    this.router.navigate(["/products"]);
+  }
+
+  public reloadPage(): void {
     window.location.reload();
   }
 }

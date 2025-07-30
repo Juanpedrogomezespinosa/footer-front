@@ -1,4 +1,4 @@
-<div class="product-card">
+<div class="product-card" (click)="goToProductDetail()" style="cursor: pointer">
   <div class="image-container">
     <img
       class="product-image"
@@ -17,9 +17,8 @@
           <span class="star" [ngClass]="star"></span>
         </ng-container>
         <span class="rating-count" *ngIf="product.ratingCount !== undefined">
-          ({{ product.ratingCount }} valoración{{
-            product.ratingCount > 1 ? "es" : ""
-          }})
+          ({{ product.ratingCount }} valoración
+          {{ product.ratingCount > 1 ? "es" : "" }})
         </span>
       </div>
     </div>

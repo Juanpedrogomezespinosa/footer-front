@@ -1,0 +1,12 @@
+.auth-form {
+  max-width: 400px;
+  margin: auto;
+  input {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .error {
+    color: red;
+    margin-top: 0.5rem;
+  }
+}

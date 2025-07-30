@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+
+<main
+  class="contenido-principal"
+  *ngIf="!isLoading && product; else loadingOrError"
+>
+  <div class="tarjeta-unificada">
+    <div class="imagen-producto">
+      <img [src]="getProductImage()" [alt]="product.name" />
+    </div>
+
+    <div class="detalle-producto">
+      <h1>{{ product.name }}</h1>
+      <p class="precio-producto">{{ product.price | currency : "EUR" }}</p>
+      <p class="descripcion">{{ product.description }}</p>
+
+      <label for="talla">Selecciona tu talla:</label>
+      <select id="talla" [(ngModel)]="selectedSize">
+        <option value="" disabled selected>-- Selecciona --</option>
+        <option *ngFor="let size of availableSizes" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+
+      <div class="acciones">
+        <button class="comprar" (click)="buyNow()" [disabled]="!selectedSize">
+          Comprar ahora
+        </button>
+        <button
+          class="añadir-cesta"
+          (click)="addToCart()"
+          [disabled]="!selectedSize"
+        >
+          Añadir a la cesta
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<ng-template #loadingOrError>
+  <main class="contenido-principal">
+    <div *ngIf="isLoading">Cargando producto...</div>
+    <div *ngIf="error">{{ error }}</div>
+  </main>
+</ng-template>
+
+<app-footer></app-footer>
