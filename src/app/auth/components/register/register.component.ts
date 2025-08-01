@@ -1,24 +1,27 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
-  ReactiveFormsModule,
   FormBuilder,
   FormGroup,
+  ReactiveFormsModule,
   Validators,
+  ValidatorFn,
+  AbstractControl,
 } from "@angular/forms";
-import { Router, RouterModule } from "@angular/router"; // ✅ IMPORTADO
+import { Router, RouterModule } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule], // ✅ AÑADIDO
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.scss"],
 })
 export class RegisterComponent {
   public form: FormGroup;
+  public passwordFieldType: string = "password";
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,15 +29,29 @@ export class RegisterComponent {
     private router: Router,
     private toastService: ToastService
   ) {
-    this.form = this.formBuilder.group({
-      name: ["", Validators.required],
-      email: ["", [Validators.required, Validators.email]],
-      password: ["", Validators.required],
-    });
+    this.form = this.formBuilder.group(
+      {
+        name: ["", Validators.required],
+        email: ["", [Validators.required, Validators.email]],
+        password: ["", Validators.required],
+        confirmPassword: ["", Validators.required],
+      },
+      {
+        validators: this.passwordMatchValidator(),
+      }
+    );
+  }
+
+  public togglePasswordVisibility(): void {
+    this.passwordFieldType =
+      this.passwordFieldType === "password" ? "text" : "password";
   }
 
   public onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const { name, email, password } = this.form.getRawValue();
 
@@ -51,5 +68,17 @@ export class RegisterComponent {
           this.toastService.showError(message);
         },
       });
+  }
+
+  private passwordMatchValidator(): ValidatorFn {
+    return (form: AbstractControl): { [key: string]: boolean } | null => {
+      const password = form.get("password")?.value;
+      const confirmPassword = form.get("confirmPassword")?.value;
+
+      if (password && confirmPassword && password !== confirmPassword) {
+        return { passwordMismatch: true };
+      }
+      return null;
+    };
   }
 }

@@ -1,20 +1,82 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-  <h2>Iniciar sesión</h2>
+<div class="log-form">
+  <h2>Accede a tu cuenta</h2>
 
-  <label>
-    Email:
-    <input type="email" formControlName="email" />
-  </label>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>
+      Email:
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Email"
+        [class.invalid]="
+          form.get('email')?.invalid && form.get('email')?.touched
+        "
+      />
+      <div
+        class="error-message"
+        *ngIf="form.get('email')?.touched && form.get('email')?.invalid"
+      >
+        <span *ngIf="form.get('email')?.errors?.['required']">
+          El campo de email es obligatorio.
+        </span>
+        <span *ngIf="form.get('email')?.errors?.['email']">
+          Introduce un email válido.
+        </span>
+      </div>
+    </label>
 
-  <label>
-    Contraseña:
-    <input type="password" formControlName="password" />
-  </label>
+    <label class="password-label">
+      Contraseña:
+      <div class="password-wrapper">
+        <input
+          [type]="passwordFieldType"
+          formControlName="password"
+          placeholder="Contraseña"
+          [class.invalid]="
+            form.get('password')?.invalid && form.get('password')?.touched
+          "
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="
+            passwordFieldType === 'password'
+              ? 'Mostrar contraseña'
+              : 'Ocultar contraseña'
+          "
+        >
+          <img
+            *ngIf="passwordFieldType === 'password'"
+            src="assets/icons/ver.svg"
+            alt="Mostrar contraseña"
+            class="password-icon"
+          />
+          <img
+            *ngIf="passwordFieldType === 'text'"
+            src="assets/icons/ocultar.svg"
+            alt="Ocultar contraseña"
+            class="password-icon"
+          />
+        </button>
+      </div>
+      <div
+        class="error-message"
+        *ngIf="form.get('password')?.touched && form.get('password')?.invalid"
+      >
+        <span *ngIf="form.get('password')?.errors?.['required']">
+          El campo de contraseña es obligatorio.
+        </span>
+      </div>
+    </label>
 
-  <button type="submit" [disabled]="form.invalid">Iniciar sesión</button>
+    <button type="submit" [disabled]="form.invalid" class="btn">
+      Continuar
+    </button>
 
-  <div class="register-link">
-    ¿No tienes cuenta?
-    <a routerLink="/register">Regístrate</a>
-  </div>
-</form>
+    <div class="register-link">
+      ¿No tienes cuenta?
+      <a routerLink="/register">Regístrate</a>
+    </div>
+  </form>
+</div>

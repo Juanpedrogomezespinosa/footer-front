@@ -6,19 +6,20 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { RouterModule, Router } from "@angular/router"; // ✅ IMPORTA RouterModule
+import { RouterModule, Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule], // ✅ AÑADE RouterModule AQUÍ
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
 })
 export class LoginComponent {
   public form: FormGroup;
+  public passwordFieldType: string = "password";
 
   constructor(
     private formBuilder: FormBuilder,
@@ -28,12 +29,20 @@ export class LoginComponent {
   ) {
     this.form = this.formBuilder.group({
       email: ["", [Validators.required, Validators.email]],
-      password: ["", Validators.required],
+      password: ["", [Validators.required]],
     });
   }
 
+  public togglePasswordVisibility(): void {
+    this.passwordFieldType =
+      this.passwordFieldType === "password" ? "text" : "password";
+  }
+
   public onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const { email, password } = this.form.getRawValue();
 

@@ -1,25 +1,123 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-  <h2>Registro</h2>
+<div class="log-form">
+  <h2>Crea tu cuenta</h2>
 
-  <label>
-    Nombre:
-    <input type="text" formControlName="name" />
-  </label>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>
+      Nombre:
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Nombre"
+        [class.invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+      />
+      <div
+        class="error-message"
+        *ngIf="form.get('name')?.touched && form.get('name')?.invalid"
+      >
+        <span *ngIf="form.get('name')?.errors?.['required']">
+          El campo de nombre es obligatorio.
+        </span>
+      </div>
+    </label>
 
-  <label>
-    Email:
-    <input type="email" formControlName="email" />
-  </label>
+    <label>
+      Email:
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Email"
+        [class.invalid]="
+          form.get('email')?.invalid && form.get('email')?.touched
+        "
+      />
+      <div
+        class="error-message"
+        *ngIf="form.get('email')?.touched && form.get('email')?.invalid"
+      >
+        <span *ngIf="form.get('email')?.errors?.['required']"
+          >El campo de email es obligatorio.</span
+        >
+        <span *ngIf="form.get('email')?.errors?.['email']"
+          >Introduce un email válido.</span
+        >
+      </div>
+    </label>
 
-  <label>
-    Contraseña:
-    <input type="password" formControlName="password" />
-  </label>
+    <label class="password-label">
+      Contraseña:
+      <div class="password-wrapper">
+        <input
+          [type]="passwordFieldType"
+          formControlName="password"
+          placeholder="Contraseña"
+          [class.invalid]="
+            form.get('password')?.invalid && form.get('password')?.touched
+          "
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="
+            passwordFieldType === 'password'
+              ? 'Mostrar contraseña'
+              : 'Ocultar contraseña'
+          "
+        >
+          <img
+            *ngIf="passwordFieldType === 'password'"
+            src="assets/icons/ver.svg"
+            alt="Mostrar contraseña"
+            class="password-icon"
+          />
+          <img
+            *ngIf="passwordFieldType === 'text'"
+            src="assets/icons/ocultar.svg"
+            alt="Ocultar contraseña"
+            class="password-icon"
+          />
+        </button>
+      </div>
+      <div
+        class="error-message"
+        *ngIf="form.get('password')?.touched && form.get('password')?.invalid"
+      >
+        <span *ngIf="form.get('password')?.errors?.['required']">
+          El campo de contraseña es obligatorio.
+        </span>
+      </div>
+    </label>
 
-  <button type="submit" [disabled]="form.invalid">Registrar</button>
+    <label class="password-label">
+      Repite la contraseña:
+      <div class="password-wrapper">
+        <input
+          [type]="passwordFieldType"
+          formControlName="confirmPassword"
+          placeholder="Repite la contraseña"
+          [class.invalid]="
+            (form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid) ||
+            (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched)
+          "
+        />
+      </div>
+      <div class="error-message" *ngIf="form.get('confirmPassword')?.touched">
+        <span *ngIf="form.get('confirmPassword')?.errors?.['required']">
+          Este campo es obligatorio.
+        </span>
+        <span *ngIf="form.errors?.['passwordMismatch']">
+          Las contraseñas no coinciden.
+        </span>
+      </div>
+    </label>
 
-  <div class="login-link">
-    ¿Ya tienes cuenta?
-    <a routerLink="/login">Inicia sesión</a>
-  </div>
-</form>
+    <button type="submit" [disabled]="form.invalid" class="btn">
+      Crear cuenta
+    </button>
+
+    <div class="register-link">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Inicia sesión</a>
+    </div>
+  </form>
+</div>

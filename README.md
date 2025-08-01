@@ -121,11 +121,13 @@ footer-front/
 │ │ │ ├── lupa.png
 │ │ │ ├── lupa.svg
 │ │ │ ├── menu.png
+│ │ │ ├── ocultar.svg
 │ │ │ └── perfil.png
 │ │ │ └── puntos.svg
 │ │ │ └── star-empty.svg
 │ │ │ └── star-full.svg
 │ │ │ └── star-half.svg
+│ │ │ └── ver.svg
 │ │ ├── products/ # Vacía actualmente
 │ │ ├── footer-logo.png
 │ │ └── logo-negro.png

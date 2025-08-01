@@ -47,6 +47,7 @@ export class AuthService {
   }
 
   public register(data: RegisterData): Observable<LoginResponse> {
+    // Envía username, email y password tal como espera el backend
     return this.httpClient
       .post<LoginResponse>("/api/auth/register", data)
       .pipe(tap((response) => this.handleLoginResponse(response)));

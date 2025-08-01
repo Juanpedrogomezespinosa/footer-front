@@ -1,12 +1,181 @@
-.auth-form {
-  max-width: 400px;
-  margin: auto;
-  input {
-    width: 100%;
-    margin-bottom: 1rem;
+@import url("https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,300,600");
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Open Sans", helvetica, arial, sans-serif;
+  background: url("http://farm8.staticflickr.com/7064/6858179818_5d652f531c_h.jpg")
+    no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.log-form {
+  width: 40%;
+  min-width: 320px;
+  max-width: 475px;
+  background: #ffffff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+  // border-radius: 6px;
+
+  @media (max-width: 1024px) {
+    width: 60%;
   }
-  .error {
-    color: red;
+
+  @media (max-width: 768px) {
+    width: 80%;
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: 100%;
+    position: fixed; /* Para que quede fijo y visible */
+    // top: 2vh; /* Pequeño margen arriba */
+    // left: 50%; /* Centrado horizontal */
+    // transform: translateX(-50%);
+    // bottom: 2vh; /* Pequeño margen abajo */
+    // border: none;
+    // border-radius: 6px 6px 0 0; /* Solo redondear arriba */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    // max-height: 100vh; /* Máximo alto según ventana */
+    overflow-y: auto; /* Scroll interno si el contenido sobrepasa */
+    margin: 0; /* Quitar márgenes para fullscreen */
+  }
+
+  form {
+    width: 100%;
+    padding: 2em;
+  }
+
+  h2 {
+    width: 100%;
+    font-family: "Open Sans Condensed", sans-serif;
+    font-size: 1.35em;
+    text-transform: uppercase;
+    padding: 0.75em 1em 0.75em 1.5em;
+    border: 1px solid #232323;
+    margin: 0 0 1.5rem 0;
+    font-weight: 200;
+    background: #2a2a2a;
+    color: #ffffff;
+
+    @media (max-width: 480px) {
+      font-size: 1.1em;
+      padding-left: 1em;
+    }
+  }
+
+  label {
+    display: block;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #333333;
+  }
+
+  input {
+    display: block;
+    width: 100%;
     margin-top: 0.5rem;
+    padding: 0.5em;
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    font-size: 1em;
+    color: #444444;
+    background-color: transparent;
+
+    &:focus {
+      outline: none;
+      border-color: #555555;
+    }
+
+    &.invalid {
+      border-bottom: 1px solid red;
+    }
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.85em;
+    margin-top: 0.25rem;
+  }
+
+  .password-wrapper {
+    position: relative;
+
+    input {
+      padding-right: 2.5rem;
+    }
+  }
+
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #555555;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .password-icon {
+    width: 20px;
+    height: 20px;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .btn {
+    display: inline-block;
+    background: #1e1e1e;
+    border: 1px solid #444444;
+    padding: 0.75em 2em;
+    color: #ffffff;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1em;
+    box-shadow: inset 0 0.2px 0 rgba(255, 255, 255, 0.5);
+    transition: background 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background: #3a3a3a;
+    }
+
+    &:active:not(:disabled) {
+      background: #1e1e1e;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.7);
+    }
+
+    &:disabled {
+      background: #494949;
+      cursor: not-allowed;
+    }
+  }
+
+  .register-link {
+    margin-top: 1.5rem;
+    text-align: center;
+
+    a {
+      color: #444444;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
