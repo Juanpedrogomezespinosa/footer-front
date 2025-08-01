@@ -8,6 +8,10 @@ footer-front/
 │ │ │ └── admin.module.ts
 │ ├── auth/ # Módulo de autenticación (login, register)
 │ │ ├── components/
+│ │ │ ├── auth-page/
+│ │ │ │ ├── auth-page.component.ts
+│ │ │ │ ├── auth-page.component.html
+│ │ │ │ └── auth-page.component.scss
 │ │ │ ├── login/
 │ │ │ │ ├── login.component.ts
 │ │ │ │ ├── login.component.html
@@ -105,13 +109,20 @@ footer-front/
 │ ├── assets/
 │ │ ├── icons/
 │ │ │ ├── agregar-carrito.png
+│ │ │ ├── agregar-carrito.svg
 │ │ │ ├── carrito.png
+│ │ │ ├── carrito.svg
 │ │ │ ├── eliminar-carrito.png
+│ │ │ ├── eliminar-carrito.svg
 │ │ │ ├── login.png
+│ │ │ ├── login.svg
 │ │ │ ├── logout.png
+│ │ │ ├── logout.svg
 │ │ │ ├── lupa.png
+│ │ │ ├── lupa.svg
 │ │ │ ├── menu.png
 │ │ │ └── perfil.png
+│ │ │ └── puntos.svg
 │ │ │ └── star-empty.svg
 │ │ │ └── star-full.svg
 │ │ │ └── star-half.svg

@@ -4,7 +4,7 @@
   aria-label="Navegación principal"
   (document:click)="handleDocumentClick($event)"
 >
-  <!-- Sección izquierda: Logo -->
+  <!-- Sección izquierda: logo -->
   <div class="navbar__left">
     <a
       href="/products"
@@ -16,9 +16,9 @@
     </a>
   </div>
 
-  <!-- Sección derecha: iconos en escritorio -->
+  <!-- Sección derecha (escritorio) -->
   <div class="navbar__right desktop-only">
-    <!-- Barra de búsqueda -->
+    <!-- Buscador -->
     <div
       class="search-wrapper"
       [class.active]="searchActive"
@@ -31,6 +31,7 @@
         placeholder="Buscar productos..."
         aria-label="Buscar productos"
         (keydown.enter)="submitSearch()"
+        [(ngModel)]="searchTerm"
         #searchInput
       />
       <button
@@ -41,28 +42,48 @@
           searchActive ? 'Cerrar búsqueda' : 'Buscar productos'
         "
         [attr.aria-expanded]="searchActive"
-        [attr.aria-controls]="'search-input'"
+        aria-controls="search-input"
       >
-        <img src="/assets/icons/lupa.png" alt="Buscar" />
+        <img src="/assets/icons/lupa.svg" alt="Buscar" />
       </button>
     </div>
 
-    <!-- Iconos de usuario -->
-    <a href="/cart" class="icon-button" aria-label="Ir al carrito de la compra">
-      <img src="/assets/icons/carrito.png" alt="Carrito" aria-hidden="true" />
-    </a>
+    <!-- Carrito y perfil (solo si está logueado) -->
+    <ng-container *ngIf="isLoggedIn">
+      <a
+        href="/cart"
+        class="icon-button"
+        aria-label="Ir al carrito de la compra"
+      >
+        <img src="/assets/icons/carrito.svg" alt="Carrito" aria-hidden="true" />
+      </a>
 
-    <a href="/profile" class="icon-button" aria-label="Ir al perfil de usuario">
-      <img src="/assets/icons/perfil.png" alt="Perfil" aria-hidden="true" />
-    </a>
+      <a
+        href="/profile"
+        class="icon-button"
+        aria-label="Ir al perfil de usuario"
+      >
+        <img src="/assets/icons/perfil.svg" alt="Perfil" aria-hidden="true" />
+      </a>
+    </ng-container>
 
-    <a href="/login" class="icon-button" aria-label="Iniciar sesión">
-      <img src="/assets/icons/login.png" alt="Login" aria-hidden="true" />
-    </a>
+    <!-- Login o Logout según estado -->
+    <ng-container *ngIf="!isLoggedIn; else logoutIcon">
+      <a href="/login" class="icon-button" aria-label="Iniciar sesión">
+        <img src="/assets/icons/login.svg" alt="Login" aria-hidden="true" />
+      </a>
+    </ng-container>
+
+    <ng-template #logoutIcon>
+      <button class="icon-button" (click)="logout()" aria-label="Cerrar sesión">
+        <img src="/assets/icons/logout.svg" alt="Logout" aria-hidden="true" />
+      </button>
+    </ng-template>
   </div>
 
-  <!-- Sección móvil: barra de búsqueda y menú -->
+  <!-- Sección móvil -->
   <div class="navbar__mobile mobile-only">
+    <!-- Buscador -->
     <div
       class="search-wrapper"
       [class.active]="searchActive"
@@ -75,6 +96,7 @@
         placeholder="Buscar productos..."
         aria-label="Buscar productos"
         (keydown.enter)="submitSearch()"
+        [(ngModel)]="searchTerm"
         #searchInputMobile
       />
       <button
@@ -85,12 +107,13 @@
           searchActive ? 'Cerrar búsqueda' : 'Buscar productos'
         "
         [attr.aria-expanded]="searchActive"
-        [attr.aria-controls]="'search-input-mobile'"
+        aria-controls="search-input-mobile"
       >
-        <img src="/assets/icons/lupa.png" alt="Buscar" />
+        <img src="/assets/icons/lupa.svg" alt="Buscar" />
       </button>
     </div>
 
+    <!-- Botón menú móvil -->
     <button
       class="icon-button"
       aria-label="Abrir menú"
@@ -98,40 +121,42 @@
       *ngIf="!searchActive"
       #menuToggleButton
     >
-      <img src="/assets/icons/menu.png" alt="Menú" />
+      <img src="/assets/icons/menu.svg" alt="Menú" />
     </button>
   </div>
 
-  <!-- Menú desplegable móvil -->
+  <!-- Menú móvil desplegable -->
   <div
     class="mobile-menu"
     *ngIf="mobileMenuActive"
-    #mobileMenu
     role="menu"
     aria-label="Menú móvil"
   >
-    <a href="/cart" aria-label="Ir al carrito" role="menuitem" tabindex="0"
-      >Ir al carrito</a
-    >
-    <a href="/profile" aria-label="Ir al perfil" role="menuitem" tabindex="0"
-      >Perfil de usuario</a
-    >
-    <a
-      href="/login"
-      *ngIf="!isLoggedIn"
-      aria-label="Iniciar sesión"
-      role="menuitem"
-      tabindex="0"
-      >Login</a
-    >
-    <a
-      href="#"
-      *ngIf="isLoggedIn"
-      (click)="$event.preventDefault(); logout()"
-      aria-label="Cerrar sesión"
-      role="menuitem"
-      tabindex="0"
-      >Logout</a
-    >
+    <ng-container *ngIf="isLoggedIn; else guestMenu">
+      <a href="/cart" aria-label="Ir al carrito" role="menuitem" tabindex="0">
+        Ir al carrito
+      </a>
+      <a href="/profile" aria-label="Ir al perfil" role="menuitem" tabindex="0">
+        Perfil de usuario
+      </a>
+      <a
+        href="#"
+        (click)="$event.preventDefault(); logout()"
+        aria-label="Cerrar sesión"
+        role="menuitem"
+        tabindex="0"
+      >
+        Logout
+      </a>
+    </ng-container>
+
+    <ng-template #guestMenu>
+      <a href="/login" aria-label="Iniciar sesión" role="menuitem" tabindex="0">
+        Login
+      </a>
+      <a href="/register" aria-label="Registrarse" role="menuitem" tabindex="0">
+        Register
+      </a>
+    </ng-template>
   </div>
 </nav>

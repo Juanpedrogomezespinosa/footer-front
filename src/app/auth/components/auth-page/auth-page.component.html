@@ -1,0 +1,16 @@
+<div class="auth-wrapper">
+  <h2>{{ showLogin ? "Iniciar sesión" : "Registrarse" }}</h2>
+
+  <app-login *ngIf="showLogin"></app-login>
+  <app-register *ngIf="!showLogin"></app-register>
+
+  <div class="toggle-link">
+    <button (click)="toggleForm()">
+      {{
+        showLogin
+          ? "¿No tienes cuenta? Regístrate"
+          : "¿Ya tienes cuenta? Inicia sesión"
+      }}
+    </button>
+  </div>
+</div>

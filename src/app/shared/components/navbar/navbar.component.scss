@@ -40,7 +40,7 @@
       width: 2.8rem;
       overflow: hidden;
       border: 1px solid transparent;
-      border-radius: 20px;
+      max-height: 32px;
       background-color: white;
       box-shadow: none;
       transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -155,10 +155,11 @@
         transform: translateX(-10vw);
         border: 1px solid #cccccc;
         background-color: white;
-        border-radius: 20px;
+        // border-radius: 20px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         cursor: auto;
-        margin: 2.5%;
+        margin-left: 1rem;
+        // margin: 2.5%;
 
         input {
           opacity: 1 !important;

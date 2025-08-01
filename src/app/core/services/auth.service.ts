@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
-import { jwtDecode } from "jwt-decode";
 
 interface RegisterData {
   username: string;
@@ -14,13 +13,17 @@ interface LoginCredentials {
   password: string;
 }
 
-interface TokenResponse {
-  token: string;
-}
-
 interface User {
+  id: number;
   email: string;
   username: string;
+  role: string;
+}
+
+interface LoginResponse {
+  message: string;
+  user: User;
+  token: string;
 }
 
 @Injectable({ providedIn: "root" })
@@ -31,25 +34,27 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient) {
     const token = localStorage.getItem("token");
-    if (token) {
-      this.decodeToken(token);
+    const userString = localStorage.getItem("user");
+    if (token && userString) {
+      this.userSubject.next(JSON.parse(userString));
     }
   }
 
-  public login(credentials: LoginCredentials): Observable<TokenResponse> {
+  public login(credentials: LoginCredentials): Observable<LoginResponse> {
     return this.httpClient
-      .post<TokenResponse>("/api/auth/login", credentials)
-      .pipe(tap((response) => this.handleToken(response.token)));
+      .post<LoginResponse>("/api/auth/login", credentials)
+      .pipe(tap((response) => this.handleLoginResponse(response)));
   }
 
-  public register(data: RegisterData): Observable<TokenResponse> {
+  public register(data: RegisterData): Observable<LoginResponse> {
     return this.httpClient
-      .post<TokenResponse>("/api/auth/register", data)
-      .pipe(tap((response) => this.handleToken(response.token)));
+      .post<LoginResponse>("/api/auth/register", data)
+      .pipe(tap((response) => this.handleLoginResponse(response)));
   }
 
   public logout(): void {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     this.userSubject.next(null);
   }
 
@@ -57,13 +62,9 @@ export class AuthService {
     return !!localStorage.getItem("token");
   }
 
-  private handleToken(token: string): void {
-    localStorage.setItem("token", token);
-    this.decodeToken(token);
-  }
-
-  private decodeToken(token: string): void {
-    const decodedUser: User = jwtDecode<User>(token);
-    this.userSubject.next(decodedUser);
+  private handleLoginResponse(response: LoginResponse): void {
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("user", JSON.stringify(response.user));
+    this.userSubject.next(response.user);
   }
 }

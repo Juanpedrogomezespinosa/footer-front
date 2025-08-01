@@ -1,12 +1,13 @@
 import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { NgIf } from "@angular/common";
-import { AuthService } from "../../../core/services/auth.service"; // importar el servicio
-import { Router } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { Router, RouterModule } from "@angular/router";
+import { AuthService } from "../../../core/services/auth.service";
 
 @Component({
   selector: "app-navbar",
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, FormsModule, RouterModule],
   templateUrl: "./navbar.component.html",
   styleUrls: ["./navbar.component.scss"],
 })
@@ -14,12 +15,13 @@ export class NavbarComponent {
   public searchActive = false;
   public mobileMenuActive = false;
   public isLoggedIn = false;
+  public searchTerm = "";
 
   @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild("searchInputMobile")
   searchInputMobile!: ElementRef<HTMLInputElement>;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     this.authService.user$.subscribe((user) => {
       this.isLoggedIn = !!user;
     });
@@ -36,8 +38,14 @@ export class NavbarComponent {
   }
 
   public submitSearch(): void {
-    // lógica de búsqueda…
+    const trimmed = this.searchTerm.trim();
+    if (trimmed.length > 0) {
+      this.router.navigate(["/products"], {
+        queryParams: { search: trimmed },
+      });
+    }
     this.searchActive = false;
+    this.searchTerm = "";
   }
 
   public toggleMobileMenu(): void {
