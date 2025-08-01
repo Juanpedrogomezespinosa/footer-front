@@ -6,14 +6,14 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Router, RouterModule } from "@angular/router"; // ✅ IMPORTADO
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // ✅ AÑADIDO
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.scss"],
 })
@@ -34,14 +34,9 @@ export class RegisterComponent {
   }
 
   public onSubmit(): void {
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
-    const formValues = this.form.getRawValue();
-    const name: string = formValues.name;
-    const email: string = formValues.email;
-    const password: string = formValues.password;
+    const { name, email, password } = this.form.getRawValue();
 
     this.authenticationService
       .register({ username: name, email, password })

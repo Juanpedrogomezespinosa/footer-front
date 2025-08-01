@@ -4,10 +4,10 @@
   aria-label="Navegación principal"
   (document:click)="handleDocumentClick($event)"
 >
-  <!-- Sección izquierda: logo -->
+  <!-- Izquierda: Logo -->
   <div class="navbar__left">
     <a
-      href="/products"
+      routerLink="/products"
       class="navbar__logo"
       (click)="$event.preventDefault(); reloadPage()"
       aria-label="Ir a la página principal"
@@ -16,7 +16,7 @@
     </a>
   </div>
 
-  <!-- Sección derecha (escritorio) -->
+  <!-- Derecha: Escritorio -->
   <div class="navbar__right desktop-only">
     <!-- Buscador -->
     <div
@@ -48,10 +48,10 @@
       </button>
     </div>
 
-    <!-- Carrito y perfil (solo si está logueado) -->
-    <ng-container *ngIf="isLoggedIn">
+    <!-- Iconos si logueado -->
+    <ng-container *ngIf="isLoggedIn; else guestIcons">
       <a
-        href="/cart"
+        routerLink="/cart"
         class="icon-button"
         aria-label="Ir al carrito de la compra"
       >
@@ -59,31 +59,28 @@
       </a>
 
       <a
-        href="/profile"
+        routerLink="/profile"
         class="icon-button"
         aria-label="Ir al perfil de usuario"
       >
         <img src="/assets/icons/perfil.svg" alt="Perfil" aria-hidden="true" />
       </a>
-    </ng-container>
 
-    <!-- Login o Logout según estado -->
-    <ng-container *ngIf="!isLoggedIn; else logoutIcon">
-      <a href="/login" class="icon-button" aria-label="Iniciar sesión">
-        <img src="/assets/icons/login.svg" alt="Login" aria-hidden="true" />
-      </a>
-    </ng-container>
-
-    <ng-template #logoutIcon>
       <button class="icon-button" (click)="logout()" aria-label="Cerrar sesión">
         <img src="/assets/icons/logout.svg" alt="Logout" aria-hidden="true" />
       </button>
+    </ng-container>
+
+    <!-- Iconos si NO logueado -->
+    <ng-template #guestIcons>
+      <a routerLink="/login" class="icon-button" aria-label="Iniciar sesión">
+        <img src="/assets/icons/login.svg" alt="Login" aria-hidden="true" />
+      </a>
     </ng-template>
   </div>
 
-  <!-- Sección móvil -->
+  <!-- Móvil -->
   <div class="navbar__mobile mobile-only">
-    <!-- Buscador -->
     <div
       class="search-wrapper"
       [class.active]="searchActive"
@@ -125,7 +122,7 @@
     </button>
   </div>
 
-  <!-- Menú móvil desplegable -->
+  <!-- Menú desplegable móvil -->
   <div
     class="mobile-menu"
     *ngIf="mobileMenuActive"
@@ -133,10 +130,20 @@
     aria-label="Menú móvil"
   >
     <ng-container *ngIf="isLoggedIn; else guestMenu">
-      <a href="/cart" aria-label="Ir al carrito" role="menuitem" tabindex="0">
+      <a
+        routerLink="/cart"
+        aria-label="Ir al carrito"
+        role="menuitem"
+        tabindex="0"
+      >
         Ir al carrito
       </a>
-      <a href="/profile" aria-label="Ir al perfil" role="menuitem" tabindex="0">
+      <a
+        routerLink="/profile"
+        aria-label="Ir al perfil"
+        role="menuitem"
+        tabindex="0"
+      >
         Perfil de usuario
       </a>
       <a
@@ -151,10 +158,20 @@
     </ng-container>
 
     <ng-template #guestMenu>
-      <a href="/login" aria-label="Iniciar sesión" role="menuitem" tabindex="0">
+      <a
+        routerLink="/login"
+        aria-label="Iniciar sesión"
+        role="menuitem"
+        tabindex="0"
+      >
         Login
       </a>
-      <a href="/register" aria-label="Registrarse" role="menuitem" tabindex="0">
+      <a
+        routerLink="/register"
+        aria-label="Registrarse"
+        role="menuitem"
+        tabindex="0"
+      >
         Register
       </a>
     </ng-template>

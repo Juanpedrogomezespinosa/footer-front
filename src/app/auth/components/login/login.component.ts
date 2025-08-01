@@ -6,14 +6,14 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { Router } from "@angular/router";
+import { RouterModule, Router } from "@angular/router"; // ✅ IMPORTA RouterModule
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // ✅ AÑADE RouterModule AQUÍ
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
 })
@@ -33,13 +33,9 @@ export class LoginComponent {
   }
 
   public onSubmit(): void {
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
-    const formValues = this.form.getRawValue();
-    const email: string = formValues.email;
-    const password: string = formValues.password;
+    const { email, password } = this.form.getRawValue();
 
     this.authenticationService.login({ email, password }).subscribe({
       next: () => {
