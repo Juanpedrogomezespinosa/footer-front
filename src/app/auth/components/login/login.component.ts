@@ -1,12 +1,12 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
-  ReactiveFormsModule,
   FormBuilder,
   FormGroup,
+  ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { RouterModule, Router } from "@angular/router";
+import { Router, RouterModule } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
@@ -15,46 +15,43 @@ import { ToastService } from "../../../core/services/toast.service";
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./login.component.html",
-  styleUrls: [],
 })
 export class LoginComponent {
-  public form: FormGroup;
-  public passwordFieldType: string = "password";
+  form: FormGroup;
+  passwordFieldType = "password";
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authenticationService: AuthService,
+    private fb: FormBuilder,
+    private authService: AuthService,
     private router: Router,
-    private toastService: ToastService
+    private toast: ToastService
   ) {
-    this.form = this.formBuilder.group({
+    this.form = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
       password: ["", [Validators.required]],
     });
   }
 
-  public togglePasswordVisibility(): void {
+  togglePasswordVisibility(): void {
     this.passwordFieldType =
       this.passwordFieldType === "password" ? "text" : "password";
   }
 
-  public onSubmit(): void {
+  onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const { email, password } = this.form.getRawValue();
-
-    this.authenticationService.login({ email, password }).subscribe({
+    const { email, password } = this.form.value;
+    this.authService.login({ email, password }).subscribe({
       next: () => {
-        this.toastService.showSuccess("Inicio de sesión exitoso");
+        this.toast.showSuccess("Inicio de sesión exitoso");
         this.router.navigate(["/products"]);
       },
-      error: (errorResponse) => {
-        const message: string =
-          errorResponse?.error?.message || "Error en el inicio de sesión";
-        this.toastService.showError(message);
+      error: (err) => {
+        const message = err?.error?.message || "Error en el inicio de sesión";
+        this.toast.showError(message);
       },
     });
   }

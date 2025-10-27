@@ -17,68 +17,59 @@ import { ToastService } from "../../../core/services/toast.service";
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./register.component.html",
-  styleUrls: [],
 })
 export class RegisterComponent {
-  public form: FormGroup;
-  public passwordFieldType: string = "password";
+  form: FormGroup;
+  passwordFieldType = "password";
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authenticationService: AuthService,
+    private fb: FormBuilder,
+    private authService: AuthService,
     private router: Router,
-    private toastService: ToastService
+    private toast: ToastService
   ) {
-    this.form = this.formBuilder.group(
+    this.form = this.fb.group(
       {
         name: ["", Validators.required],
         email: ["", [Validators.required, Validators.email]],
         password: ["", Validators.required],
         confirmPassword: ["", Validators.required],
       },
-      {
-        validators: this.passwordMatchValidator(),
-      }
+      { validators: this.passwordMatchValidator() }
     );
   }
 
-  public togglePasswordVisibility(): void {
+  togglePasswordVisibility(): void {
     this.passwordFieldType =
       this.passwordFieldType === "password" ? "text" : "password";
   }
 
-  public onSubmit(): void {
+  onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const { name, email, password } = this.form.getRawValue();
-
-    this.authenticationService
-      .register({ username: name, email, password })
-      .subscribe({
-        next: () => {
-          this.toastService.showSuccess("Registro completado con éxito");
-          this.router.navigate(["/products"]);
-        },
-        error: (errorResponse) => {
-          const message: string =
-            errorResponse?.error?.message || "Error en el registro";
-          this.toastService.showError(message);
-        },
-      });
+    const { name, email, password } = this.form.value;
+    this.authService.register({ username: name, email, password }).subscribe({
+      next: () => {
+        this.toast.showSuccess("Registro completado con éxito");
+        this.router.navigate(["/products"]);
+      },
+      error: (err) => {
+        const message = err?.error?.message || "Error en el registro";
+        this.toast.showError(message);
+      },
+    });
   }
 
   private passwordMatchValidator(): ValidatorFn {
-    return (form: AbstractControl): { [key: string]: boolean } | null => {
-      const password = form.get("password")?.value;
-      const confirmPassword = form.get("confirmPassword")?.value;
-
-      if (password && confirmPassword && password !== confirmPassword) {
-        return { passwordMismatch: true };
-      }
-      return null;
+    return (form: AbstractControl) => {
+      const pass = form.get("password")?.value;
+      const confirm = form.get("confirmPassword")?.value;
+      return pass && confirm && pass !== confirm
+        ? { passwordMismatch: true }
+        : null;
     };
   }
 }

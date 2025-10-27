@@ -28,11 +28,11 @@ interface LoginResponse {
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-  private userSubject: BehaviorSubject<User | null> =
-    new BehaviorSubject<User | null>(null);
-  public user$: Observable<User | null> = this.userSubject.asObservable();
+  private userSubject = new BehaviorSubject<User | null>(null);
+  public user$ = this.userSubject.asObservable();
+  private backendUrl = "http://localhost:3000/api/auth"; // Cambia puerto si es necesario
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private http: HttpClient) {
     const token = localStorage.getItem("token");
     const userString = localStorage.getItem("user");
     if (token && userString) {
@@ -40,32 +40,31 @@ export class AuthService {
     }
   }
 
-  public login(credentials: LoginCredentials): Observable<LoginResponse> {
-    return this.httpClient
-      .post<LoginResponse>("/api/auth/login", credentials)
-      .pipe(tap((response) => this.handleLoginResponse(response)));
+  login(credentials: LoginCredentials): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.backendUrl}/login`, credentials)
+      .pipe(tap((res) => this.handleLoginResponse(res)));
   }
 
-  public register(data: RegisterData): Observable<LoginResponse> {
-    // Envía username, email y password tal como espera el backend
-    return this.httpClient
-      .post<LoginResponse>("/api/auth/register", data)
-      .pipe(tap((response) => this.handleLoginResponse(response)));
+  register(data: RegisterData): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.backendUrl}/register`, data)
+      .pipe(tap((res) => this.handleLoginResponse(res)));
   }
 
-  public logout(): void {
+  logout(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     this.userSubject.next(null);
   }
 
-  public isAuthenticated(): boolean {
+  isAuthenticated(): boolean {
     return !!localStorage.getItem("token");
   }
 
-  private handleLoginResponse(response: LoginResponse): void {
-    localStorage.setItem("token", response.token);
-    localStorage.setItem("user", JSON.stringify(response.user));
-    this.userSubject.next(response.user);
+  private handleLoginResponse(res: LoginResponse) {
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("user", JSON.stringify(res.user));
+    this.userSubject.next(res.user);
   }
 }
