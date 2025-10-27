@@ -9,7 +9,7 @@ import { ToastComponent } from "./shared/components/toast/toast.component";
   standalone: true,
   imports: [RouterOutlet, ToastComponent],
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"],
+  styleUrls: [],
 })
 export class AppComponent {
   title = "footer-front";

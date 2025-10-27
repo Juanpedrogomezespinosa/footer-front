@@ -9,7 +9,7 @@ import { AuthService } from "../../../core/services/auth.service";
   standalone: true,
   imports: [NgIf, FormsModule, RouterModule],
   templateUrl: "./navbar.component.html",
-  styleUrls: ["./navbar.component.scss"],
+  styleUrls: [],
 })
 export class NavbarComponent {
   public searchActive = false;

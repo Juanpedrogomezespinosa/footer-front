@@ -1,27 +1,41 @@
-<h3>Filtrar productos</h3>
+<div class="p-4 bg-white rounded-2xl shadow-md w-full max-w-md">
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Filtrar productos</h3>
 
-<div class="filter-group" *ngFor="let filter of filters">
-  <label>{{ filter.label }}</label>
-  <div class="checkbox-list">
-    <label *ngFor="let option of filter.options">
-      <input
-        type="checkbox"
-        [value]="option"
-        (change)="onFilterChange(filter.key, $event)"
-        [checked]="selectedFilters[filter.key]?.includes(option) || false"
-      />
-      {{ option }}
-    </label>
+  <!-- Filtros -->
+  <div class="mb-6" *ngFor="let filter of filters">
+    <p class="text-gray-700 font-medium mb-2">{{ filter.label }}</p>
+    <div class="flex flex-col gap-2">
+      <label
+        *ngFor="let option of filter.options"
+        class="flex items-center gap-2 cursor-pointer select-none"
+      >
+        <input
+          type="checkbox"
+          [value]="option"
+          (change)="onFilterChange(filter.key, $event)"
+          [checked]="selectedFilters[filter.key]?.includes(option) || false"
+          class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-secondary focus:ring-offset-1"
+        />
+        <span class="text-gray-700">{{ option }}</span>
+      </label>
+    </div>
   </div>
-</div>
 
-<div class="sort-group">
-  <label for="sort">Ordenar por:</label>
-  <select id="sort" (change)="onSortChange($event)">
-    <option value="">Sin orden</option>
-    <option value="price_asc">Precio: menor a mayor</option>
-    <option value="price_desc">Precio: mayor a menor</option>
-    <option value="rating_desc">Valoración: más alta</option>
-    <option value="rating_count_desc">Valoración: más baja</option>
-  </select>
+  <!-- Ordenar -->
+  <div class="mb-4">
+    <label for="sort" class="block text-gray-700 font-medium mb-2">
+      Ordenar por:
+    </label>
+    <select
+      id="sort"
+      (change)="onSortChange($event)"
+      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white text-gray-800"
+    >
+      <option value="">Sin orden</option>
+      <option value="price_asc">Precio: menor a mayor</option>
+      <option value="price_desc">Precio: mayor a menor</option>
+      <option value="rating_desc">Valoración: más alta</option>
+      <option value="rating_count_desc">Valoración: más baja</option>
+    </select>
+  </div>
 </div>

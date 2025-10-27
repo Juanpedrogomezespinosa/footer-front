@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect } from "@angular/core";
+import { Component, signal, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
@@ -17,33 +17,40 @@ import { ProductService, Product } from "app/core/services/product.service";
     ProductsFiltersComponent,
   ],
   templateUrl: "./products-list.component.html",
-  styleUrls: ["./products-list.component.scss"],
+  styleUrls: [],
 })
 export class ProductsListComponent {
+  // Signals
   products = signal<Product[]>([]);
   currentPage = signal(1);
   totalPages = signal(1);
+
   readonly itemsPerPage = 18;
 
+  // Filtros y orden
   selectedFilters: Record<string, string[]> = {};
   selectedSort: string = "";
 
-  showMobileFilters = false;
-  isMobile = window.innerWidth <= 900;
+  // Estado del sidebar de filtros (móvil y escritorio)
+  showFilters = false;
 
   constructor(private productService: ProductService) {
     this.fetchProducts();
-    window.addEventListener("resize", this.onResize.bind(this));
+
+    // Escuchar tecla ESC para cerrar el sidebar
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Escape" && this.showFilters) {
+        this.showFilters = false;
+      }
+    });
   }
 
-  onResize() {
-    this.isMobile = window.innerWidth <= 900;
+  /** Alternar visibilidad del sidebar de filtros */
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
   }
 
-  toggleFilters() {
-    this.showMobileFilters = !this.showMobileFilters;
-  }
-
+  /** Obtener productos desde el servicio */
   fetchProducts(): void {
     const page = this.currentPage();
     const filters = this.selectedFilters;
@@ -72,6 +79,7 @@ export class ProductsListComponent {
       });
   }
 
+  /** Navegar entre páginas */
   goToPage(pageNumber: number): void {
     if (pageNumber >= 1 && pageNumber <= this.totalPages()) {
       this.currentPage.set(pageNumber);
@@ -93,8 +101,10 @@ export class ProductsListComponent {
     }
   }
 
+  /** Actualizar productos al cambiar filtros */
   onFiltersChanged(filters: Record<string, string | string[]>): void {
     const normalizedFilters: Record<string, string[]> = {};
+
     for (const key in filters) {
       const value = filters[key];
       if (Array.isArray(value)) {
@@ -111,6 +121,7 @@ export class ProductsListComponent {
     this.fetchProducts();
   }
 
+  /** Actualizar productos al cambiar orden */
   onSortChanged(sortValue: string): void {
     this.selectedSort = sortValue;
     this.currentPage.set(1);

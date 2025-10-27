@@ -1,33 +1,64 @@
 <app-navbar></app-navbar>
 
 <main
-  class="contenido-principal"
+  class="max-w-6xl mx-auto px-4 py-12"
   *ngIf="!isLoading && product; else loadingOrError"
 >
-  <div class="tarjeta-unificada">
-    <div class="imagen-producto">
-      <img [src]="getProductImage()" [alt]="product.name" />
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+    <!-- Imagen del producto -->
+    <div class="w-full flex justify-center">
+      <img
+        [src]="getProductImage()"
+        [alt]="product.name"
+        class="w-full max-w-md object-cover rounded-3xl shadow-lg transition-transform duration-500 hover:scale-[1.02]"
+        loading="lazy"
+      />
     </div>
 
-    <div class="detalle-producto">
-      <h1>{{ product.name }}</h1>
-      <p class="precio-producto">{{ product.price | currency : "EUR" }}</p>
-      <p class="descripcion">{{ product.description }}</p>
+    <!-- Detalle del producto -->
+    <div class="flex flex-col gap-6">
+      <div>
+        <h1 class="text-4xl font-semibold text-gray-900 leading-tight">
+          {{ product.name }}
+        </h1>
+        <p class="text-3xl font-bold text-primary mt-3">
+          {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
+        </p>
+      </div>
 
-      <label for="talla">Selecciona tu talla:</label>
-      <select id="talla" [(ngModel)]="selectedSize">
-        <option value="" disabled selected>-- Selecciona --</option>
-        <option *ngFor="let size of availableSizes" [value]="size">
-          {{ size }}
-        </option>
-      </select>
+      <p class="text-gray-600 leading-relaxed text-lg">
+        {{ product.description }}
+      </p>
 
-      <div class="acciones">
-        <button class="comprar" (click)="buyNow()" [disabled]="!selectedSize">
+      <!-- Selector de talla -->
+      <div>
+        <label for="talla" class="block text-gray-800 font-medium mb-2"
+          >Selecciona tu talla:</label
+        >
+        <select
+          id="talla"
+          [(ngModel)]="selectedSize"
+          class="w-full border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/50 transition"
+        >
+          <option value="" disabled selected>-- Selecciona --</option>
+          <option *ngFor="let size of availableSizes" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-2">
+        <button
+          class="bg-primary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="buyNow()"
+          [disabled]="!selectedSize"
+        >
           Comprar ahora
         </button>
+
         <button
-          class="añadir-cesta"
+          class="py-3 px-8 rounded-xl font-medium text-lg text-primary bg-primary/10 hover:bg-primary/20 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="addToCart()"
           [disabled]="!selectedSize"
         >
@@ -38,10 +69,15 @@
   </div>
 </main>
 
+<!-- Estado de carga o error -->
 <ng-template #loadingOrError>
-  <main class="contenido-principal">
-    <div *ngIf="isLoading">Cargando producto...</div>
-    <div *ngIf="error">{{ error }}</div>
+  <main class="max-w-4xl mx-auto px-4 py-24 text-center">
+    <div *ngIf="isLoading" class="animate-pulse text-lg text-gray-500">
+      Cargando producto...
+    </div>
+    <div *ngIf="error" class="text-red-500 font-medium">
+      {{ error }}
+    </div>
   </main>
 </ng-template>
 

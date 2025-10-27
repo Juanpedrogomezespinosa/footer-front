@@ -2,8 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { ProductService, Product } from "app/core/services/product.service";
 import { HttpClientModule } from "@angular/common/http";
+import { ProductService, Product } from "app/core/services/product.service";
 import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
 import { FooterComponent } from "../../../shared/components/footer/footer.component";
 
@@ -18,13 +18,13 @@ import { FooterComponent } from "../../../shared/components/footer/footer.compon
     FooterComponent,
   ],
   templateUrl: "./product-detail.component.html",
-  styleUrls: ["./product-detail.component.scss"],
+  styleUrls: [],
 })
 export class ProductDetailComponent implements OnInit {
   product!: Product;
-  isLoading: boolean = true;
-  error: string = "";
-  selectedSize: string = "";
+  isLoading = true;
+  error = "";
+  selectedSize = "";
   availableSizes: string[] = [
     "36",
     "37",
@@ -37,8 +37,8 @@ export class ProductDetailComponent implements OnInit {
     "44",
   ];
 
-  backendUrl: string = "http://localhost:3000";
-  defaultImage: string = "/assets/icons/agregar-carrito.png";
+  backendUrl = "http://localhost:3000";
+  defaultImage = "/assets/icons/agregar-carrito.png";
 
   constructor(
     private route: ActivatedRoute,
@@ -46,33 +46,25 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("ProductDetailComponent: ngOnInit iniciado");
-
-    const productIdString = this.route.snapshot.paramMap.get("id");
-    console.log("Parámetro id recibido:", productIdString);
-
-    const productId = Number(productIdString);
+    const productIdParam = this.route.snapshot.paramMap.get("id");
+    const productId = Number(productIdParam);
 
     if (isNaN(productId)) {
       this.error = "ID de producto inválido.";
       this.isLoading = false;
-      console.error(this.error);
       return;
     }
 
     this.productService.getProducts(1, 100).subscribe({
       next: (res) => {
-        console.log("Respuesta del servicio getProducts:", res);
         const found = res.products.find((p) => p.id === productId);
         if (found) {
           this.product = {
             ...found,
             rating: found.averageRating,
           };
-          console.log("Producto encontrado:", this.product);
         } else {
           this.error = "Producto no encontrado.";
-          console.error(this.error);
         }
         this.isLoading = false;
       },
@@ -85,26 +77,21 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getProductImage(): string {
-    return this.product?.image
-      ? `${this.backendUrl}/uploads/${this.product.image}`
-      : this.defaultImage;
+    if (this.product?.image && this.product.image.trim() !== "") {
+      return `${this.backendUrl}/uploads/${this.product.image}`;
+    }
+    return this.defaultImage;
   }
 
   addToCart(): void {
     console.log(
-      "Producto añadido al carrito:",
-      this.product.name,
-      "Talla:",
-      this.selectedSize
+      `🛒 Producto añadido al carrito: ${this.product?.name}, Talla: ${this.selectedSize}`
     );
   }
 
   buyNow(): void {
     console.log(
-      "Compra directa del producto:",
-      this.product.name,
-      "Talla:",
-      this.selectedSize
+      `💳 Compra directa: ${this.product?.name}, Talla: ${this.selectedSize}`
     );
   }
 }

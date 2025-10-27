@@ -1,24 +1,25 @@
-<div class="toast-container">
+<div class="fixed top-5 right-5 flex flex-col gap-3 z-[1000]">
   <div
     *ngFor="let toast of toasts"
-    class="toast"
-    [ngClass]="toast.type"
+    class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white fade-in"
+    [ngClass]="{
+      'bg-green-600': toast.type === 'success',
+      'bg-red-600': toast.type === 'error'
+    }"
     [@fadeAnimation]
   >
     <img
       *ngIf="toast.type === 'success'"
       src="assets/icons/check.svg"
-      alt="Success"
-      class="icon"
-      aria-hidden="true"
+      alt="Éxito"
+      class="w-5 h-5 opacity-90"
     />
     <img
       *ngIf="toast.type === 'error'"
       src="assets/icons/error.svg"
       alt="Error"
-      class="icon"
-      aria-hidden="true"
+      class="w-5 h-5 opacity-90"
     />
-    <span [innerHTML]="toast.message"></span>
+    <span [innerHTML]="toast.message" class="font-medium"></span>
   </div>
 </div>

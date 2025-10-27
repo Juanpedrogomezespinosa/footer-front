@@ -15,7 +15,7 @@ import { ToastService } from "../../../core/services/toast.service";
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.scss"],
+  styleUrls: [],
 })
 export class LoginComponent {
   public form: FormGroup;

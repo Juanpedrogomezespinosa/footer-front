@@ -6,14 +6,13 @@
 
 /* Contenedor general */
 .products-container {
-  position: relative;
   display: flex;
   flex: 1;
-  padding: 2rem;
-  padding-top: 6rem;
-  padding-bottom: 4rem;
-  gap: 2rem;
+  padding-top: 80px; // altura del navbar
+  padding-bottom: 80px; // altura del footer
+  gap: 0;
   box-sizing: border-box;
+  overflow: hidden; // evitar scroll horizontal
 }
 
 /* Columna de filtros (escritorio) */
@@ -21,21 +20,21 @@
   width: 300px;
   flex-shrink: 0;
   display: flex;
+  background-color: #f9f9f9;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  height: calc(100vh - 80px - 80px); // viewport - navbar - footer
+  position: sticky;
+  top: 80px;
 }
 
 .filters-scroll {
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 80px);
-  overflow-y: auto;
   width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .filters-scroll app-products-filters {
-  background-color: #f9f9f9;
-  padding: 1rem;
-  // border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   box-sizing: border-box;
 }
@@ -45,6 +44,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  height: calc(100vh - 80px - 80px); // viewport - navbar - footer
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 /* Grid de productos */
@@ -52,10 +55,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
-  background-color: #ffffff;
   width: 100%;
   box-sizing: border-box;
-  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 /* Paginación */
@@ -65,8 +67,9 @@
   align-items: center;
   align-self: center;
   gap: 1rem;
-  margin: 2rem 0;
+  padding: 2rem 0;
   flex-wrap: wrap;
+  margin-top: auto; // empuja la paginación hacia abajo
 }
 
 .page-indicator {
@@ -81,7 +84,6 @@
   color: #222222;
   background-color: transparent;
   border: 1px solid #dddddd;
-  // border-radius: 8px;
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.3s ease, color 0.3s ease;
@@ -100,7 +102,6 @@
 .outlined-button:not(:disabled)::after {
   content: "";
   position: absolute;
-  // border-radius: 50%;
   width: 120px;
   height: 120px;
   background: rgba(0, 0, 0, 0.15);
@@ -120,17 +121,19 @@
 
 /* Botón móvil "Filtros" */
 .filters-toggle-button {
+  position: fixed;
+  top: 90px; // justo debajo del navbar
+  right: 1rem;
+  z-index: 100;
   display: inline-flex;
-  align-items: center; // Centrado vertical
-  justify-content: center; // Centrado horizontal
+  align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   font-weight: 500;
-  margin: 3rem 2.9rem auto auto;
   background-color: #ffffff;
   border: 1px solid rgba(17, 17, 17, 0.34);
-  // border-radius: 4px;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
@@ -154,6 +157,7 @@
   display: inline-flex;
   align-items: center;
 }
+
 /* Modal de filtros móvil */
 .filters-modal {
   position: fixed;
@@ -174,6 +178,7 @@
   display: flex;
   flex-direction: column;
   width: 90%;
+  max-width: 500px;
   height: 80vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   transform: translateY(-20px);
@@ -222,15 +227,21 @@
 @media (max-width: 900px) {
   .products-container {
     flex-direction: column;
-    padding: 1rem;
+    padding-top: 80px;
+    padding-bottom: 80px;
   }
 
   .filters-column {
     display: none;
   }
 
+  .content-column {
+    height: calc(100vh - 80px - 80px);
+    padding: 1rem;
+    padding-top: 4rem; // espacio para el botón de filtros
+  }
+
   .product-grid {
-    margin-top: 5rem; // margen para no tapar botón
     gap: 16px;
   }
 }

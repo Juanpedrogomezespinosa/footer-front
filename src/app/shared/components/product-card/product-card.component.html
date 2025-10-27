@@ -1,29 +1,65 @@
-<div class="product-card" (click)="goToProductDetail()" style="cursor: pointer">
-  <div class="image-container">
+<div
+  class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer group focus-within:ring-2 focus-within:ring-primary"
+  (click)="goToProductDetail()"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="'Ver detalles de ' + product.name"
+>
+  <!-- Imagen del producto -->
+  <div class="relative w-full aspect-square overflow-hidden">
     <img
-      class="product-image"
+      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
       [src]="getProductImage()"
       [alt]="product.name"
       (error)="onImageError($event)"
+      loading="lazy"
     />
+
+    <!-- Capa de overlay opcional al hacer hover -->
+    <div
+      class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"
+      aria-hidden="true"
+    ></div>
   </div>
 
-  <div class="product-info">
-    <h2 class="product-name">{{ product.name }}</h2>
+  <!-- Información del producto -->
+  <div class="p-4 flex flex-col gap-2">
+    <!-- Nombre del producto -->
+    <h2
+      class="text-lg font-semibold text-gray-800 truncate group-hover:text-primary transition-colors"
+      [title]="product.name"
+    >
+      {{ product.name }}
+    </h2>
 
-    <div class="product-rating-container" *ngIf="product.rating !== undefined">
-      <div class="product-rating">
-        <ng-container *ngFor="let star of getStars()">
-          <span class="star" [ngClass]="star"></span>
-        </ng-container>
-        <span class="rating-count" *ngIf="product.ratingCount !== undefined">
-          ({{ product.ratingCount }} valoración
-          {{ product.ratingCount > 1 ? "es" : "" }})
+    <!-- Valoración del producto -->
+    <div class="flex items-center gap-1" *ngIf="product.rating !== undefined">
+      <ng-container *ngFor="let star of getStars()">
+        <span
+          class="material-icons text-base transition-colors"
+          [ngClass]="{
+            'text-yellow-400': star === 'full',
+            'text-yellow-300': star === 'half',
+            'text-gray-300': star === 'empty'
+          }"
+          aria-hidden="true"
+        >
+          star
         </span>
-      </div>
+      </ng-container>
+
+      <span
+        class="text-sm text-gray-500 ml-1"
+        *ngIf="product.ratingCount !== undefined"
+      >
+        ({{ product.ratingCount }} valoración{{
+          product.ratingCount > 1 ? "es" : ""
+        }})
+      </span>
     </div>
 
-    <p class="price">
+    <!-- Precio -->
+    <p class="text-xl font-semibold text-primary mt-1">
       {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
     </p>
   </div>

@@ -6,13 +6,20 @@ import { CommonModule } from "@angular/common";
   standalone: true,
   imports: [CommonModule],
   templateUrl: "./products-filters.component.html",
-  styleUrls: ["./products-filters.component.scss"],
+  styleUrls: [],
 })
 export class ProductsFiltersComponent {
-  @Output() filtersChanged = new EventEmitter<Record<string, string[]>>();
-  @Output() sortChanged = new EventEmitter<string>();
+  // Emite el objeto con los filtros seleccionados: { key: [values] }
+  @Output()
+  public filtersChanged: EventEmitter<Record<string, string[]>> =
+    new EventEmitter<Record<string, string[]>>();
 
-  selectedFilters: Record<string, string[]> = {
+  // Emite el valor de orden seleccionado: cadena (por ejemplo "price_asc")
+  @Output()
+  public sortChanged: EventEmitter<string> = new EventEmitter<string>();
+
+  // Estado interno de filtros seleccionados
+  public selectedFilters: Record<string, string[]> = {
     brand: [],
     gender: [],
     season: [],
@@ -20,7 +27,12 @@ export class ProductsFiltersComponent {
     color: [],
   };
 
-  filters = [
+  // Lista de filtros y opciones (puedes cargarla externamente si lo prefieres)
+  public filters: Array<{
+    key: string;
+    label: string;
+    options: string[];
+  }> = [
     {
       key: "material",
       label: "Material",
@@ -48,7 +60,8 @@ export class ProductsFiltersComponent {
     },
   ];
 
-  onFilterChange(key: string, event: Event): void {
+  // Maneja los cambios de los checkboxes de los filtros
+  public onFilterChange(key: string, event: Event): void {
     const inputElement = event.target as HTMLInputElement;
 
     if (!this.selectedFilters[key]) {
@@ -61,14 +74,16 @@ export class ProductsFiltersComponent {
       }
     } else {
       this.selectedFilters[key] = this.selectedFilters[key].filter(
-        (value) => value !== inputElement.value
+        (value: string) => value !== inputElement.value
       );
     }
 
-    this.filtersChanged.emit(this.selectedFilters);
+    // Emitimos la estructura actualizada de filtros
+    this.filtersChanged.emit({ ...this.selectedFilters });
   }
 
-  onSortChange(event: Event): void {
+  // Maneja el cambio del select de orden
+  public onSortChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.sortChanged.emit(selectElement.value);
   }

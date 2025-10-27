@@ -1,89 +1,108 @@
 <app-navbar></app-navbar>
 
-<!-- Botón para abrir filtros en móviles -->
+<!-- Botón para abrir filtros (visible en todas las resoluciones) -->
 <button
-  class="filters-toggle-button"
-  *ngIf="isMobile"
+  class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg fixed bottom-6 right-6 shadow-lg z-40"
   (click)="toggleFilters()"
+  aria-label="Abrir filtros"
 >
-  <span class="filters-icon">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      fill-rule="evenodd"
-      aria-hidden="true"
-      width="1rem"
-      height="1rem"
-    >
-      <path
-        d="M18.9 1.2c-.3-.7-1-1.2-1.8-1.2s-1.5.5-1.8 1.2H0v1.5h15.2c.3.8 1 1.3 1.9 1.3s1.6-.5 1.9-1.3h5V1.2zM6.8 10.1c-.8 0-1.5.5-1.8 1.2H0v1.5h4.9c.3.8 1 1.3 1.9 1.3s1.6-.5 1.9-1.3H24v-1.5H8.6c-.3-.8-1-1.2-1.8-1.2m8.5 11.1c.3-.7 1-1.2 1.8-1.2s1.5.5 1.8 1.2H24v1.5h-5c-.3.8-1 1.3-1.9 1.3s-1.6-.5-1.9-1.3H0v-1.5z"
-      ></path>
-    </svg>
-  </span>
-  <span class="filters-label">Filtrar</span>
+  <!-- Icono de filtro -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    class="w-5 h-5"
+    aria-hidden="true"
+  >
+    <path
+      d="M3 5a1 1 0 0 1 1-1h16a1 1 0 0 1 .7 1.7L16 12.4V19a1 1 0 0 1-1.5.86L10 17.07V12.4L3.3 6.7A1 1 0 0 1 3 5z"
+    />
+  </svg>
+  <span class="font-medium">Filtrar</span>
 </button>
 
-<!-- Contenedor principal -->
-<div class="products-container">
-  <!-- Sidebar de filtros (escritorio) -->
-  <div class="filters-column" *ngIf="!isMobile">
-    <div class="filters-scroll">
-      <app-products-filters
-        (filtersChanged)="onFiltersChanged($event)"
-        (sortChanged)="onSortChanged($event)"
-      ></app-products-filters>
-    </div>
-  </div>
-
-  <!-- Contenido de productos -->
-  <div class="content-column">
-    <div class="product-grid" *ngIf="products() && products().length > 0">
+<!-- Contenido principal -->
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <section>
+    <div
+      *ngIf="products() && products().length > 0"
+      class="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+    >
       <app-product-card
         *ngFor="let product of products()"
         [product]="product"
       ></app-product-card>
     </div>
 
-    <div class="pagination-controls">
+    <!-- Paginación -->
+    <div class="flex justify-center items-center gap-4 mt-8">
       <button
         *ngIf="currentPage() > 1"
-        class="outlined-button"
+        class="btn-outline"
         (click)="goToPreviousPage()"
+        type="button"
       >
         Anterior
       </button>
 
-      <span class="page-indicator">
+      <span class="text-sm text-gray-600">
         Página {{ currentPage() }} de {{ totalPages() }}
       </span>
 
       <button
         *ngIf="currentPage() < totalPages()"
-        class="outlined-button"
+        class="btn-outline"
         (click)="goToNextPage()"
+        type="button"
       >
         Siguiente
       </button>
     </div>
-  </div>
+  </section>
 </div>
 
-<!-- Modal de filtros para móviles -->
+<!-- Sidebar de filtros (móvil y escritorio) -->
 <div
-  class="filters-modal"
-  *ngIf="showMobileFilters && isMobile"
+  *ngIf="showFilters"
+  class="fixed inset-0 bg-black/60 flex justify-end z-50 transition-opacity duration-300"
   (click)="toggleFilters()"
+  role="dialog"
+  aria-modal="true"
 >
-  <div class="filters-modal-content" (click)="$event.stopPropagation()">
-    <div class="filters-modal-body">
+  <div
+    class="bg-white w-80 sm:w-96 h-full flex flex-col transform transition-transform duration-300 ease-in-out translate-x-0"
+    (click)="$event.stopPropagation()"
+    role="document"
+  >
+    <!-- Cabecera -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="text-lg font-semibold text-gray-800">Filtros</h2>
+      <button
+        class="text-gray-600 hover:text-gray-900"
+        (click)="toggleFilters()"
+        aria-label="Cerrar filtros"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Contenido del filtro -->
+    <div class="flex-1 overflow-y-auto p-4">
       <app-products-filters
         (filtersChanged)="onFiltersChanged($event)"
         (sortChanged)="onSortChanged($event)"
       ></app-products-filters>
     </div>
-    <div class="filters-modal-footer">
-      <button class="outlined-button" (click)="toggleFilters()">Aplicar</button>
+
+    <!-- Botón inferior -->
+    <div class="border-t p-4">
+      <button
+        class="btn-primary w-full"
+        (click)="toggleFilters()"
+        type="button"
+      >
+        Aplicar filtros
+      </button>
     </div>
   </div>
 </div>

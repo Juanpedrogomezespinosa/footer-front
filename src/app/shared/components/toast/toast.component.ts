@@ -9,7 +9,7 @@ import { trigger, style, animate, transition } from "@angular/animations";
   standalone: true,
   imports: [CommonModule],
   templateUrl: "./toast.component.html",
-  styleUrls: ["./toast.component.scss"],
+  styleUrls: [],
   animations: [
     trigger("fadeAnimation", [
       transition(":enter", [

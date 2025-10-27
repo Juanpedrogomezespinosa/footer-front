@@ -17,7 +17,7 @@ import { ToastService } from "../../../core/services/toast.service";
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./register.component.html",
-  styleUrls: ["./register.component.scss"],
+  styleUrls: [],
 })
 export class RegisterComponent {
   public form: FormGroup;
