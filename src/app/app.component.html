@@ -1,4 +1,13 @@
-<main class="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
-  <router-outlet></router-outlet>
-  <app-toast></app-toast>
-</main>
+<div class="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
+  <!-- Navbar solo si no estamos en login/register -->
+  <app-navbar *ngIf="!hideLayout"></app-navbar>
+
+  <!-- Contenido principal -->
+  <main class="flex-1">
+    <router-outlet></router-outlet>
+    <app-toast></app-toast>
+  </main>
+
+  <!-- Footer solo si no estamos en login/register -->
+  <app-footer *ngIf="!hideLayout"></app-footer>
+</div>

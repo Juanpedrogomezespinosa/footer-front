@@ -5,12 +5,29 @@
 /* ---------------------------------------------------
    🌐 ESTILOS GLOBALES ECOMMERCE
 --------------------------------------------------- */
+
+/* Base HTML + BODY */
 html,
 body {
-  @apply font-sans bg-gray-50 text-gray-900 min-h-screen scroll-smooth;
+  @apply font-sans bg-gray-50 text-gray-900 scroll-smooth;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* Scrollbar personalizada (moderna y discreta) */
+/* El contenedor raíz (app-root) debe usar flex para empujar el footer */
+app-root {
+  @apply flex flex-col min-h-screen;
+}
+
+/* El contenido principal crece ocupando el espacio restante */
+main {
+  @apply flex-1;
+}
+
+/* ---------------------------------------------------
+   🖱️ Scrollbar personalizada (moderna y discreta)
+--------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -25,7 +42,9 @@ body {
   background: #6b7280;
 }
 
-/* Animaciones suaves para toast, hover o aparición de elementos */
+/* ---------------------------------------------------
+   ✨ Animaciones suaves
+--------------------------------------------------- */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -53,16 +72,20 @@ body {
   animation: fade-out 0.3s ease-in forwards;
 }
 
-/* Botones globales reutilizables */
+/* ---------------------------------------------------
+   🎨 Botones globales reutilizables
+--------------------------------------------------- */
 .btn-primary {
-  @apply bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-secondary transition;
+  @apply bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-secondary transition-colors duration-200;
 }
 
 .btn-outline {
-  @apply border border-primary text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary hover:text-white transition;
+  @apply border border-primary text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary hover:text-white transition-colors duration-200;
 }
 
-/* Contenedor principal */
+/* ---------------------------------------------------
+   📦 Contenedor principal
+--------------------------------------------------- */
 .container {
   @apply max-w-6xl mx-auto px-4;
 }

@@ -1,5 +1,3 @@
-<app-navbar></app-navbar>
-
 <main
   class="max-w-6xl mx-auto px-4 py-12"
   *ngIf="!isLoading && product; else loadingOrError"
@@ -10,7 +8,7 @@
       <img
         [src]="getProductImage()"
         [alt]="product.name"
-        class="w-full max-w-md object-cover rounded-3xl shadow-lg transition-transform duration-500 hover:scale-[1.02]"
+        class="w-full max-w-md object-cover rounded-3xl shadow-lg"
         loading="lazy"
       />
     </div>
@@ -80,5 +78,3 @@
     </div>
   </main>
 </ng-template>
-
-<app-footer></app-footer>
