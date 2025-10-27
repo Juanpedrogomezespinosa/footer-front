@@ -18,7 +18,6 @@ export class ProductCardComponent {
 
   constructor(private router: Router) {}
 
-  /** Obtiene la URL de la imagen del producto o una por defecto */
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
       return `${this.backendUrl}/uploads/${this.product.image}`;
@@ -31,14 +30,12 @@ export class ProductCardComponent {
     }
   }
 
-  /** Maneja errores de carga de imagen */
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     console.error("Error al cargar la imagen:", target.src);
     target.src = this.defaultImage;
   }
 
-  /** Navega al detalle del producto */
   goToProductDetail(): void {
     if (!this.product || !this.product.id) {
       console.error("Producto o ID inválido, no se puede navegar.");
@@ -55,12 +52,10 @@ export class ProductCardComponent {
     );
   }
 
-  /** Simula agregar al carrito */
   addToCart(): void {
     console.log(`Producto agregado al carrito: ${this.product.name}`);
   }
 
-  /** Devuelve un arreglo con los tipos de estrella (llena, media o vacía) según la valoración */
   getStars(): ("full" | "half" | "empty")[] {
     const stars: ("full" | "half" | "empty")[] = [];
     let rating = this.product.rating ?? 0;

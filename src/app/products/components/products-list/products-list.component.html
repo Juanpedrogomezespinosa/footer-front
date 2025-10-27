@@ -4,7 +4,6 @@
   (click)="toggleFilters()"
   aria-label="Abrir filtros"
 >
-  <!-- Icono de filtro -->
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -20,11 +19,11 @@
 </button>
 
 <!-- Contenido principal -->
-<div class="max-w-6xl mx-auto px-4 py-10">
+<div class="max-w-7xl mx-auto px-4 py-10">
   <section>
     <div
       *ngIf="products() && products().length > 0"
-      class="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+      class="grid [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))] gap-4"
     >
       <app-product-card
         *ngFor="let product of products()"
@@ -72,7 +71,6 @@
     (click)="$event.stopPropagation()"
     role="document"
   >
-    <!-- Cabecera -->
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="text-lg font-semibold text-gray-800">Filtros</h2>
       <button
@@ -84,7 +82,6 @@
       </button>
     </div>
 
-    <!-- Contenido del filtro -->
     <div class="flex-1 overflow-y-auto p-4">
       <app-products-filters
         (filtersChanged)="onFiltersChanged($event)"
@@ -92,7 +89,6 @@
       ></app-products-filters>
     </div>
 
-    <!-- Botón inferior -->
     <div class="border-t p-4">
       <button
         class="btn-primary w-full"
