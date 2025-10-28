@@ -3,6 +3,8 @@ import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import { NgIf } from "@angular/common";
 import { AuthService } from "../../../core/services/auth.service";
+// 👇 AÑADIR ESTAS IMPORTACIONES
+import { trigger, transition, style, animate } from "@angular/animations";
 
 @Component({
   selector: "app-navbar",
@@ -10,6 +12,24 @@ import { AuthService } from "../../../core/services/auth.service";
   imports: [FormsModule, RouterModule, NgIf],
   templateUrl: "./navbar.component.html",
   styleUrls: [],
+  // 👇 AÑADIR ANIMACIONES
+  animations: [
+    trigger("slideDown", [
+      transition(":enter", [
+        style({ opacity: 0, transform: "translateY(-10px)" }),
+        animate(
+          "200ms ease-out",
+          style({ opacity: 1, transform: "translateY(0)" })
+        ),
+      ]),
+      transition(":leave", [
+        animate(
+          "150ms ease-in",
+          style({ opacity: 0, transform: "translateY(-10px)" })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class NavbarComponent {
   public isLoggedIn = false;
@@ -36,7 +56,6 @@ export class NavbarComponent {
     });
   }
 
-  /** Envía la búsqueda */
   public submitSearch(): void {
     const trimmed = this.searchTerm.trim();
     if (trimmed.length > 0) {
@@ -49,7 +68,6 @@ export class NavbarComponent {
     this.mobileMenuActive = false;
   }
 
-  /** Abre o cierra el buscador desktop */
   public toggleSearchDesktop(): void {
     this.searchActiveDesktop = !this.searchActiveDesktop;
     if (this.searchActiveDesktop) {
@@ -57,7 +75,6 @@ export class NavbarComponent {
     }
   }
 
-  /** Menú móvil */
   public toggleMobileMenu(): void {
     this.mobileMenuActive = !this.mobileMenuActive;
     if (this.mobileMenuActive) {
@@ -83,7 +100,7 @@ export class NavbarComponent {
 
     if (
       !clicked.closest(".mobile-menu") &&
-      !clicked.closest('button[aria-label="Abrir menú"]')
+      !clicked.closest('button[aria-label="Menú de navegación"]')
     ) {
       this.mobileMenuActive = false;
     }
