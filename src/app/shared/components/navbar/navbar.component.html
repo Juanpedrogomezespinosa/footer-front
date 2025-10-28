@@ -1,122 +1,179 @@
-<nav
-  class="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm"
-  role="navigation"
-  aria-label="Navegación principal"
-  (document:click)="handleDocumentClick($event)"
+<header
+  class="sticky top-0 z-50 w-full bg-card-light/80 dark:bg-card-dark/80 backdrop-blur-sm border-b border-subtle-light dark:border-subtle-dark"
 >
-  <div class="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-    <!-- Logo -->
+  <div
+    class="flex items-center justify-between px-4 sm:px-10 py-3 max-w-7xl mx-auto"
+  >
+    <!-- IZQUIERDA -->
     <a
       routerLink="/home"
-      (click)="$event.preventDefault(); reloadPage()"
-      class="flex items-center gap-2"
+      class="flex items-center gap-3"
+      aria-label="Ir al inicio"
     >
-      <img
-        src="/assets/logo-2.png"
-        alt="Logo de la aplicación"
-        class="w-10 sm:w-10"
-      />
+      <div class="size-6 text-secondary">
+        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path
+            clip-rule="evenodd"
+            d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+            fill="currentColor"
+            fill-rule="evenodd"
+          ></path>
+        </svg>
+      </div>
+      <h2
+        class="text-lg font-bold leading-tight tracking-[-0.015em] text-gray-800 hover:text-primary-dark transition"
+      >
+        Footer
+      </h2>
     </a>
 
-    <!-- Buscador escritorio -->
-    <div
-      class="hidden md:flex items-center border border-gray-300 rounded-full px-3 py-1.5 focus-within:ring-2 focus-within:ring-secondary transition"
-      [class.ring-2]="searchActive"
-      role="search"
-    >
-      <input
-        id="search-input"
-        type="search"
-        placeholder="Buscar productos..."
-        class="outline-none px-2 w-48 sm:w-64 md:w-80"
-        (keydown.enter)="submitSearch()"
-        [(ngModel)]="searchTerm"
-        #searchInput
-      />
-      <button
-        type="button"
-        (click)="searchActive ? submitSearch() : toggleSearch()"
-        [attr.aria-label]="
-          searchActive ? 'Cerrar búsqueda' : 'Buscar productos'
-        "
-      >
-        <img
-          src="/assets/icons/lupa.svg"
-          alt="Buscar"
-          class="w-5 h-5 opacity-70"
-        />
-      </button>
-    </div>
+    <!-- DERECHA -->
+    <div class="flex items-center gap-3">
+      <!-- Buscador -->
+      <div class="relative">
+        <button
+          type="button"
+          (click)="toggleSearchDesktop()"
+          aria-label="Buscar productos"
+          class="search-button flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          <img src="/assets/icons/lupa.svg" alt="Buscar" class="w-5 h-5" />
+        </button>
 
-    <!-- Iconos -->
-    <div class="flex items-center gap-4">
-      <ng-container *ngIf="isLoggedIn; else guestIcons">
-        <a
-          routerLink="/cart"
-          aria-label="Carrito"
-          class="hover:opacity-70 transition"
+        <!-- DESPLEGABLE buscador desktop -->
+        <form
+          *ngIf="searchActiveDesktop"
+          (ngSubmit)="submitSearch()"
+          class="search-desktop-wrapper absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-2"
         >
-          <img src="/assets/icons/carrito.svg" alt="Carrito" class="w-6 h-6" />
-        </a>
-        <a
-          routerLink="/profile"
-          aria-label="Perfil"
-          class="hover:opacity-70 transition"
-        >
-          <img src="/assets/icons/perfil.svg" alt="Perfil" class="w-6 h-6" />
-        </a>
+          <div class="flex items-center gap-2 px-2 py-1">
+            <img
+              src="/assets/icons/lupa.svg"
+              alt="Buscar"
+              class="w-4 h-4 opacity-60"
+            />
+            <input
+              #searchInputDesktop
+              type="search"
+              placeholder="Buscar productos..."
+              [(ngModel)]="searchTerm"
+              name="search"
+              class="bg-transparent outline-none w-full text-sm text-gray-700 dark:text-gray-200"
+            />
+            <button
+              type="submit"
+              aria-label="Enviar búsqueda"
+              class="text-primary text-sm font-medium px-2 hover:opacity-70 transition"
+            >
+              OK
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Carrito -->
+      <a
+        routerLink="/cart"
+        aria-label="Carrito"
+        class="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+      >
+        <img src="/assets/icons/carrito.svg" alt="Carrito" class="w-5 h-5" />
+      </a>
+
+      <!-- Perfil -->
+      <a
+        routerLink="/profile"
+        aria-label="Perfil"
+        class="flex items-center justify-center h-10 w-10 rounded-full overflow-hidden hover:opacity-80 transition"
+      >
+        <div
+          class="bg-center bg-cover aspect-square w-8 h-8 rounded-full"
+          [style.background-image]="'url(' + userAvatarUrl + ')'"
+          role="img"
+        ></div>
+      </a>
+
+      <!-- Login / Logout -->
+      <ng-container *ngIf="isLoggedIn; else loginIcon">
         <button
           (click)="logout()"
           aria-label="Cerrar sesión"
-          class="hover:opacity-70 transition"
+          class="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
-          <img src="/assets/icons/logout.svg" alt="Logout" class="w-6 h-6" />
+          <img
+            src="/assets/icons/logout.svg"
+            alt="Cerrar sesión"
+            class="w-5 h-5"
+          />
         </button>
       </ng-container>
 
-      <ng-template #guestIcons>
+      <ng-template #loginIcon>
         <a
           routerLink="/login"
           aria-label="Iniciar sesión"
-          class="hover:opacity-70 transition"
+          class="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
-          <img src="/assets/icons/login.svg" alt="Login" class="w-6 h-6" />
+          <img
+            src="/assets/icons/login.svg"
+            alt="Iniciar sesión"
+            class="w-5 h-5"
+          />
         </a>
       </ng-template>
 
-      <!-- Botón menú móvil -->
+      <!-- Menú móvil -->
       <button
-        class="md:hidden hover:opacity-70 transition"
+        class="md:hidden flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         (click)="toggleMobileMenu()"
         aria-label="Abrir menú"
-        #menuToggleButton
       >
         <img src="/assets/icons/menu.svg" alt="Menú" class="w-6 h-6" />
       </button>
     </div>
   </div>
 
-  <!-- Menú móvil -->
+  <!-- MENÚ MÓVIL -->
   <div
     *ngIf="mobileMenuActive"
-    class="md:hidden bg-white border-t border-gray-200 shadow-lg"
+    class="md:hidden mobile-menu bg-card-light dark:bg-card-dark border-t border-subtle-light dark:border-subtle-dark"
   >
     <div class="flex flex-col p-4 space-y-3">
+      <!-- Buscador móvil -->
+      <form
+        (ngSubmit)="submitSearch()"
+        class="flex items-center bg-background-light dark:bg-background-dark rounded-lg h-10 px-3 gap-2"
+      >
+        <img
+          src="/assets/icons/lupa.svg"
+          alt="Buscar"
+          class="w-4 h-4 opacity-60"
+        />
+        <input
+          type="search"
+          placeholder="Buscar productos..."
+          [(ngModel)]="searchTerm"
+          name="mobileSearch"
+          class="bg-transparent w-full outline-none text-sm text-gray-700 dark:text-gray-200"
+        />
+      </form>
+
+      <a
+        routerLink="/cart"
+        class="text-gray-700 dark:text-gray-200 hover:text-primary transition"
+        >Carrito</a
+      >
+      <a
+        routerLink="/profile"
+        class="text-gray-700 dark:text-gray-200 hover:text-primary transition"
+        >Perfil</a
+      >
+
       <ng-container *ngIf="isLoggedIn; else guestMenu">
-        <a
-          routerLink="/cart"
-          class="text-gray-700 hover:text-secondary transition"
-          >Carrito</a
-        >
-        <a
-          routerLink="/profile"
-          class="text-gray-700 hover:text-secondary transition"
-          >Perfil</a
-        >
         <a
           href="#"
           (click)="$event.preventDefault(); logout()"
-          class="text-gray-700 hover:text-secondary transition"
+          class="text-gray-700 dark:text-gray-200 hover:text-primary transition"
           >Cerrar sesión</a
         >
       </ng-container>
@@ -124,15 +181,15 @@
       <ng-template #guestMenu>
         <a
           routerLink="/login"
-          class="text-gray-700 hover:text-secondary transition"
+          class="text-gray-700 dark:text-gray-200 hover:text-primary transition"
           >Iniciar sesión</a
         >
         <a
           routerLink="/register"
-          class="text-gray-700 hover:text-secondary transition"
+          class="text-gray-700 dark:text-gray-200 hover:text-primary transition"
           >Registrarse</a
         >
       </ng-template>
     </div>
   </div>
-</nav>
+</header>
