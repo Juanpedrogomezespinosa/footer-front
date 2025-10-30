@@ -42,7 +42,10 @@ export class ProductCardComponent {
       return;
     }
 
-    this.router.navigate(["/products", this.product.id]).then(
+    // --- 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+    // La ruta correcta es '/products/product/:id'
+    this.router.navigate(["/products", "product", this.product.id]).then(
+      // --- FIN DE LA CORRECCIÓN ---
       (success) => {
         console.log("Navegación completada:", success);
       },
