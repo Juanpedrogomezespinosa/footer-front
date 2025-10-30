@@ -1,39 +1,45 @@
 import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
-import { NgIf } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { AuthService } from "../../../core/services/auth.service";
-// 👇 AÑADIR ESTAS IMPORTACIONES
 import { trigger, transition, style, animate } from "@angular/animations";
+import { UiStateService } from "../../../core/services/ui-state.service"; // <-- 1. IMPORTAR
 
 @Component({
   selector: "app-navbar",
   standalone: true,
-  imports: [FormsModule, RouterModule, NgIf],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: "./navbar.component.html",
   styleUrls: [],
-  // 👇 AÑADIR ANIMACIONES
   animations: [
-    trigger("slideDown", [
+    trigger("slideFromRight", [
       transition(":enter", [
-        style({ opacity: 0, transform: "translateY(-10px)" }),
+        style({ transform: "translateX(100%)" }),
         animate(
-          "200ms ease-out",
-          style({ opacity: 1, transform: "translateY(0)" })
+          "300ms cubic-bezier(0.4, 0, 0.2, 1)",
+          style({ transform: "translateX(0)" })
         ),
       ]),
       transition(":leave", [
         animate(
-          "150ms ease-in",
-          style({ opacity: 0, transform: "translateY(-10px)" })
+          "250ms cubic-bezier(0.4, 0, 0.2, 1)",
+          style({ transform: "translateX(100%)" })
         ),
       ]),
+    ]),
+    trigger("fadeIn", [
+      transition(":enter", [
+        style({ opacity: 0 }),
+        animate("300ms ease-out", style({ opacity: 1 })),
+      ]),
+      transition(":leave", [animate("250ms ease-in", style({ opacity: 0 }))]),
     ]),
   ],
 })
 export class NavbarComponent {
   public isLoggedIn = false;
-  public userAvatarUrl = "/assets/icons/perfil.svg";
+  public userAvatarUrl = "";
   public mobileMenuActive = false;
   public searchActiveDesktop = false;
   public searchTerm = "";
@@ -41,18 +47,31 @@ export class NavbarComponent {
   @ViewChild("searchInputDesktop")
   searchInputDesktop!: ElementRef<HTMLInputElement>;
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private uiStateService: UiStateService // <-- 2. INYECTAR
+  ) {
     this.authService.user$.subscribe((user: any) => {
       this.isLoggedIn = !!user;
-
       const possibleAvatar =
         user?.avatarUrl ||
         user?.photoURL ||
         user?.profileImage ||
         user?.image ||
         user?.picture;
-
-      this.userAvatarUrl = possibleAvatar || "/assets/icons/perfil.svg";
+      if (possibleAvatar) {
+        this.userAvatarUrl = possibleAvatar;
+      } else {
+        const name = user?.username || user?.name || "Usuario";
+        const initials = name
+          .split(" ")
+          .map((n: string) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+        this.userAvatarUrl = `https://placehold.co/100x100/60a5fa/FFFFFF?text=${initials}`;
+      }
     });
   }
 
@@ -60,12 +79,12 @@ export class NavbarComponent {
     const trimmed = this.searchTerm.trim();
     if (trimmed.length > 0) {
       this.router.navigate(["/products"], {
-        queryParams: { search: trimmed },
+        queryParams: { name: trimmed },
       });
     }
     this.searchTerm = "";
     this.searchActiveDesktop = false;
-    this.mobileMenuActive = false;
+    this.closeMobileMenu();
   }
 
   public toggleSearchDesktop(): void {
@@ -77,32 +96,39 @@ export class NavbarComponent {
 
   public toggleMobileMenu(): void {
     this.mobileMenuActive = !this.mobileMenuActive;
+    this.uiStateService.isMobileMenuOpen.set(this.mobileMenuActive); // <-- 3. ACTUALIZAR SIGNAL
     if (this.mobileMenuActive) {
       this.searchActiveDesktop = false;
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
+  }
+
+  public closeMobileMenu(): void {
+    this.mobileMenuActive = false;
+    this.uiStateService.isMobileMenuOpen.set(false); // <-- 3. ACTUALIZAR SIGNAL
+    document.body.style.overflow = "auto";
   }
 
   public logout(): void {
     this.authService.logout();
-    this.router.navigate(["/products"]);
+    this.closeMobileMenu();
+    this.router.navigate(["/home"]);
   }
 
   @HostListener("document:click", ["$event"])
   public onDocumentClick(event: MouseEvent): void {
     const clicked = event.target as HTMLElement;
-
-    if (
-      !clicked.closest(".search-desktop-wrapper") &&
-      !clicked.closest(".search-button")
-    ) {
-      this.searchActiveDesktop = false;
+    if (clicked.classList.contains("mobile-menu-backdrop")) {
+      this.closeMobileMenu();
     }
+  }
 
-    if (
-      !clicked.closest(".mobile-menu") &&
-      !clicked.closest('button[aria-label="Menú de navegación"]')
-    ) {
-      this.mobileMenuActive = false;
+  @HostListener("document:keydown.escape", ["$event"])
+  public onEscapeKey(): void {
+    if (this.mobileMenuActive) {
+      this.closeMobileMenu();
     }
   }
 }
