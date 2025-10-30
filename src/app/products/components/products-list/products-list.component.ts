@@ -1,8 +1,7 @@
 import { Component, signal, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
+// Se eliminan NavbarComponent y FooterComponent, ya que son componentes globales.
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
-import { FooterComponent } from "../../../shared/components/footer/footer.component";
 import { ProductsFiltersComponent } from "../../../shared/components/filters/products-filters.component";
 import { ProductService, Product } from "app/core/services/product.service";
 
@@ -11,8 +10,8 @@ import { ProductService, Product } from "app/core/services/product.service";
   standalone: true,
   imports: [
     CommonModule,
-    NavbarComponent,
-    FooterComponent,
+    // NavbarComponent, <-- Eliminado (causaba warning)
+    // FooterComponent, <-- Eliminado (causaba warning)
     ProductCardComponent,
     ProductsFiltersComponent,
   ],
@@ -28,7 +27,9 @@ export class ProductsListComponent {
   readonly itemsPerPage = 18;
 
   // Filtros y orden
-  selectedFilters: Record<string, string[]> = {};
+  // --- MEJORA ---
+  // Actualizamos el tipo para que coincida con lo que el servicio espera
+  selectedFilters: Record<string, string | string[]> = {};
   selectedSort: string = "";
 
   // Estado del sidebar de filtros (móvil y escritorio)
@@ -60,14 +61,20 @@ export class ProductsListComponent {
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
-          const mappedProducts = response.products.map((product) => ({
-            id: product.id,
-            name: product.name,
-            price: Number(product.price),
-            image: product.image,
-            rating: product.averageRating ?? 0,
-            ratingCount: product.ratingCount ?? 0,
-          }));
+          // --- CORRECCIÓN ---
+          // Mapeamos la respuesta completa de la API, incluyendo la 'category'
+          const mappedProducts: Product[] = response.products.map(
+            (product) => ({
+              id: product.id,
+              name: product.name,
+              price: Number(product.price),
+              image: product.image,
+              rating: product.averageRating ?? 0,
+              ratingCount: product.ratingCount ?? 0,
+              category: product.category, // <-- ESTA LÍNEA FALTABA
+            })
+          );
+          // --- FIN CORRECCIÓN ---
 
           this.products.set(mappedProducts);
           this.totalPages.set(response.totalPages);
@@ -102,24 +109,14 @@ export class ProductsListComponent {
   }
 
   /** Actualizar productos al cambiar filtros */
+  // --- MEJORA ---
+  // Simplificamos este método. El servicio ya sabe cómo manejar los filtros.
   onFiltersChanged(filters: Record<string, string | string[]>): void {
-    const normalizedFilters: Record<string, string[]> = {};
-
-    for (const key in filters) {
-      const value = filters[key];
-      if (Array.isArray(value)) {
-        normalizedFilters[key] = value;
-      } else if (typeof value === "string") {
-        normalizedFilters[key] = [value];
-      } else {
-        normalizedFilters[key] = [];
-      }
-    }
-
-    this.selectedFilters = normalizedFilters;
+    this.selectedFilters = filters;
     this.currentPage.set(1);
     this.fetchProducts();
   }
+  // --- FIN MEJORA ---
 
   /** Actualizar productos al cambiar orden */
   onSortChanged(sortValue: string): void {
