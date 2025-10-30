@@ -7,7 +7,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./home/home.component").then((m) => m.HomeComponent),
   },
-
   {
     path: "products",
     loadChildren: () =>
@@ -27,6 +26,24 @@ export const routes: Routes = [
         (m) => m.RegisterComponent
       ),
   },
+
+  // --- 👇 RUTAS AÑADIDAS ---
+
+  {
+    path: "cart",
+    loadComponent: () =>
+      import("./cart/cart.component").then((m) => m.CartComponent),
+  },
+  // {
+  //   path: "confirmation/:orderId",
+  //   loadComponent: () =>
+  //     import("./confirmation/confirmation.component").then(
+  //       (m) => m.ConfirmationComponent
+  //     ),
+  // },
+
+  // --- FIN DE RUTAS AÑADIDAS ---
+
   {
     path: "",
     redirectTo: "home",

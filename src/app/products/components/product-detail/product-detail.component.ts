@@ -1,21 +1,22 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router"; // <-- 1. IMPORTAR Router
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http"; // <-- IMPORTAR HttpErrorResponse
 import { ProductService, Product } from "app/core/services/product.service";
-import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
-import { FooterComponent } from "../../../shared/components/footer/footer.component";
+import { CartService } from "app/core/services/cart.service"; // <-- 2. IMPORTAR CartService
+import { ToastService } from "app/core/services/toast.service"; // <-- 3. IMPORTAR ToastService
+// --- CAMBIO: Eliminados NavbarComponent y FooterComponent de imports ---
+// (Están causando warnings y probablemente se cargan desde app.component)
 
 @Component({
   selector: "app-product-detail",
   standalone: true,
   imports: [
     CommonModule,
-    HttpClientModule,
     FormsModule,
-    NavbarComponent,
-    FooterComponent,
+    // NavbarComponent, // <-- Eliminado
+    // FooterComponent, // <-- Eliminado
   ],
   templateUrl: "./product-detail.component.html",
   styleUrls: [],
@@ -42,7 +43,10 @@ export class ProductDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: ProductService
+    private router: Router, // <-- 4. INYECTAR Router
+    private productService: ProductService,
+    private cartService: CartService, // <-- 5. INYECTAR CartService
+    private toastService: ToastService // <-- 6. INYECTAR ToastService
   ) {}
 
   ngOnInit(): void {
@@ -55,20 +59,22 @@ export class ProductDetailComponent implements OnInit {
       return;
     }
 
-    this.productService.getProducts(1, 100).subscribe({
-      next: (res) => {
-        const found = res.products.find((p) => p.id === productId);
-        if (found) {
+    // --- Lógica de carga más eficiente ---
+    this.productService.getProductById(productId).subscribe({
+      next: (foundProduct) => {
+        if (foundProduct) {
           this.product = {
-            ...found,
-            rating: found.averageRating,
+            ...foundProduct,
+            price: Number(foundProduct.price), // Aseguramos que sea número
+            rating: foundProduct.averageRating,
           };
         } else {
           this.error = "Producto no encontrado.";
         }
         this.isLoading = false;
       },
-      error: (err) => {
+      // --- CAMBIO: Tipado del error ---
+      error: (err: HttpErrorResponse) => {
         console.error("Error al cargar el producto:", err);
         this.error = "Error al cargar el producto.";
         this.isLoading = false;
@@ -83,15 +89,54 @@ export class ProductDetailComponent implements OnInit {
     return this.defaultImage;
   }
 
+  // --- Lógica real de "Añadir al Carrito" ---
   addToCart(): void {
+    if (!this.selectedSize) {
+      this.toastService.showError("Por favor, selecciona una talla.");
+      return;
+    }
+
     console.log(
-      `🛒 Producto añadido al carrito: ${this.product?.name}, Talla: ${this.selectedSize}`
+      `🛒 Añadiendo al carrito: ${this.product?.name}, Talla: ${this.selectedSize}`
     );
+
+    this.cartService.addToCart(this.product.id, 1).subscribe({
+      next: () => {
+        this.toastService.showSuccess("¡Producto añadido a la cesta!");
+      },
+      // --- CAMBIO: Tipado del error ---
+      error: (err: HttpErrorResponse) => {
+        console.error("Error al añadir al carrito:", err);
+        this.toastService.showError(
+          err.error?.message || "No se pudo añadir el producto."
+        );
+      },
+    });
   }
 
+  // --- Lógica real de "Comprar Ahora" ---
   buyNow(): void {
+    if (!this.selectedSize) {
+      this.toastService.showError("Por favor, selecciona una talla.");
+      return;
+    }
+
     console.log(
       `💳 Compra directa: ${this.product?.name}, Talla: ${this.selectedSize}`
     );
+
+    this.cartService.addToCart(this.product.id, 1).subscribe({
+      next: () => {
+        // Al tener éxito, navega directo al carrito para el checkout
+        this.router.navigate(["/cart"]);
+      },
+      // --- CAMBIO: Tipado del error ---
+      error: (err: HttpErrorResponse) => {
+        console.error("Error en Compra Directa:", err);
+        this.toastService.showError(
+          err.error?.message || "No se pudo añadir el producto."
+        );
+      },
+    });
   }
 }
