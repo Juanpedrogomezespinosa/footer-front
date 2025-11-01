@@ -1,12 +1,22 @@
 <div class="p-4 bg-white rounded-2xl shadow-md w-full max-w-md">
   <h3 class="text-xl font-semibold text-gray-800 mb-4">Filtrar productos</h3>
 
+  <!-- Botón para Limpiar Filtros (Añadido para evitar el bloqueo) -->
+  <div class="mb-4">
+    <button
+      (click)="resetFilters()"
+      class="w-full py-2 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75"
+    >
+      Limpiar Filtros
+    </button>
+  </div>
+
   <!-- Filtros -->
   <div class="mb-6" *ngFor="let filter of filters">
     <p class="text-gray-700 font-medium mb-2">{{ filter.label }}</p>
     <div class="flex flex-col gap-2">
       <label
-        *ngFor="let option of filter.options"
+        *ngFor="let option of filter.options; trackBy: trackByFn"
         class="flex items-center gap-2 cursor-pointer select-none"
       >
         <input

@@ -8,7 +8,7 @@ import {
   ViewChild,
   ElementRef,
   Renderer2,
-} from "@angular/core"; // <-- Imports
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
 import { ProductsFiltersComponent } from "../../../shared/components/filters/products-filters.component";
@@ -75,6 +75,9 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentPage.set(pageFromUrl);
       }
 
+      // IMPORTANTE: Aquí no se llama a fetchProducts() porque la suscripción se
+      // lanza al iniciar. El filtrado se llama desde onFiltersChanged.
+      // Pero sí necesitamos re-cargar si cambia la categoría o búsqueda de la URL.
       this.fetchProducts();
     });
   }
@@ -214,21 +217,41 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.goToPage(this.currentPage() - 1);
   }
 
+  /**
+   * Maneja el cambio de filtros. Actualiza el estado y recarga los productos.
+   * La clave para el filtrado en tiempo real es llamar a fetchProducts() aquí.
+   */
   onFiltersChanged(filters: Record<string, string | string[]>): void {
+    // 1. Actualizar el estado interno de los filtros
     this.selectedFilters = filters;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page: 1 },
-      queryParamsHandling: "merge",
-    });
+
+    // 2. Resetear la paginación a la página 1.
+    if (this.currentPage() !== 1) {
+      this.currentPage.set(1);
+    }
+
+    // 3. Forzar la recarga de productos con los nuevos filtros (Real-time filtering)
+    this.fetchProducts();
+
+    // Nota: Eliminamos la navegación aquí para forzar el filtrado en tiempo real.
+    // Si quieres que el filtro se refleje en la URL, puedes reintroducir la navegación,
+    // pero debe estar sincronizado con fetchProducts.
   }
 
+  /**
+   * Maneja el cambio de orden. Actualiza el estado y recarga los productos.
+   */
   onSortChanged(sortValue: string): void {
     this.selectedSort = sortValue;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page: 1 },
-      queryParamsHandling: "merge",
-    });
+
+    // 1. Resetear la paginación a la página 1.
+    if (this.currentPage() !== 1) {
+      this.currentPage.set(1);
+    }
+
+    // 2. Forzar la recarga de productos con el nuevo orden.
+    this.fetchProducts();
+
+    // Nota: Igual que en onFiltersChanged, eliminamos la navegación para forzar la reactividad.
   }
 }
