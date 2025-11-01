@@ -1,8 +1,16 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+  WritableSignal,
+} from "@angular/core"; // 1. Importar signal
 import { CommonModule } from "@angular/common";
 import { Subscription, timer } from "rxjs";
 import { ToastService, Toast } from "../../../core/services/toast.service";
 import { trigger, style, animate, transition } from "@angular/animations";
+import { Router, NavigationEnd } from "@angular/router"; // 2. Importar Router y NavigationEnd
+import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-toast",
@@ -22,19 +30,40 @@ import { trigger, style, animate, transition } from "@angular/animations";
 })
 export class ToastComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
-  private sub!: Subscription;
+  private toastSub!: Subscription;
+  private routerSub!: Subscription; // 4. Añadir subscripción al router
 
-  constructor(private toastService: ToastService) {}
+  // 5. Crear un signal para saber si estamos en la página de productos
+  public isProductsPage: WritableSignal<boolean> = signal(false);
+
+  constructor(
+    private toastService: ToastService,
+    private router: Router // 3. Inyectar el Router
+  ) {}
 
   ngOnInit() {
-    this.sub = this.toastService.toast$.subscribe((toast) => {
+    this.toastSub = this.toastService.toast$.subscribe((toast) => {
       this.toasts.push(toast);
       timer(5000).subscribe(() => this.removeToast(toast));
     });
+
+    // 6. Escuchar los eventos de navegación
+    this.routerSub = this.router.events
+      .pipe(
+        // Filtrar solo los eventos de 'NavigationEnd'
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd
+        )
+      )
+      .subscribe((event: NavigationEnd) => {
+        // Comprobar si la URL actual (después de redirecciones) incluye '/products'
+        this.isProductsPage.set(event.urlAfterRedirects.includes("/products"));
+      });
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.toastSub.unsubscribe();
+    this.routerSub.unsubscribe(); // 7. Limpiar la subscripción
   }
 
   removeToast(toast: Toast) {
