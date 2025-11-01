@@ -1,0 +1,120 @@
+<!-- Estado de Carga -->
+<div *ngIf="isLoading()" class="flex justify-center items-center py-40">
+  <div
+    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+  ></div>
+</div>
+
+<!-- Estado de Error -->
+<div
+  *ngIf="error() && !isLoading()"
+  class="max-w-2xl mx-auto px-4 py-16 text-center"
+>
+  <h2 class="text-2xl font-bold text-red-600">¡Oops! Hubo un error</h2>
+  <p class="text-text-muted-light mt-2">{{ error() }}</p>
+  <a
+    routerLink="/orders"
+    class="mt-6 inline-block bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+  >
+    Ir a mis pedidos
+  </a>
+</div>
+
+<!-- Contenido de Confirmación -->
+<main
+  *ngIf="!isLoading() && !error() && order() as ord"
+  class="flex flex-1 justify-center py-10 sm:py-20 px-4"
+>
+  <div class="w-full max-w-2xl">
+    <div
+      class="flex flex-col items-center bg-card-light dark:bg-card-dark rounded-xl shadow-sm p-8 sm:p-12 text-center"
+    >
+      <!-- Icono de Check -->
+      <div
+        class="flex items-center justify-center size-16 rounded-full bg-primary/20 mb-6"
+      >
+        <!-- SVG en línea (reemplazando Material Symbols) -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-10 h-10 text-primary"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          />
+        </svg>
+      </div>
+
+      <!-- Textos -->
+      <div class="flex flex-col gap-3 mb-8">
+        <h1 class="text-4xl font-black leading-tight tracking-[-0.033em]">
+          ¡Compra Realizada!
+        </h1>
+        <p
+          class="text-text-muted-light dark:text-gray-400 text-base font-normal leading-normal max-w-md mx-auto"
+        >
+          Gracias por tu pedido. Hemos enviado los detalles de la confirmación a
+          tu correo electrónico.
+        </p>
+      </div>
+
+      <!-- Detalles del Pedido -->
+      <div
+        class="w-full text-left bg-background-light dark:bg-background-dark p-6 rounded-lg mb-8"
+      >
+        <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-x-6">
+          <div
+            class="col-span-1 sm:col-span-2 grid grid-cols-subgrid py-4 border-b border-subtle-light dark:border-subtle-dark"
+          >
+            <p
+              class="text-text-muted-light dark:text-gray-400 text-sm font-normal leading-normal"
+            >
+              Número de Pedido:
+            </p>
+            <p
+              class="text-sm font-medium leading-normal text-right sm:text-left"
+            >
+              #{{ ord.id }}
+            </p>
+          </div>
+          <div class="col-span-1 sm:col-span-2 grid grid-cols-subgrid py-4">
+            <p
+              class="text-text-muted-light dark:text-gray-400 text-sm font-normal leading-normal"
+            >
+              Email de Confirmación:
+            </p>
+            <!-- 👇 CORRECCIÓN: Eliminado el fallback '|| ord.User.email' -->
+            <p
+              class="text-sm font-medium leading-normal text-right sm:text-left"
+            >
+              {{ userEmail() }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div
+        class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
+      >
+        <a
+          routerLink="/products"
+          class="w-full sm:w-auto flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors"
+        >
+          <span class="truncate">Continuar Comprando</span>
+        </a>
+        <a
+          routerLink="/orders"
+          class="w-full sm:w-auto text-sm font-medium hover:text-primary transition-colors"
+        >
+          Ir a mis pedidos
+        </a>
+      </div>
+    </div>
+  </div>
+</main>

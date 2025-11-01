@@ -2,25 +2,29 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 
-interface RegisterData {
+// --- 👇 CAMBIO: Añadido 'export' ---
+export interface RegisterData {
   username: string;
   email: string;
   password: string;
 }
 
-interface LoginCredentials {
+// --- 👇 CAMBIO: Añadido 'export' ---
+export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-interface User {
+// --- 👇 CAMBIO: Añadido 'export' ---
+export interface User {
   id: number;
   email: string;
   username: string;
   role: string;
 }
 
-interface LoginResponse {
+// --- 👇 CAMBIO: Añadido 'export' ---
+export interface LoginResponse {
   message: string;
   user: User;
   token: string;
@@ -60,6 +64,11 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem("token");
+  }
+
+  // --- CAMBIO: añadido getToken() para el interceptor (aunque ya funciona) ---
+  getToken(): string | null {
+    return localStorage.getItem("token");
   }
 
   private handleLoginResponse(res: LoginResponse) {

@@ -1,5 +1,7 @@
 // src/app/app.routes.ts
+// --- FORZANDO RECARGA DE CACHÉ (v2) ---
 import { Routes } from "@angular/router";
+import { AuthGuard } from "./core/guards/auth.guard";
 
 export const routes: Routes = [
   {
@@ -27,22 +29,22 @@ export const routes: Routes = [
       ),
   },
 
-  // --- 👇 RUTAS AÑADIDAS ---
-
   {
     path: "cart",
     loadComponent: () =>
       import("./cart/cart.component").then((m) => m.CartComponent),
+    canActivate: [AuthGuard],
   },
-  // {
-  //   path: "confirmation/:orderId",
-  //   loadComponent: () =>
-  //     import("./confirmation/confirmation.component").then(
-  //       (m) => m.ConfirmationComponent
-  //     ),
-  // },
 
-  // --- FIN DE RUTAS AÑADIDAS ---
+  // --- Esta es la ruta que debe cargar ---
+  {
+    path: "confirmation/:orderId",
+    loadComponent: () =>
+      import("./confirmation/confirmation.component").then(
+        (m) => m.ConfirmationComponent
+      ),
+    canActivate: [AuthGuard],
+  },
 
   {
     path: "",
