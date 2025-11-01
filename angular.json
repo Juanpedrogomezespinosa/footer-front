@@ -30,7 +30,7 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": ["src/favicon.ico", "src"],
             "styles": ["src/styles.scss"],
             "scripts": []
           },
@@ -70,7 +70,6 @@
           },
           "defaultConfiguration": "development"
         },
-
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },
@@ -80,7 +79,7 @@
             "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": ["src/favicon.ico", "src"],
             "styles": ["src/styles.scss"],
             "scripts": []
           }
