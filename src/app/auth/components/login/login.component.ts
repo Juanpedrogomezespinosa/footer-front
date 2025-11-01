@@ -47,7 +47,7 @@ export class LoginComponent {
     this.authService.login({ email, password }).subscribe({
       next: () => {
         this.toast.showSuccess("Inicio de sesión exitoso");
-        this.router.navigate(["/products"]);
+        this.router.navigate(["/home"]);
       },
       error: (err) => {
         const message = err?.error?.message || "Error en el inicio de sesión";
