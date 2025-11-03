@@ -2,9 +2,9 @@ import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import { AuthService } from "../../../core/services/auth.service";
+import { AuthService, User } from "../../../core/services/auth.service"; // 🆕 Importamos la interfaz User
 import { trigger, transition, style, animate } from "@angular/animations";
-import { UiStateService } from "../../../core/services/ui-state.service"; // <-- 1. IMPORTAR
+import { UiStateService } from "../../../core/services/ui-state.service";
 
 @Component({
   selector: "app-navbar",
@@ -44,33 +44,49 @@ export class NavbarComponent {
   public searchActiveDesktop = false;
   public searchTerm = "";
 
+  // 🆕 Constantes para construir la URL del avatar
+  private readonly API_URL = "http://localhost:3000";
+  private readonly DEFAULT_AVATAR_PLACEHOLDER =
+    "https://placehold.co/100x100/60a5fa/FFFFFF?text=";
+
   @ViewChild("searchInputDesktop")
   searchInputDesktop!: ElementRef<HTMLInputElement>;
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private uiStateService: UiStateService // <-- 2. INYECTAR
+    private uiStateService: UiStateService
   ) {
-    this.authService.user$.subscribe((user: any) => {
+    // 🆕 Lógica de suscripción al avatar actualizada
+    this.authService.user$.subscribe((user: User | null) => {
       this.isLoggedIn = !!user;
-      const possibleAvatar =
-        user?.avatarUrl ||
-        user?.photoURL ||
-        user?.profileImage ||
-        user?.image ||
-        user?.picture;
-      if (possibleAvatar) {
-        this.userAvatarUrl = possibleAvatar;
+
+      if (!user) {
+        // Si no hay usuario, usamos un placeholder genérico
+        this.userAvatarUrl = `${this.DEFAULT_AVATAR_PLACEHOLDER}NA`;
+        return;
+      }
+
+      // 1. Verificar si el usuario tiene un avatarUrl desde el backend
+      if (user.avatarUrl) {
+        // 2. Construir la URL completa
+        // Si la URL ya es absoluta (ej. Google/Pravatar), la usa.
+        // Si es relativa (empieza con /uploads/), le añade la URL de la API.
+        if (user.avatarUrl.startsWith("http")) {
+          this.userAvatarUrl = user.avatarUrl;
+        } else {
+          this.userAvatarUrl = `${this.API_URL}${user.avatarUrl}`;
+        }
       } else {
-        const name = user?.username || user?.name || "Usuario";
+        // 3. Si no hay avatarUrl, crear placeholder con iniciales
+        const name = user?.username || "Usuario";
         const initials = name
           .split(" ")
           .map((n: string) => n[0])
           .join("")
           .substring(0, 2)
           .toUpperCase();
-        this.userAvatarUrl = `https://placehold.co/100x100/60a5fa/FFFFFF?text=${initials}`;
+        this.userAvatarUrl = `${this.DEFAULT_AVATAR_PLACEHOLDER}${initials}`;
       }
     });
   }
@@ -96,7 +112,7 @@ export class NavbarComponent {
 
   public toggleMobileMenu(): void {
     this.mobileMenuActive = !this.mobileMenuActive;
-    this.uiStateService.isMobileMenuOpen.set(this.mobileMenuActive); // <-- 3. ACTUALIZAR SIGNAL
+    this.uiStateService.isMobileMenuOpen.set(this.mobileMenuActive);
     if (this.mobileMenuActive) {
       this.searchActiveDesktop = false;
       document.body.style.overflow = "hidden";
@@ -107,7 +123,7 @@ export class NavbarComponent {
 
   public closeMobileMenu(): void {
     this.mobileMenuActive = false;
-    this.uiStateService.isMobileMenuOpen.set(false); // <-- 3. ACTUALIZAR SIGNAL
+    this.uiStateService.isMobileMenuOpen.set(false);
     document.body.style.overflow = "auto";
   }
 

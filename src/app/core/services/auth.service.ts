@@ -2,31 +2,35 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 
-// --- 👇 CAMBIO: Añadido 'export' ---
+// --- Interfaces de Autenticación ---
 export interface RegisterData {
   username: string;
   email: string;
   password: string;
 }
 
-// --- 👇 CAMBIO: Añadido 'export' ---
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-// --- 👇 CAMBIO: Añadido 'export' ---
+/**
+ * 🆕 Interfaz de Usuario actualizada
+ * Ahora incluye los campos opcionales del backend
+ */
 export interface User {
   id: number;
   email: string;
   username: string;
   role: string;
+  lastName?: string | null;
+  phone?: string | null;
+  avatarUrl?: string | null; // <-- CAMBIO: Añadido avatarUrl
 }
 
-// --- 👇 CAMBIO: Añadido 'export' ---
 export interface LoginResponse {
   message: string;
-  user: User;
+  user: User; // <-- Usará la interfaz User actualizada
   token: string;
 }
 
@@ -34,7 +38,7 @@ export interface LoginResponse {
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.userSubject.asObservable();
-  private backendUrl = "http://localhost:3000/api/auth"; // Cambia puerto si es necesario
+  private backendUrl = "http://localhost:3000/api/auth";
 
   constructor(private http: HttpClient) {
     const token = localStorage.getItem("token");
@@ -66,9 +70,30 @@ export class AuthService {
     return !!localStorage.getItem("token");
   }
 
-  // --- CAMBIO: añadido getToken() para el interceptor (aunque ya funciona) ---
   getToken(): string | null {
     return localStorage.getItem("token");
+  }
+
+  /**
+   * 🆕 NUEVA FUNCIÓN: Actualiza el avatar del usuario en el estado global.
+   * Esto notificará a la Navbar y a cualquier otro componente que escuche user$.
+   */
+  public updateUserAvatar(avatarUrl: string): void {
+    const currentUser = this.userSubject.getValue();
+
+    if (currentUser) {
+      // 1. Crear un nuevo objeto de usuario con la URL actualizada
+      const updatedUser = {
+        ...currentUser,
+        avatarUrl: avatarUrl,
+      };
+
+      // 2. Emitir el nuevo estado
+      this.userSubject.next(updatedUser);
+
+      // 3. Actualizar el localStorage para persistir el cambio
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
   }
 
   private handleLoginResponse(res: LoginResponse) {

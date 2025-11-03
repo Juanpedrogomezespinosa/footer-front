@@ -3,11 +3,28 @@
     <aside class="lg:w-1/4 xl:w-1/5">
       <div class="flex flex-col gap-4 sticky top-28">
         <div class="flex items-center gap-3 mb-4">
-          <div
-            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
-            [ngStyle]="avatarStyle"
-            data-alt="User avatar"
-          ></div>
+          <label for="avatarInput" class="relative cursor-pointer group">
+            <div
+              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
+              [ngStyle]="avatarStyle"
+              data-alt="User avatar"
+            ></div>
+
+            <div
+              class="absolute inset-0 size-12 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <span class="material-symbols-outlined text-white">edit</span>
+            </div>
+          </label>
+
+          <input
+            type="file"
+            id="avatarInput"
+            class="hidden"
+            accept="image/png, image/jpeg, image/gif"
+            (change)="onFileSelect($event)"
+          />
+
           <div class="flex flex-col overflow-hidden">
             <h1
               class="text-text-light-primary text-base font-semibold leading-normal"
@@ -22,6 +39,23 @@
           </div>
         </div>
 
+        <div *ngIf="selectedAvatarPreview" class="flex items-center gap-2">
+          <button
+            (click)="uploadAvatar()"
+            [disabled]="uploadingAvatar"
+            class="flex-1 text-xs px-2 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            {{ uploadingAvatar ? "Subiendo..." : "Guardar Avatar" }}
+          </button>
+          <button
+            (click)="cancelAvatarUpload()"
+            [disabled]="uploadingAvatar"
+            class="text-xs px-2 py-1.5 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            Cancelar
+          </button>
+        </div>
+
         <div class="flex flex-col gap-1 mt-4">
           <a
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -30,14 +64,6 @@
             [routerLinkActiveOptions]="{ exact: true }"
             #rlaMisDatos="routerLinkActive"
           >
-            <span
-              class="material-symbols-outlined"
-              [ngClass]="{
-                'text-secondary': rlaMisDatos.isActive,
-                'text-text-light-primary': !rlaMisDatos.isActive
-              }"
-              >person</span
-            >
             <p
               class="text-sm font-medium"
               [ngClass]="{
@@ -55,14 +81,6 @@
             routerLinkActive="bg-secondary/10"
             #rlaDirecciones="routerLinkActive"
           >
-            <span
-              class="material-symbols-outlined"
-              [ngClass]="{
-                'text-secondary': rlaDirecciones.isActive,
-                'text-text-light-primary': !rlaDirecciones.isActive
-              }"
-              >location_on</span
-            >
             <p
               class="text-sm font-medium"
               [ngClass]="{
@@ -80,14 +98,6 @@
             routerLinkActive="bg-secondary/10"
             #rlaPedidos="routerLinkActive"
           >
-            <span
-              class="material-symbols-outlined"
-              [ngClass]="{
-                'text-secondary': rlaPedidos.isActive,
-                'text-text-light-primary': !rlaPedidos.isActive
-              }"
-              >receipt_long</span
-            >
             <p
               class="text-sm font-medium"
               [ngClass]="{
@@ -104,9 +114,6 @@
             href="#"
             (click)="onLogout($event)"
           >
-            <span class="material-symbols-outlined text-text-light-primary"
-              >logout</span
-            >
             <p class="text-text-light-primary text-sm font-medium">
               Cerrar Sesión
             </p>

@@ -7,7 +7,6 @@ import {
   Validators,
 } from "@angular/forms";
 import { Observable, catchError, of, tap } from "rxjs";
-// 🆕 Importamos 'Router' para que esté disponible
 import { Router, RouterModule } from "@angular/router";
 import {
   UpdateProfilePayload,
@@ -32,13 +31,15 @@ export class ProfileComponent implements OnInit {
   public loading: boolean = true;
   public errorMessage: string | null = null;
 
-  // Constructor con inyecciones de dependencia
+  // Estado para la subida de avatar
+  public uploadingAvatar: boolean = false;
+  public selectedAvatarPreview: string | ArrayBuffer | null = null;
+  private selectedFile: File | null = null;
+  private readonly API_URL = "http://localhost:3000"; // URL base de tu backend
+
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    //
-    // 💡 CAMBIO CLAVE: 'private router' ahora es 'public router'
-    //
     public router: Router,
     public toastService: ToastService,
     private authService: AuthService
@@ -72,7 +73,6 @@ export class ProfileComponent implements OnInit {
       .pipe(
         tap((user: UserProfile) => {
           this.user = user;
-          // Cargamos los campos del backend
           this.profileForm.patchValue({
             username: user.username,
             lastName: user.lastName || "",
@@ -99,7 +99,7 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  // Lógica para enviar el formulario de actualización
+  // Lógica para enviar el formulario de actualización de TEXTO
   public onSubmit(): void {
     if (this.profileForm.invalid || this.submitting) {
       this.profileForm.markAllAsTouched();
@@ -110,7 +110,6 @@ export class ProfileComponent implements OnInit {
     this.submitting = true;
     const formValue = this.profileForm.value;
 
-    // Construir el payload incluyendo todos los campos
     const updatePayload: UpdateProfilePayload = {
       username: formValue.username,
       lastName: formValue.lastName || null,
@@ -130,10 +129,15 @@ export class ProfileComponent implements OnInit {
           ...res.user,
         };
 
+        // 🆕 Notificamos al AuthService que el usuario ha cambiado
+        // (esto actualizará la navbar si el avatarUrl cambió, aunque esta ruta no lo haga)
+        if (res.user.avatarUrl) {
+          this.authService.updateUserAvatar(res.user.avatarUrl);
+        }
+
         this.toastService.showSuccess(res.message);
         this.submitting = false;
 
-        // Resetear solo los campos de contraseña
         this.profileForm.get("currentPassword")?.setValue("");
         this.profileForm.get("newPassword")?.setValue("");
       },
@@ -147,8 +151,18 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // Getter para crear el estilo de background del avatar de forma segura
+  // Getter para el avatar (con lógica de previsualización)
   public get avatarStyle(): { [key: string]: string } {
+    if (this.selectedAvatarPreview) {
+      return { "background-image": `url('${this.selectedAvatarPreview}')` };
+    }
+
+    if (this.user?.avatarUrl) {
+      return {
+        "background-image": `url('${this.API_URL}${this.user.avatarUrl}')`,
+      };
+    }
+
     const defaultUrl = "https://placehold.co/150x150/f0f0f0/6C757D?text=User";
     const userId = this.user?.id || 0;
     const avatarUrl = userId
@@ -168,8 +182,82 @@ export class ProfileComponent implements OnInit {
     this.toastService.showSuccess("Has cerrado la sesión.");
   }
 
-  // Método de conveniencia para acceder a los controles del formulario
   get f() {
     return this.profileForm.controls;
+  }
+
+  // -------------------------------------------
+  // LÓGICA DE SUBIDA DE AVATAR
+  // -------------------------------------------
+
+  onFileSelect(event: Event): void {
+    const element = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = element.files;
+
+    if (fileList && fileList[0]) {
+      const file = fileList[0];
+
+      if (!file.type.startsWith("image/")) {
+        this.toastService.showError(
+          "Por favor, selecciona solo archivos de imagen."
+        );
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        this.toastService.showError("La imagen no puede pesar más de 5MB.");
+        return;
+      }
+
+      this.selectedFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedAvatarPreview = e.target?.result ?? null;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  /**
+   * Sube la imagen seleccionada al backend.
+   */
+  uploadAvatar(): void {
+    if (!this.selectedFile) {
+      this.toastService.showError("No has seleccionado ninguna imagen nueva.");
+      return;
+    }
+
+    this.uploadingAvatar = true;
+
+    this.userService.updateAvatar(this.selectedFile).subscribe({
+      next: (res) => {
+        if (this.user) {
+          this.user.avatarUrl = res.avatarUrl;
+
+          //
+          // 💡 CAMBIO CLAVE: Notificar al AuthService que el avatar cambió
+          //
+          this.authService.updateUserAvatar(res.avatarUrl);
+        }
+
+        this.selectedFile = null;
+        this.selectedAvatarPreview = null;
+        this.uploadingAvatar = false;
+        this.toastService.showSuccess(res.message);
+      },
+      error: (err) => {
+        this.uploadingAvatar = false;
+        const errorMessage =
+          err.error?.message || "Error desconocido al subir la imagen.";
+        this.toastService.showError(errorMessage);
+        console.error("Error uploading avatar:", err);
+      },
+    });
+  }
+
+  cancelAvatarUpload(): void {
+    this.selectedFile = null;
+    this.selectedAvatarPreview = null;
   }
 }
