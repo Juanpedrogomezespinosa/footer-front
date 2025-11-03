@@ -4,37 +4,43 @@ import {
   HttpInterceptor,
   HttpHandler,
   HttpRequest,
+  HttpErrorResponse, // Importar HttpErrorResponse
 } from "@angular/common/http";
-import { Observable } from "rxjs";
-// No necesitamos AuthService aquí si leemos desde localStorage
+import { Observable, throwError } from "rxjs"; // Importar throwError
+import { catchError } from "rxjs/operators"; // Importar catchError
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  // No necesitamos inyectar AuthService si usamos localStorage
   constructor() {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // --- LÓGICA DE OBTENCIÓN DE TOKEN ---
-    // Asumimos que guardas el token en localStorage después del login
-    // con la clave 'token'. Si usas otra clave (ej. 'auth_token'), cámbiala aquí.
     const token = localStorage.getItem("token");
 
-    // Si no hay token, dejamos pasar la petición sin modificarla
-    // (Ej: peticiones a /login o /register)
     if (!token) {
       return next.handle(req);
     }
 
-    // Si hay token, clonamos la petición y añadimos la cabecera
-    // 'Authorization' con el formato 'Bearer TOKEN'
     const authReq = req.clone({
       headers: req.headers.set("Authorization", `Bearer ${token}`),
     });
 
-    // Enviamos la petición clonada (con el token) al backend
-    return next.handle(authReq);
+    return next.handle(authReq).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Logueamos el error ANTES de que llegue al componente
+        console.warn("🚨 INTERCEPTOR FALLÓ 🚨");
+        console.warn("Status:", error.status, "Status Text:", error.statusText);
+        console.warn(
+          "Cuerpo de error (lo que Express envió, que causó el fallo 200/ok:false):",
+          error.error
+        );
+
+        // El valor de error.error te dirá si es texto/HTML o un JSON malformado.
+
+        return throwError(() => error); // Re-lanzar el error
+      })
+    );
   }
 }

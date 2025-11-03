@@ -29,14 +29,22 @@ export const routes: Routes = [
       ),
   },
 
+  // --- Nueva ruta de Perfil de Usuario ---
+  {
+    path: "profile",
+    loadComponent: () =>
+      import("./profile/profile.component").then((m) => m.ProfileComponent),
+    canActivate: [AuthGuard], // Asegura que solo usuarios autenticados accedan
+    title: "Mi Perfil",
+  },
+  // ----------------------------------------
+
   {
     path: "cart",
     loadComponent: () =>
       import("./cart/cart.component").then((m) => m.CartComponent),
     canActivate: [AuthGuard],
   },
-
-  // --- Esta es la ruta que debe cargar ---
   {
     path: "confirmation/:orderId",
     loadComponent: () =>
@@ -45,7 +53,6 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
-
   {
     path: "",
     redirectTo: "home",
