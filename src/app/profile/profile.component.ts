@@ -7,6 +7,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { Observable, catchError, of, tap } from "rxjs";
+// 🆕 Importamos 'Router' para que esté disponible
 import { Router, RouterModule } from "@angular/router";
 import {
   UpdateProfilePayload,
@@ -35,7 +36,10 @@ export class ProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private router: Router,
+    //
+    // 💡 CAMBIO CLAVE: 'private router' ahora es 'public router'
+    //
+    public router: Router,
     public toastService: ToastService,
     private authService: AuthService
   ) {}
@@ -47,13 +51,12 @@ export class ProfileComponent implements OnInit {
         { value: "", disabled: false },
         [Validators.required, Validators.maxLength(50)],
       ],
+      lastName: [{ value: "", disabled: false }, [Validators.maxLength(50)]],
       email: [
         { value: "", disabled: false },
         [Validators.required, Validators.email],
       ],
-      phone: [
-        { value: "No disponible", disabled: true }, // Campo solo para visualización
-      ],
+      phone: [{ value: "", disabled: false }, [Validators.maxLength(20)]],
       currentPassword: ["", [Validators.minLength(6)]],
       newPassword: ["", [Validators.minLength(6)]],
     });
@@ -69,11 +72,12 @@ export class ProfileComponent implements OnInit {
       .pipe(
         tap((user: UserProfile) => {
           this.user = user;
+          // Cargamos los campos del backend
           this.profileForm.patchValue({
             username: user.username,
+            lastName: user.lastName || "",
             email: user.email,
-            // Asumimos que el backend devuelve 'phone' o lo dejamos con el valor por defecto
-            phone: user.phone || "No disponible",
+            phone: user.phone || "",
           });
         }),
         catchError((err) => {
@@ -83,7 +87,6 @@ export class ProfileComponent implements OnInit {
             "Error al cargar el perfil. Asegúrate de estar autenticado."
           );
 
-          // Si es 401/403 (Token inválido o expirado), redirigir al login
           if (err.status === 401 || err.status === 403) {
             this.router.navigate(["/login"]);
           }
@@ -107,24 +110,29 @@ export class ProfileComponent implements OnInit {
     this.submitting = true;
     const formValue = this.profileForm.value;
 
-    // Construir el payload solo con los campos que maneja el backend (username y email)
+    // Construir el payload incluyendo todos los campos
     const updatePayload: UpdateProfilePayload = {
       username: formValue.username,
+      lastName: formValue.lastName || null,
       email: formValue.email,
+      phone: formValue.phone || null,
     };
 
-    // Solo incluimos la contraseña si se ha rellenado el campo 'newPassword'
-    // Nota: El campo 'currentPassword' es solo para UX, el backend no lo pide en el controller actual.
     if (formValue.newPassword) {
       updatePayload.password = formValue.newPassword;
     }
 
     this.userService.updateProfile(updatePayload).subscribe({
       next: (res) => {
-        // Actualizar la vista local con los datos devueltos
-        this.user = { ...this.user, ...res.user, phone: this.user?.phone };
-        this.submitting = false;
+        // Actualizar el objeto user con los datos devueltos
+        this.user = {
+          ...this.user,
+          ...res.user,
+        };
+
         this.toastService.showSuccess(res.message);
+        this.submitting = false;
+
         // Resetear solo los campos de contraseña
         this.profileForm.get("currentPassword")?.setValue("");
         this.profileForm.get("newPassword")?.setValue("");
@@ -154,17 +162,10 @@ export class ProfileComponent implements OnInit {
 
   // Maneja el cierre de sesión del usuario
   public onLogout(event: Event): void {
-    event.preventDefault(); // Evita la navegación por defecto del <a>
-    this.authService.logout(); // Llama al método real de tu servicio de autenticación
-    this.router.navigate(["/login"]); // Redirige al inicio o a la página de login
+    event.preventDefault();
+    this.authService.logout();
+    this.router.navigate(["/login"]);
     this.toastService.showSuccess("Has cerrado la sesión.");
-  }
-
-  // Método para el botón 'Cambiar Contraseña' (funcionalidad no implementada)
-  public onPasswordChangeClick(): void {
-    this.toastService.showError(
-      "Funcionalidad pendiente: Abrir modal de cambio de contraseña."
-    );
   }
 
   // Método de conveniencia para acceder a los controles del formulario

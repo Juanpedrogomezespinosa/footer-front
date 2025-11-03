@@ -4,15 +4,17 @@ import { Observable } from "rxjs";
 
 /**
  * Interfaz para representar los datos esenciales del usuario.
- * Nota: No incluye 'password' por seguridad, salvo en el cuerpo de actualización.
+ * Nota: 'username' se usa para 'Nombre'. 'email' es clave.
  */
 export interface UserProfile {
   id: number;
-  username: string; // En el backend, lo llamas 'username', en el frontend lo usaremos para el 'Nombre'.
+  username: string;
+  // 🆕 Nuevos campos del backend
+  lastName?: string | null;
+  phone?: string | null;
+  // Fin de nuevos campos
   email: string;
-  // Puedes añadir otros campos si el backend los devuelve, como 'createdAt', 'role', etc.
-  // Por ahora, usaremos un campo mock para el teléfono, ya que no está en el modelo User de Sequelize.
-  phone?: string;
+  role: string;
 }
 
 /**
@@ -20,6 +22,10 @@ export interface UserProfile {
  */
 export interface UpdateProfilePayload {
   username?: string;
+  // 🆕 Nuevos campos para enviar
+  lastName?: string | null;
+  phone?: string | null;
+  // Fin de nuevos campos
   email?: string;
   password?: string;
 }
@@ -35,14 +41,12 @@ export class UserService {
 
   /**
    * Obtiene los datos del perfil del usuario autenticado.
-   * Usamos la ruta GET /api/users/profile, asumiendo que el backend
-   * utiliza esta ruta para obtener los datos del usuario autenticado (middleware).
+   * Llama a la ruta GET /api/users/profile.
    *
    * @returns Observable con los datos del perfil.
    */
   getProfile(): Observable<UserProfile> {
     // CORRECCIÓN: Usamos '/api/users/profile' para ser consistente con updateProfile.
-    // Esto asume que el backend tiene un GET en esta ruta que devuelve el perfil.
     return this.http.get<UserProfile>(`${this.apiUrl}/profile`);
   }
 

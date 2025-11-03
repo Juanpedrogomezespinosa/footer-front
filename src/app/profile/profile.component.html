@@ -1,71 +1,104 @@
 <main class="flex-1 w-full max-w-screen-xl mx-auto p-4 sm:p-6 lg:p-8">
   <div class="flex flex-col lg:flex-row gap-8">
-    <!-- Sidebar de Navegación -->
     <aside class="lg:w-1/4 xl:w-1/5">
       <div class="flex flex-col gap-4 sticky top-28">
-        <!-- Info de Usuario -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 mb-4">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
             [ngStyle]="avatarStyle"
             data-alt="User avatar"
           ></div>
-          <div class="flex flex-col">
+          <div class="flex flex-col overflow-hidden">
             <h1
               class="text-text-light-primary text-base font-semibold leading-normal"
             >
               Bienvenido, {{ user?.username || "Cargando..." }}
             </h1>
             <p
-              class="text-text-light-secondary text-sm font-normal leading-normal"
+              class="text-text-light-secondary text-sm font-normal leading-normal truncate"
             >
               {{ user?.email || "Cargando..." }}
             </p>
           </div>
         </div>
 
-        <!-- Opciones de Navegación -->
         <div class="flex flex-col gap-1 mt-4">
-          <!-- Mis Datos (Activo) -->
           <a
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-main/10"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
             routerLink="/profile"
-            routerLinkActive="bg-primary-main/10 text-primary-main"
+            routerLinkActive="bg-secondary/10"
             [routerLinkActiveOptions]="{ exact: true }"
+            #rlaMisDatos="routerLinkActive"
           >
-            <span class="material-symbols-outlined text-primary-main"
+            <span
+              class="material-symbols-outlined"
+              [ngClass]="{
+                'text-secondary': rlaMisDatos.isActive,
+                'text-text-light-primary': !rlaMisDatos.isActive
+              }"
               >person</span
             >
-            <p class="text-primary-main text-sm font-semibold">Mis Datos</p>
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-secondary font-semibold': rlaMisDatos.isActive,
+                'text-text-light-primary': !rlaMisDatos.isActive
+              }"
+            >
+              Mis Datos
+            </p>
           </a>
 
-          <!-- Direcciones (Pendiente de implementar ruta) -->
           <a
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors"
             routerLink="/profile/addresses"
+            routerLinkActive="bg-secondary/10"
+            #rlaDirecciones="routerLinkActive"
           >
-            <span class="material-symbols-outlined text-text-light-primary"
+            <span
+              class="material-symbols-outlined"
+              [ngClass]="{
+                'text-secondary': rlaDirecciones.isActive,
+                'text-text-light-primary': !rlaDirecciones.isActive
+              }"
               >location_on</span
             >
-            <p class="text-text-light-primary text-sm font-medium">
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-secondary font-semibold': rlaDirecciones.isActive,
+                'text-text-light-primary': !rlaDirecciones.isActive
+              }"
+            >
               Direcciones
             </p>
           </a>
 
-          <!-- Historial de Pedidos (Pendiente de implementar ruta) -->
           <a
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors"
             routerLink="/profile/orders"
+            routerLinkActive="bg-secondary/10"
+            #rlaPedidos="routerLinkActive"
           >
-            <span class="material-symbols-outlined text-text-light-primary"
+            <span
+              class="material-symbols-outlined"
+              [ngClass]="{
+                'text-secondary': rlaPedidos.isActive,
+                'text-text-light-primary': !rlaPedidos.isActive
+              }"
               >receipt_long</span
             >
-            <p class="text-text-light-primary text-sm font-medium">
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-secondary font-semibold': rlaPedidos.isActive,
+                'text-text-light-primary': !rlaPedidos.isActive
+              }"
+            >
               Historial de Pedidos
             </p>
           </a>
 
-          <!-- Cerrar Sesión (Debe llamar a un método de AuthService) -->
           <a
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors mt-4"
             href="#"
@@ -82,10 +115,9 @@
       </div>
     </aside>
 
-    <!-- Contenido Principal: Mis Datos Personales -->
     <div class="lg:w-3/4 xl:w-4/5">
       <section id="mis-datos">
-        <div class="flex flex-col p-4">
+        <div class="flex flex-col p-4 pb-0">
           <p
             class="text-text-light-primary text-3xl font-bold leading-tight tracking-tight"
           >
@@ -104,7 +136,7 @@
 
         <div
           *ngIf="!loading"
-          class="bg-white p-6 rounded-xl border border-gray-200"
+          class="bg-white p-6 rounded-xl border border-gray-200 mt-6"
         >
           <form
             [formGroup]="profileForm"
@@ -112,14 +144,13 @@
             class="flex flex-col gap-6"
           >
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Nombre / Username -->
               <label class="flex flex-col">
                 <p class="text-text-light-primary text-sm font-medium pb-2">
                   Nombre
                 </p>
                 <input
                   formControlName="username"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-primary-main focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
                 />
                 <div
                   *ngIf="
@@ -132,7 +163,18 @@
                 </div>
               </label>
 
-              <!-- Email -->
+              <label class="flex flex-col">
+                <p class="text-text-light-primary text-sm font-medium pb-2">
+                  Apellidos
+                </p>
+                <input
+                  formControlName="lastName"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
+                />
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <label class="flex flex-col">
                 <p class="text-text-light-primary text-sm font-medium pb-2">
                   Email
@@ -140,7 +182,7 @@
                 <input
                   formControlName="email"
                   type="email"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-primary-main focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
                 />
                 <div
                   *ngIf="
@@ -152,28 +194,26 @@
                   El email debe ser válido.
                 </div>
               </label>
-            </div>
 
-            <!-- Teléfono (Mock, no manejado por el backend) -->
-            <label class="flex flex-col">
-              <p class="text-text-light-primary text-sm font-medium pb-2">
-                Teléfono
-              </p>
-              <input
-                formControlName="phone"
-                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-primary-main focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
-              />
-              <p class="text-text-light-secondary text-xs mt-1">
-                Este campo no se guarda en el servidor.
-              </p>
-            </label>
+              <label class="flex flex-col">
+                <p class="text-text-light-primary text-sm font-medium pb-2">
+                  Teléfono
+                </p>
+                <input
+                  formControlName="phone"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
+                />
+                <p class="text-text-light-secondary text-xs mt-1">
+                  Este campo se guarda en el servidor.
+                </p>
+              </label>
+            </div>
 
             <div
               class="flex items-center gap-4 pt-4 border-t border-gray-200 flex-wrap"
             >
-              <!-- Botón Cambiar Contraseña -->
               <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 bg-transparent text-primary-main gap-2 text-sm font-bold min-w-0 px-6 border-2 border-primary-main hover:bg-primary-main/10 transition-colors"
+                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 bg-secondary text-white gap-2 text-sm font-bold min-w-0 px-6 border-2 border-secondary hover:bg-secondary-dark transition-colors"
                 type="button"
                 (click)="
                   toastService.showError(
@@ -184,10 +224,9 @@
                 Cambiar Contraseña
               </button>
 
-              <!-- Botón Guardar Cambios -->
               <button
                 [disabled]="profileForm.invalid || submitting"
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 bg-primary-main text-white gap-2 text-sm font-bold min-w-0 px-6 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 bg-secondary text-white gap-2 text-sm font-bold min-w-0 px-6 hover:bg-secondary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit"
               >
                 <span *ngIf="submitting" class="animate-spin text-xl">↻</span>
@@ -197,7 +236,6 @@
           </form>
         </div>
       </section>
-      <!-- Aquí irían las rutas hijas para Direcciones e Historial de Pedidos -->
       <router-outlet></router-outlet>
     </div>
   </div>
