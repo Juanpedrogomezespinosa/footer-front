@@ -62,7 +62,12 @@
     </form>
 
     <nav class="flex items-center gap-1 sm:gap-2 shrink-0">
+      <!-- 
+        💡 CAMBIO AQUÍ: 
+        Añadido *ngIf="isLoggedIn" para ocultar el carrito si no está logueado.
+      -->
       <a
+        *ngIf="isLoggedIn"
         routerLink="/cart"
         aria-label="Ver carrito de compras"
         class="hidden md:flex items-center justify-center h-10 w-10 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark hover:text-text-primary-light dark:hover:text-text-primary-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -83,11 +88,7 @@
         </svg>
       </a>
 
-      <!-- 
-        💡 CAMBIO AQUÍ: 
-        Añadido *ngIf="isLoggedIn" para ocultar el avatar si no está logueado.
-        He respetado tus clases personalizadas del anillo.
-      -->
+      <!-- Avatar (ya tiene el *ngIf="isLoggedIn") -->
       <a
         *ngIf="isLoggedIn"
         routerLink="/profile"
@@ -340,7 +341,12 @@
       <hr class="border-subtle-light" />
 
       <!-- Carrito y Perfil Móvil -->
+      <!-- 
+        💡 CAMBIO AQUÍ: 
+        Añadido *ngIf="isLoggedIn" para ocultar "Carrito" si no está logueado.
+      -->
       <a
+        *ngIf="isLoggedIn"
         routerLink="/cart"
         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-primary-light hover:bg-gray-100 transition-all group"
         (click)="closeMobileMenu()"
