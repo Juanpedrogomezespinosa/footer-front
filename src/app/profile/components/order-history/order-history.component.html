@@ -1,0 +1,93 @@
+<section id="historial-pedidos">
+  <div class="flex flex-col p-4 pb-0 lg:p-0">
+    <p
+      class="text-text-light-primary text-3xl font-bold leading-tight tracking-tight"
+    >
+      Historial de Pedidos
+    </p>
+    <p
+      class="text-text-light-secondary text-base font-normal leading-normal pt-2"
+    >
+      Consulta el estado y los detalles de tus pedidos anteriores.
+    </p>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-10 text-gray-500">
+    Cargando historial...
+  </div>
+
+  <div *ngIf="error" class="text-center py-10 text-red-500">
+    {{ error }}
+  </div>
+
+  <div *ngIf="orders$ | async as data">
+    <div
+      *ngIf="!data?.orders || data.orders.length === 0; else showOrders"
+      class="bg-white p-6 rounded-xl border border-gray-200 mt-6 text-center text-gray-500"
+    >
+      <p>Aún no has realizado ningún pedido.</p>
+    </div>
+
+    <ng-template #showOrders>
+      <div class="flex flex-col gap-6 mt-6">
+        <div
+          *ngFor="let order of data.orders"
+          class="bg-white p-6 rounded-xl border border-gray-200"
+        >
+          <div
+            class="flex flex-col md:flex-row justify-between md:items-center pb-4 border-b border-gray-200"
+          >
+            <div>
+              <p class="text-lg font-semibold text-text-light-primary">
+                Pedido #{{ order.id }}
+              </p>
+              <p class="text-sm text-text-light-secondary">
+                Realizado el:
+                {{ order.createdAt | date : "dd/MM/yyyy 'a las' HH:mm" }}
+              </p>
+            </div>
+            <div class="mt-2 md:mt-0 text-left md:text-right">
+              <p class="text-lg font-bold text-secondary">
+                {{ order.total | currency : "EUR" }}
+              </p>
+              <span
+                class="text-xs font-medium px-2.5 py-0.5 rounded"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': order.status === 'COMPLETED',
+                  'bg-yellow-100 text-yellow-800': order.status === 'PENDING',
+                  'bg-red-100 text-red-800': order.status === 'CANCELLED'
+                }"
+              >
+                {{ order.status | titlecase }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4 pt-4">
+            <div
+              *ngFor="let item of order.OrderItems"
+              class="flex items-center gap-4"
+            >
+              <img
+                [src]="'http://localhost:3000' + item.Product.image"
+                [alt]="item.Product.name"
+                class="size-16 rounded-lg object-cover border border-gray-100"
+              />
+              <div class="flex-1">
+                <a
+                  [routerLink]="['/products', item.Product.id]"
+                  class="text-sm font-medium text-text-light-primary hover:text-secondary"
+                >
+                  {{ item.Product.name }}
+                </a>
+                <p class="text-sm text-text-light-secondary">
+                  {{ item.quantity }} x {{ item.price | currency : "EUR" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</section>

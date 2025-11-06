@@ -1,44 +1,31 @@
+// src/app/profile/profile.component.ts
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
-import { Observable, catchError, of, tap } from "rxjs";
-import { Router, RouterModule } from "@angular/router";
-import {
-  UpdateProfilePayload,
-  UserProfile,
-  UserService,
-} from "app/core/services/user.service";
+import { catchError, of, tap } from "rxjs";
+import { Router, RouterModule } from "@angular/router"; // Importar RouterModule
+import { UserProfile, UserService } from "app/core/services/user.service";
 import { AuthService } from "app/core/services/auth.service";
 import { ToastService } from "app/core/services/toast.service";
 
 @Component({
   selector: "app-profile",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, RouterModule], // Quitar ReactiveFormsModule, Añadir RouterModule
   templateUrl: "./profile.component.html",
   styleUrls: [],
 })
 export class ProfileComponent implements OnInit {
-  // Estado
+  // Estado (Simplificado para el layout)
   public user: UserProfile | null = null;
-  public profileForm!: FormGroup;
-  public submitting: boolean = false;
   public loading: boolean = true;
-  public errorMessage: string | null = null;
 
-  // Estado para la subida de avatar
+  // Estado para la subida de avatar (Se mantiene)
   public uploadingAvatar: boolean = false;
   public selectedAvatarPreview: string | ArrayBuffer | null = null;
   private selectedFile: File | null = null;
   private readonly API_URL = "http://localhost:3000"; // URL base de tu backend
 
   constructor(
-    private fb: FormBuilder,
     private userService: UserService,
     public router: Router,
     public toastService: ToastService,
@@ -46,26 +33,11 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Inicialización del formulario
-    this.profileForm = this.fb.group({
-      username: [
-        { value: "", disabled: false },
-        [Validators.required, Validators.maxLength(50)],
-      ],
-      lastName: [{ value: "", disabled: false }, [Validators.maxLength(50)]],
-      email: [
-        { value: "", disabled: false },
-        [Validators.required, Validators.email],
-      ],
-      phone: [{ value: "", disabled: false }, [Validators.maxLength(20)]],
-      currentPassword: ["", [Validators.minLength(6)]],
-      newPassword: ["", [Validators.minLength(6)]],
-    });
-
+    // Solo cargamos el perfil para el saludo y avatar
     this.loadProfile();
   }
 
-  // Obtiene los datos del perfil del usuario
+  // Carga solo los datos del perfil para el 'aside' (saludo, email, avatar)
   private loadProfile(): void {
     this.loading = true;
     this.userService
@@ -73,12 +45,6 @@ export class ProfileComponent implements OnInit {
       .pipe(
         tap((user: UserProfile) => {
           this.user = user;
-          this.profileForm.patchValue({
-            username: user.username,
-            lastName: user.lastName || "",
-            email: user.email,
-            phone: user.phone || "",
-          });
         }),
         catchError((err) => {
           console.error("Error al cargar el perfil:", err);
@@ -88,6 +54,7 @@ export class ProfileComponent implements OnInit {
           );
 
           if (err.status === 401 || err.status === 403) {
+            this.authService.logout(); // Deslogueamos si hay error de auth
             this.router.navigate(["/login"]);
           }
 
@@ -97,58 +64,6 @@ export class ProfileComponent implements OnInit {
       .subscribe(() => {
         this.loading = false;
       });
-  }
-
-  // Lógica para enviar el formulario de actualización de TEXTO
-  public onSubmit(): void {
-    if (this.profileForm.invalid || this.submitting) {
-      this.profileForm.markAllAsTouched();
-      this.toastService.showError("Por favor, revisa los campos con errores.");
-      return;
-    }
-
-    this.submitting = true;
-    const formValue = this.profileForm.value;
-
-    const updatePayload: UpdateProfilePayload = {
-      username: formValue.username,
-      lastName: formValue.lastName || null,
-      email: formValue.email,
-      phone: formValue.phone || null,
-    };
-
-    if (formValue.newPassword) {
-      updatePayload.password = formValue.newPassword;
-    }
-
-    this.userService.updateProfile(updatePayload).subscribe({
-      next: (res) => {
-        // Actualizar el objeto user con los datos devueltos
-        this.user = {
-          ...this.user,
-          ...res.user,
-        };
-
-        // 🆕 Notificamos al AuthService que el usuario ha cambiado
-        // (esto actualizará la navbar si el avatarUrl cambió, aunque esta ruta no lo haga)
-        if (res.user.avatarUrl) {
-          this.authService.updateUserAvatar(res.user.avatarUrl);
-        }
-
-        this.toastService.showSuccess(res.message);
-        this.submitting = false;
-
-        this.profileForm.get("currentPassword")?.setValue("");
-        this.profileForm.get("newPassword")?.setValue("");
-      },
-      error: (err) => {
-        this.submitting = false;
-        const errorMessage =
-          err.error?.message || "Error desconocido al actualizar.";
-        this.toastService.showError(errorMessage);
-        console.error("Error updating profile:", err);
-      },
-    });
   }
 
   // Getter para el avatar (con lógica de previsualización)
@@ -182,12 +97,8 @@ export class ProfileComponent implements OnInit {
     this.toastService.showSuccess("Has cerrado la sesión.");
   }
 
-  get f() {
-    return this.profileForm.controls;
-  }
-
   // -------------------------------------------
-  // LÓGICA DE SUBIDA DE AVATAR
+  // LÓGICA DE SUBIDA DE AVATAR (Se mantiene intacta)
   // -------------------------------------------
 
   onFileSelect(event: Event): void {
@@ -234,10 +145,6 @@ export class ProfileComponent implements OnInit {
       next: (res) => {
         if (this.user) {
           this.user.avatarUrl = res.avatarUrl;
-
-          //
-          // 💡 CAMBIO CLAVE: Notificar al AuthService que el avatar cambió
-          //
           this.authService.updateUserAvatar(res.avatarUrl);
         }
 

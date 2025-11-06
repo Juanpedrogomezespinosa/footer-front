@@ -1,5 +1,4 @@
 // src/app/app.routes.ts
-// --- FORZANDO RECARGA DE CACHÉ (v2) ---
 import { Routes } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
 
@@ -29,13 +28,43 @@ export const routes: Routes = [
       ),
   },
 
-  // --- Nueva ruta de Perfil de Usuario ---
+  // --- Ruta de Perfil de Usuario (Modificada) ---
   {
     path: "profile",
     loadComponent: () =>
       import("./profile/profile.component").then((m) => m.ProfileComponent),
-    canActivate: [AuthGuard], // Asegura que solo usuarios autenticados accedan
+    canActivate: [AuthGuard],
     title: "Mi Perfil",
+    // --- Rutas Hijas ---
+    children: [
+      {
+        path: "", // Ruta por defecto: /profile
+        loadComponent: () =>
+          import(
+            "./profile/components/profile-details/profile-details.component"
+          ).then((m) => m.ProfileDetailsComponent),
+        title: "Mis Datos",
+      },
+      {
+        path: "orders", // Ruta de historial: /profile/orders
+        loadComponent: () =>
+          import(
+            "./profile/components/order-history/order-history.component"
+          ).then((m) => m.OrderHistoryComponent),
+        title: "Historial de Pedidos",
+      },
+      // --- ¡NUEVA RUTA AÑADIDA! ---
+      {
+        path: "addresses", // Ruta de direcciones: /profile/addresses
+        loadComponent: () =>
+          import(
+            "./profile/components/profile-addresses/profile-addresses.component"
+          ).then((m) => m.ProfileAddressesComponent),
+        title: "Mis Direcciones",
+      },
+      // ----------------------------
+    ],
+    // -------------------
   },
   // ----------------------------------------
 
