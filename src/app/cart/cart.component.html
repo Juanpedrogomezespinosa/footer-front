@@ -109,7 +109,7 @@
                 class="text-text-muted-light hover:text-primary transition-colors"
                 aria-label="Eliminar producto"
               >
-                <!-- He reemplazado el icono de Material Symbols por un SVG de Heroicons -->
+                <!-- Icono SVG -->
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -129,7 +129,7 @@
           </div>
         </div>
 
-        <!-- Resumen del Pedido -->
+        <!-- Resumen del Pedido (MODIFICADO) -->
         <aside class="lg:col-span-1">
           <div
             class="sticky top-28 bg-surface-light p-6 rounded-xl border border-border-light shadow-sm"
@@ -139,6 +139,75 @@
             >
               Resumen del Pedido
             </h2>
+
+            <!--
+              --- INICIO DE SECCIÓN DE DIRECCIÓN AÑADIDA ---
+            -->
+            <div class="border-b border-border-light pb-6 mb-6">
+              <h3 class="text-base font-semibold text-text-dark mb-4">
+                Dirección de Envío
+              </h3>
+
+              <!-- Cargando Direcciones... -->
+              <div *ngIf="isLoadingAddresses()">
+                <div
+                  class="h-10 bg-gray-200 rounded animate-pulse w-full"
+                ></div>
+              </div>
+
+              <!-- Lista de Direcciones -->
+              <div
+                *ngIf="!isLoadingAddresses() && addresses().length > 0"
+                class="flex flex-col gap-3"
+              >
+                <div
+                  *ngFor="let address of addresses()"
+                  (click)="onSelectAddress(address.id)"
+                  class="p-4 rounded-lg border-2 cursor-pointer transition-all"
+                  [ngClass]="{
+                    'border-secondary bg-secondary/5':
+                      selectedAddressId() === address.id,
+                    'border-border-light hover:border-gray-400':
+                      selectedAddressId() !== address.id
+                  }"
+                >
+                  <p
+                    class="font-semibold text-sm text-text-dark flex justify-between"
+                  >
+                    {{ address.alias }}
+                    <span
+                      *ngIf="selectedAddressId() === address.id"
+                      class="text-secondary"
+                    >
+                      ✓
+                    </span>
+                  </p>
+                  <p class="text-xs text-text-muted-light mt-1 leading-snug">
+                    {{ address.street }}, {{ address.city }},
+                    {{ address.postalCode }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Sin Direcciones -->
+              <div
+                *ngIf="!isLoadingAddresses() && addresses().length === 0"
+                class="text-center p-4 bg-gray-50 rounded-lg"
+              >
+                <p class="text-sm text-text-muted-light">
+                  No tienes direcciones guardadas.
+                </p>
+                <a
+                  routerLink="/profile/addresses"
+                  class="text-sm font-semibold text-secondary hover:underline mt-2 inline-block"
+                >
+                  Añadir una dirección
+                </a>
+              </div>
+            </div>
+            <!--
+              --- FIN DE SECCIÓN DE DIRECCIÓN AÑADIDA ---
+            -->
 
             <div class="space-y-4">
               <div class="flex justify-between items-center text-base">
@@ -164,13 +233,19 @@
 
             <button
               (click)="onCheckout()"
-              class="mt-8 flex w-full items-center justify-center rounded-lg h-14 bg-secondary text-white text-lg font-bold tracking-wide transition-colors hover:bg-secondary-dark active:scale-[0.98]"
-              [disabled]="isLoading() || cartItems().length === 0"
+              class="mt-8 flex w-full items-center justify-center rounded-lg h-14 bg-secondary text-white text-lg font-bold tracking-wide transition-colors hover:bg-secondary-dark active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="
+                isLoading() || cartItems().length === 0 || !selectedAddressId()
+              "
             >
               Pagar de forma segura
             </button>
-
-            <!-- (He omitido los logos de pago estáticos de tu maqueta, puedes añadirlos si quieres) -->
+            <p
+              *ngIf="!selectedAddressId() && !isLoadingAddresses()"
+              class="text-xs text-red-600 text-center mt-3"
+            >
+              Debes seleccionar una dirección de envío para continuar.
+            </p>
           </div>
         </aside>
       </div>

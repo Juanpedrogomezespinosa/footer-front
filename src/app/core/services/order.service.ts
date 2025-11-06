@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ProductApiResponse } from "./product.service";
+import { UserAddress } from "./user.service"; // <-- 1. IMPORTAR UserAddress
 
 // Interfaz para los items que enviamos al crear la orden
-// (Basado en tu backend)
 export interface OrderItemInput {
   productId: number;
   productName: string;
@@ -30,6 +30,7 @@ export interface OrderDetails {
     price: number;
     Product: ProductApiResponse;
   }[];
+  Address: UserAddress; // <-- 2. AÑADIR LA DIRECCIÓN A LOS DETALLES
 }
 
 @Injectable({
@@ -44,16 +45,22 @@ export class OrderService {
   /**
    * Llama al backend para crear una orden y obtener la sesión de Stripe
    * Backend: POST /api/orders/checkout
+   * --- ¡MODIFICADO! ---
    */
-  createOrder(items: OrderItemInput[]): Observable<CreateOrderResponse> {
+  createOrder(
+    items: OrderItemInput[],
+    addressId: number // <-- 3. AÑADIR addressId
+  ): Observable<CreateOrderResponse> {
+    // 4. ENVIAR 'items' Y 'addressId'
     return this.http.post<CreateOrderResponse>(`${this.apiUrl}/checkout`, {
       items,
+      addressId,
     });
   }
 
   /**
    * Obtiene una orden específica por su ID
-   * Backend: GET /api/orders/:id (¡Lo añadiremos a tu backend ahora!)
+   * Backend: GET /api/orders/:id
    */
   getOrderById(orderId: number): Observable<OrderDetails> {
     return this.http.get<OrderDetails>(`${this.apiUrl}/${orderId}`);

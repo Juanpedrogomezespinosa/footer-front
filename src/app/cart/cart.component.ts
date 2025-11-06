@@ -9,7 +9,11 @@ import {
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { CartService, CartItem } from "../core/services/cart.service";
-import { OrderService, OrderItemInput } from "../core/services/order.service"; // <-- 1. IMPORTAR OrderService
+import { OrderService, OrderItemInput } from "../core/services/order.service";
+// --- 1. Imports añadidos ---
+import { UserService, UserAddress } from "../core/services/user.service";
+import { ToastService } from "../core/services/toast.service";
+// --- Fin de Imports añadidos ---
 import { ProductApiResponse } from "../core/services/product.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -22,8 +26,14 @@ import { HttpErrorResponse } from "@angular/common/http";
 })
 export class CartComponent implements OnInit {
   public cartItems: WritableSignal<CartItem[]> = signal([]);
-  public isLoading = signal(true);
+  public isLoading = signal(true); // Carga principal
   public error: WritableSignal<string | null> = signal(null);
+
+  // --- 2. Nuevos signals para Direcciones ---
+  public addresses = signal<UserAddress[]>([]);
+  public isLoadingAddresses = signal(true);
+  public selectedAddressId = signal<number | null>(null);
+  // --- Fin de nuevos signals ---
 
   public subtotal: Signal<number> = computed(() => {
     return this.cartItems().reduce((sum, item) => {
@@ -36,13 +46,17 @@ export class CartComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    private orderService: OrderService, // <-- 2. INYECTAR OrderService
-    private router: Router
+    private orderService: OrderService,
+    private router: Router,
+    // --- 3. Inyectar UserService y ToastService ---
+    private userService: UserService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
     console.log("CartComponent re-inicializado.");
     this.loadCart();
+    this.loadAddresses(); // <-- 4. Cargar direcciones al iniciar
   }
 
   loadCart(): void {
@@ -56,6 +70,27 @@ export class CartComponent implements OnInit {
         console.error("Error al cargar el carrito:", err);
         this.error.set("No se pudo cargar tu carrito. Inténtalo de nuevo.");
         this.isLoading.set(false);
+      },
+    });
+  }
+
+  // --- 5. Nueva función para cargar direcciones ---
+  loadAddresses(): void {
+    this.isLoadingAddresses.set(true);
+    this.userService.getAddresses().subscribe({
+      next: (addresses) => {
+        this.addresses.set(addresses);
+        // Autoseleccionar la dirección por defecto si existe
+        const defaultAddress = addresses.find((addr) => addr.isDefault);
+        if (defaultAddress) {
+          this.selectedAddressId.set(defaultAddress.id);
+        }
+        this.isLoadingAddresses.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error("Error al cargar direcciones:", err);
+        this.toastService.showError("No se pudieron cargar tus direcciones.");
+        this.isLoadingAddresses.set(false);
       },
     });
   }
@@ -87,14 +122,25 @@ export class CartComponent implements OnInit {
     });
   }
 
+  // --- 6. Nueva función para seleccionar dirección ---
+  onSelectAddress(addressId: number): void {
+    this.selectedAddressId.set(addressId);
+  }
+
   /**
-   * --- 👇 LÓGICA DE CHECKOUT CORREGIDA ---
-   * Procesa el pago y redirige a Stripe
+   * --- LÓGICA DE CHECKOUT MODIFICADA ---
    */
   onCheckout(): void {
+    // 7. Validación de dirección
+    if (!this.selectedAddressId()) {
+      this.toastService.showError(
+        "Por favor, selecciona una dirección de envío."
+      );
+      return;
+    }
+
     this.isLoading.set(true);
 
-    // 1. Mapea los items del carrito al formato que tu backend espera
     const itemsToOrder: OrderItemInput[] = this.cartItems().map((item) => ({
       productId: item.productId,
       productName: item.Product.name,
@@ -102,21 +148,21 @@ export class CartComponent implements OnInit {
       price: Number(item.Product.price),
     }));
 
-    // 2. Llama al OrderService (no al CartService)
-    this.orderService.createOrder(itemsToOrder).subscribe({
-      next: (response) => {
-        // 3. ¡Éxito! Redirige a la URL de pago de Stripe
-        // El navegador abandonará tu app y se irá a Stripe
-        window.location.href = response.checkoutUrl;
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error("Error en el checkout:", err);
-        this.error.set(err.error?.message || "Error al procesar el pago.");
-        this.isLoading.set(false);
-      },
-    });
+    // 8. Enviar items Y la dirección seleccionada
+    this.orderService
+      .createOrder(itemsToOrder, this.selectedAddressId()!)
+      .subscribe({
+        next: (response) => {
+          window.location.href = response.checkoutUrl;
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error("Error en el checkout:", err);
+          this.error.set(err.error?.message || "Error al procesar el pago.");
+          this.isLoading.set(false);
+        },
+      });
   }
-  // --- FIN DE LA LÓGICA CORREGIDA ---
+  // --- FIN DE LA LÓGICA MODIFICADA ---
 
   getProductImage(imageName: string | undefined | null): string {
     if (imageName) {
