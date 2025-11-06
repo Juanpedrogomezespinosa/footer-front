@@ -1,10 +1,17 @@
-import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  OnDestroy,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import { AuthService, User } from "../../../core/services/auth.service"; // 🆕 Importamos la interfaz User
+import { AuthService, User } from "../../../core/services/auth.service";
 import { trigger, transition, style, animate } from "@angular/animations";
 import { UiStateService } from "../../../core/services/ui-state.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-navbar",
@@ -37,17 +44,18 @@ import { UiStateService } from "../../../core/services/ui-state.service";
     ]),
   ],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnDestroy {
   public isLoggedIn = false;
   public userAvatarUrl = "";
   public mobileMenuActive = false;
   public searchActiveDesktop = false;
   public searchTerm = "";
 
-  // 🆕 Constantes para construir la URL del avatar
   private readonly API_URL = "http://localhost:3000";
   private readonly DEFAULT_AVATAR_PLACEHOLDER =
     "https://placehold.co/100x100/60a5fa/FFFFFF?text=";
+
+  private userSubscription?: Subscription;
 
   @ViewChild("searchInputDesktop")
   searchInputDesktop!: ElementRef<HTMLInputElement>;
@@ -57,38 +65,50 @@ export class NavbarComponent {
     private authService: AuthService,
     private uiStateService: UiStateService
   ) {
-    // 🆕 Lógica de suscripción al avatar actualizada
-    this.authService.user$.subscribe((user: User | null) => {
-      this.isLoggedIn = !!user;
+    this.initializeUserSubscription();
+  }
 
-      if (!user) {
-        // Si no hay usuario, usamos un placeholder genérico
-        this.userAvatarUrl = `${this.DEFAULT_AVATAR_PLACEHOLDER}NA`;
-        return;
-      }
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
 
-      // 1. Verificar si el usuario tiene un avatarUrl desde el backend
-      if (user.avatarUrl) {
-        // 2. Construir la URL completa
-        // Si la URL ya es absoluta (ej. Google/Pravatar), la usa.
-        // Si es relativa (empieza con /uploads/), le añade la URL de la API.
-        if (user.avatarUrl.startsWith("http")) {
-          this.userAvatarUrl = user.avatarUrl;
-        } else {
-          this.userAvatarUrl = `${this.API_URL}${user.avatarUrl}`;
-        }
-      } else {
-        // 3. Si no hay avatarUrl, crear placeholder con iniciales
-        const name = user?.username || "Usuario";
-        const initials = name
-          .split(" ")
-          .map((n: string) => n[0])
-          .join("")
-          .substring(0, 2)
-          .toUpperCase();
-        this.userAvatarUrl = `${this.DEFAULT_AVATAR_PLACEHOLDER}${initials}`;
-      }
+  private initializeUserSubscription(): void {
+    this.userSubscription = this.authService.user$.subscribe({
+      next: (user: User | null) => {
+        this.isLoggedIn = !!user;
+        this.userAvatarUrl = this.buildAvatarUrl(user);
+      },
+      error: (err) => {},
     });
+  }
+
+  private buildAvatarUrl(user: User | null): string {
+    if (!user) {
+      return `${this.DEFAULT_AVATAR_PLACEHOLDER}NA`;
+    }
+
+    if (user.avatarUrl) {
+      if (user.avatarUrl.startsWith("http")) {
+        return user.avatarUrl;
+      } else {
+        const fullUrl = `${this.API_URL}${user.avatarUrl}`;
+        return fullUrl;
+      }
+    }
+
+    const name = user.username || "Usuario";
+    const initials = name
+      .split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+
+    const placeholderUrl = `${this.DEFAULT_AVATAR_PLACEHOLDER}${initials}`;
+
+    return placeholderUrl;
   }
 
   public submitSearch(): void {
@@ -141,7 +161,7 @@ export class NavbarComponent {
     }
   }
 
-  @HostListener("document:keydown.escape", ["$event"])
+  @HostListener("document:keydown.escape")
   public onEscapeKey(): void {
     if (this.mobileMenuActive) {
       this.closeMobileMenu();
