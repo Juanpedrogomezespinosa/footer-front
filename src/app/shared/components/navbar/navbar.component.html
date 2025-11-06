@@ -83,7 +83,13 @@
         </svg>
       </a>
 
+      <!-- 
+        💡 CAMBIO AQUÍ: 
+        Añadido *ngIf="isLoggedIn" para ocultar el avatar si no está logueado.
+        He respetado tus clases personalizadas del anillo.
+      -->
       <a
+        *ngIf="isLoggedIn"
         routerLink="/profile"
         aria-label="Ver perfil de usuario"
         class="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:ring-2 hover: dark:hover:ring-offset-card-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
@@ -356,7 +362,12 @@
         <span class="font-medium">Carrito</span>
       </a>
 
+      <!-- 
+        💡 CAMBIO AQUÍ: 
+        Añadido *ngIf="isLoggedIn" para ocultar "Mi Perfil" si no está logueado.
+      -->
       <a
+        *ngIf="isLoggedIn"
         routerLink="/profile"
         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-primary-light hover:bg-gray-100 transition-all group"
         (click)="closeMobileMenu()"
