@@ -12,19 +12,15 @@
     </p>
   </div>
 
-  <!-- Estado de Carga -->
   <div *ngIf="loading" class="text-center py-10 text-gray-500">
     Cargando historial...
   </div>
 
-  <!-- Estado de Error -->
   <div *ngIf="error" class="text-center py-10 text-red-500">
     {{ error }}
   </div>
 
-  <!-- Contenido Principal -->
   <div *ngIf="orders$ | async as data">
-    <!-- Estado Vacío -->
     <div
       *ngIf="!data?.orders || data.orders.length === 0; else showOrders"
       class="bg-white p-6 rounded-xl border border-gray-200 mt-6 text-center text-gray-500"
@@ -32,14 +28,12 @@
       <p>Aún no has realizado ningún pedido.</p>
     </div>
 
-    <!-- Lista de Pedidos -->
     <ng-template #showOrders>
       <div class="flex flex-col gap-6 mt-6">
         <div
           *ngFor="let order of data.orders"
           class="bg-white p-6 rounded-xl border border-gray-200"
         >
-          <!-- Cabecera del Pedido -->
           <div
             class="flex flex-col md:flex-row justify-between md:items-center pb-4 border-b border-gray-200"
           >
@@ -56,11 +50,6 @@
               <p class="text-lg font-bold text-secondary">
                 {{ order.total | currency : "EUR" }}
               </p>
-              <!--
-                --- ¡CORRECCIÓN DE ESTADOS! ---
-                Estos ahora coinciden con los estados en español
-                definidos en tu backend (orderModel.js y orderController.js)
-              -->
               <span
                 class="text-xs font-medium px-2.5 py-0.5 rounded"
                 [ngClass]="{
@@ -75,18 +64,11 @@
             </div>
           </div>
 
-          <!-- Items del Pedido -->
           <div class="flex flex-col gap-4 pt-4">
             <div
               *ngFor="let item of order.OrderItems"
               class="flex items-center gap-4"
             >
-              <!--
-                --- ¡AQUÍ ESTÁ LA IMAGEN CORREGIDA! ---
-                1. Comentarios HTML movidos fuera de la etiqueta.
-                2. Añadida barra inclinada (/) después de /uploads.
-                3. Añadido fallback 'onerror' de forma segura.
-              -->
               <img
                 [src]="'http://localhost:3000/uploads/' + item.Product.image"
                 [alt]="item.Product.name"
@@ -95,7 +77,7 @@
               />
               <div class="flex-1">
                 <a
-                  [routerLink]="['/products', item.Product.id]"
+                  [routerLink]="['/products', 'product', item.Product.id]"
                   class="text-sm font-medium text-text-light-primary hover:text-secondary"
                 >
                   {{ item.Product.name }}
