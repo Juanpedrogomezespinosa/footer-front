@@ -12,22 +12,32 @@ export interface UserProfile {
   phone?: string | null;
   email: string;
   role: string;
-  avatarUrl?: string | null; // 🆕 Añadido avatarUrl
+  avatarUrl?: string | null;
 }
 
 /**
  * Interfaz para la carga de actualización de perfil (solo texto).
+ * --- 'password' ELIMINADO DE AQUÍ POR SEGURIDAD ---
  */
 export interface UpdateProfilePayload {
   username?: string;
   lastName?: string | null;
   phone?: string | null;
   email?: string;
-  password?: string;
+  // password?: string; <-- ELIMINADO
+}
+
+/**
+ * --- ¡NUEVA INTERFAZ AÑADIDA! ---
+ * Payload para el cambio de contraseña
+ */
+export interface UpdatePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
 }
 
 // ----------------------------------------------------
-// --- NUEVAS INTERFACES PARA DIRECCIONES ---
+// --- INTERFACES DE DIRECCIONES (Sin cambios) ---
 // ----------------------------------------------------
 
 /**
@@ -44,13 +54,12 @@ export interface UserAddress {
   country: string;
   phone?: string | null;
   isDefault: boolean;
-  created_at?: string; // La API de Sequelize los añade
-  updated_at?: string; // La API de Sequelize los añade
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
  * Payload para CREAR o ACTUALIZAR una dirección.
- * Omitimos los campos que genera el servidor (id, userId, timestamps).
  */
 export type AddressPayload = Omit<
   UserAddress,
@@ -65,7 +74,7 @@ export type AddressPayload = Omit<
 export class UserService {
   // Endpoints de la API
   private apiUrl = "/api/users";
-  private addressesApiUrl = "/api/addresses"; // <-- NUEVO ENDPOINT
+  private addressesApiUrl = "/api/addresses";
 
   constructor(private http: HttpClient) {}
 
@@ -89,8 +98,19 @@ export class UserService {
   }
 
   /**
-   * 🆕 Sube una nueva imagen de perfil.
-   * El backend espera un campo 'avatar' en el FormData.
+   * --- ¡NUEVO MÉTODO AÑADIDO! ---
+   * Actualiza la contraseña del usuario de forma segura.
+   * Llama a: PUT /api/users/profile/password
+   */
+  updatePassword(data: UpdatePasswordPayload): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      `${this.apiUrl}/profile/password`,
+      data
+    );
+  }
+
+  /**
+   * Sube una nueva imagen de perfil.
    */
   updateAvatar(file: File): Observable<{ message: string; avatarUrl: string }> {
     const formData = new FormData();
@@ -103,37 +123,21 @@ export class UserService {
   }
 
   // ----------------------------------------------------
-  // --- NUEVOS MÉTODOS CRUD PARA DIRECCIONES ---
+  // --- MÉTODOS DE DIRECCIONES (Sin cambios) ---
   // ----------------------------------------------------
 
-  /**
-   * Obtiene todas las direcciones del usuario autenticado
-   * GET /api/addresses
-   */
   getAddresses(): Observable<UserAddress[]> {
     return this.http.get<UserAddress[]>(this.addressesApiUrl);
   }
 
-  /**
-   * Crea una nueva dirección para el usuario
-   * POST /api/addresses
-   */
   createAddress(data: AddressPayload): Observable<UserAddress> {
     return this.http.post<UserAddress>(this.addressesApiUrl, data);
   }
 
-  /**
-   * Actualiza una dirección existente
-   * PUT /api/addresses/:id
-   */
   updateAddress(id: number, data: AddressPayload): Observable<UserAddress> {
     return this.http.put<UserAddress>(`${this.addressesApiUrl}/${id}`, data);
   }
 
-  /**
-   * Elimina una dirección
-   * DELETE /api/addresses/:id
-   */
   deleteAddress(id: number): Observable<void> {
     return this.http.delete<void>(`${this.addressesApiUrl}/${id}`);
   }
