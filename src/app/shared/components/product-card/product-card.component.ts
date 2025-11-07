@@ -2,8 +2,9 @@ import { Component, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
 import { Product } from "app/core/services/product.service";
-import { CartService } from "app/core/services/cart.service"; // <-- 1. IMPORTAR
-import { ToastService } from "app/core/services/toast.service"; // <-- 2. IMPORTAR
+// --- ¡SERVICIOS RESTAURADOS! ---
+import { CartService } from "app/core/services/cart.service";
+import { ToastService } from "app/core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
@@ -17,22 +18,22 @@ export class ProductCardComponent {
   @Input() product!: Product;
 
   backendUrl: string = "http://localhost:3000";
-  defaultImage: string = "assets/icons/agregar-carrito.png";
+  // --- Imagen por defecto actualizada ---
+  defaultImage: string =
+    "https://placehold.co/400x400/f0f0f0/6C757D?text=Footer";
 
   constructor(
     private router: Router,
-    private cartService: CartService, // <-- 3. INYECTAR
-    private toastService: ToastService // <-- 4. INYECTAR
+    // --- ¡SERVICIOS RESTAURADOS! ---
+    private cartService: CartService,
+    private toastService: ToastService
   ) {}
 
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
+      // Ruta corregida para incluir /uploads/
       return `${this.backendUrl}/uploads/${this.product.image}`;
     } else {
-      console.warn(
-        "Producto sin imagen. Usando imagen por defecto:",
-        this.product
-      );
       return this.defaultImage;
     }
   }
@@ -43,22 +44,18 @@ export class ProductCardComponent {
     target.src = this.defaultImage;
   }
 
+  // --- ¡FUNCIONALIDAD RESTAURADA! ---
+  // (Usando la ruta original de tu fichero)
   goToProductDetail(): void {
     if (!this.product || !this.product.id) {
       console.error("Producto o ID inválido, no se puede navegar.");
       return;
     }
-    this.router.navigate(["/products", "product", this.product.id]).then(
-      (success) => {
-        console.log("Navegación completada:", success);
-      },
-      (error) => {
-        console.error("Error al navegar al detalle:", error);
-      }
-    );
+    // He mantenido tu ruta original de 'products/product/:id'
+    this.router.navigate(["/products", "product", this.product.id]);
   }
 
-  // --- 👇 5. LÓGICA DE AÑADIR AL CARRITO ---
+  // --- ¡FUNCIONALIDAD RESTAURADA! ---
   addToCart(event: MouseEvent): void {
     // Detiene el clic para que no se propague al div padre (que navega al detalle)
     event.stopPropagation();
@@ -75,23 +72,7 @@ export class ProductCardComponent {
       },
     });
   }
-  // --- FIN DE LA LÓGICA ---
 
-  getStars(): ("full" | "half" | "empty")[] {
-    const stars: ("full" | "half" | "empty")[] = [];
-    let rating = this.product.rating ?? 0;
-
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= 1) {
-        stars.push("full");
-      } else if (rating >= 0.5) {
-        stars.push("half");
-      } else {
-        stars.push("empty");
-      }
-      rating -= 1;
-    }
-
-    return stars;
-  }
+  // --- getStars() ELIMINADO ---
+  // (La nueva card no lo usa)
 }

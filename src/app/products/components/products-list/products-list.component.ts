@@ -8,6 +8,7 @@ import {
   ViewChild,
   ElementRef,
   Renderer2,
+  computed, // Importar computed
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
@@ -25,21 +26,18 @@ import { UiStateService } from "app/core/services/ui-state.service";
   styleUrls: [],
 })
 export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
-  // <-- Implementamos interfaces
-
   public isMobileMenuOpen: Signal<boolean>;
 
-  // --- 👇 LÓGICA PARA EL BOTÓN FLOTANTE ---
   @ViewChild("filterButton") filterButton!: ElementRef;
   private footerObserver: IntersectionObserver | null = null;
-  private readonly buttonBottomMargin = 24; // 1.5rem (bottom-6)
+  private readonly buttonBottomMargin = 24;
 
   constructor(
     private productService: ProductService,
     private route: ActivatedRoute,
     private router: Router,
     private uiStateService: UiStateService,
-    private renderer: Renderer2 // <-- Inyectamos Renderer2
+    private renderer: Renderer2
   ) {
     this.isMobileMenuOpen = this.uiStateService.isMobileMenuOpen.asReadonly();
 
@@ -50,17 +48,57 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // --- ¡CORRECCIÓN! Declarar las propiedades de la clase ---
   private currentCategory: string | null = null;
   private currentSearchTerm: string | null = null;
+  // --- FIN DE LA CORRECCIÓN ---
 
+  // Estado
   products = signal<Product[]>([]);
   currentPage = signal(1);
   totalPages = signal(1);
+  totalItems = signal(0); // Para el contador "Mostrando X productos"
+  listTitle = signal("Todos los productos"); // Para el título
 
   readonly itemsPerPage = 18;
   selectedFilters: Record<string, string | string[]> = {};
-  selectedSort: string = "";
+  selectedSort: string = ""; // La ordenación se controla aquí ahora
   showFilters = false;
+
+  // Lógica de Ordenación (Movida desde el componente de filtros)
+  public sortOptions = [
+    { value: "", label: "Más Relevante" },
+    { value: "price_asc", label: "Precio: Menor a Mayor" },
+    { value: "price_desc", label: "Precio: Mayor a Menor" },
+    { value: "rating_desc", label: "Mejor Valorados" },
+  ];
+
+  // Lógica de Paginación Numérica
+  public pageNumbers: Signal<number[]> = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    const pages: number[] = [];
+    if (current > 3) {
+      pages.push(1);
+      if (current > 4) pages.push(-1); // -1 representa "..."
+    }
+    for (let i = -2; i <= 2; i++) {
+      const page = current + i;
+      if (page > 0 && page <= total) {
+        if (!pages.includes(page)) {
+          pages.push(page);
+        }
+      }
+    }
+    if (current < total - 2) {
+      if (current < total - 3) pages.push(-1); // -1 representa "..."
+      pages.push(total);
+    }
+    return pages.filter((p, i) => p !== -1 || pages[i - 1] !== -1);
+  });
 
   ngOnInit(): void {
     combineLatest({
@@ -71,68 +109,44 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentSearchTerm = queryParams.get("name");
       const pageFromUrl = parseInt(queryParams.get("page") || "1", 10);
 
+      this.updateListTitle();
+
       if (this.currentPage() !== pageFromUrl) {
         this.currentPage.set(pageFromUrl);
       }
-
-      // IMPORTANTE: Aquí no se llama a fetchProducts() porque la suscripción se
-      // lanza al iniciar. El filtrado se llama desde onFiltersChanged.
-      // Pero sí necesitamos re-cargar si cambia la categoría o búsqueda de la URL.
       this.fetchProducts();
     });
   }
 
-  // --- 👇 LÓGICA DEL OBSERVER CORREGIDA ---
+  // Lógica de Observer (sin cambios)
   ngAfterViewInit(): void {
     const footer = document.querySelector("app-footer");
     const buttonEl = this.filterButton?.nativeElement;
-
     if (!footer || !buttonEl) {
-      console.warn(
-        "No se encontró el footer o el botón de filtro para la lógica de 'choque'."
-      );
+      console.warn("No se encontró el footer o el botón de filtro.");
       return;
     }
-
     const options = {
-      root: null, // Observa contra el viewport
+      root: null,
       rootMargin: "0px",
-      // Creamos un array de thresholds para que la animación sea más suave
       threshold: Array.from({ length: 101 }, (_, i) => i / 100),
     };
-
     this.footerObserver = new IntersectionObserver(([entry]) => {
-      // --- 👇 CORRECCIÓN: Añadida comprobación de nulidad para rootBounds ---
-      if (!entry.rootBounds) {
-        return;
-      }
-
-      // Comprobamos si el footer está intersectando Y si su borde superior
-      // está por encima del borde inferior del viewport.
+      if (!entry.rootBounds) return;
       const isIntersectingAtBottom =
         entry.isIntersecting &&
         entry.boundingClientRect.top < entry.rootBounds.height;
-
       if (isIntersectingAtBottom) {
-        // El footer está "chocando" con el borde inferior.
-        // Calculamos cuánto se ha "metido" el footer en la pantalla:
         const overlap = entry.rootBounds.height - entry.boundingClientRect.top;
-
-        // El nuevo 'bottom' es ese solapamiento + el margen que queremos
         const newBottom = overlap + this.buttonBottomMargin;
-
-        // Nos aseguramos de que el botón no suba más que el alto del footer
         const maxBottom =
           entry.boundingClientRect.height + this.buttonBottomMargin;
-
         this.renderer.setStyle(
           buttonEl,
           "bottom",
           `${Math.min(newBottom, maxBottom)}px`
         );
       } else {
-        // El footer no está visible, o ya hemos scrollado por encima de él.
-        // El botón vuelve a su posición fija original.
         this.renderer.setStyle(
           buttonEl,
           "bottom",
@@ -140,12 +154,9 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     }, options);
-
     this.footerObserver.observe(footer);
   }
-  // --- FIN DE LA LÓGICA CORREGIDA ---
 
-  // --- 👇 NUEVO: ngOnDestroy para limpiar el Observer ---
   ngOnDestroy(): void {
     if (this.footerObserver) {
       this.footerObserver.disconnect();
@@ -154,6 +165,20 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
+  }
+
+  // Lógica de Título
+  private updateListTitle(): void {
+    if (this.currentSearchTerm) {
+      this.listTitle.set(`Resultados para "${this.currentSearchTerm}"`);
+    } else if (this.currentCategory) {
+      const cleanTitle =
+        this.currentCategory.charAt(0).toUpperCase() +
+        this.currentCategory.slice(1);
+      this.listTitle.set(cleanTitle);
+    } else {
+      this.listTitle.set("Todos los productos");
+    }
   }
 
   fetchProducts(): void {
@@ -167,30 +192,39 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.currentSearchTerm) {
       filters["name"] = this.currentSearchTerm;
     }
-
     filters["stock"] = "true";
 
     this.productService
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
+          // --- Mapeo Actualizado para la nueva Card ---
           const mappedProducts: Product[] = response.products.map(
             (product) => ({
               id: product.id,
               name: product.name,
               price: Number(product.price),
+              // Simulamos un precio anterior si el precio es bajo
+              oldPrice:
+                Number(product.price) < 80
+                  ? Number(product.price) + 20
+                  : undefined,
               image: product.image,
+              brand: product.brand, // <-- Pasamos la marca
+              category: product.category,
+              // Pasamos los ratings (aunque la card no los use, el tipo Product los tiene)
               rating: product.averageRating ?? 0,
               ratingCount: product.ratingCount ?? 0,
-              category: product.category,
             })
           );
           this.products.set(mappedProducts);
           this.totalPages.set(response.totalPages);
+          this.totalItems.set(response.totalItems); // <-- Guardamos el total
         },
         error: (error) => {
           console.error("Error al cargar los productos:", error);
           this.products.set([]);
+          this.totalItems.set(0);
         },
       });
   }
@@ -206,6 +240,10 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
         queryParams: { page: pageNumber },
         queryParamsHandling: "merge",
       });
+      // Scroll al inicio de la lista de productos
+      document
+        .querySelector("#product-list-header")
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   }
 
@@ -217,41 +255,23 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.goToPage(this.currentPage() - 1);
   }
 
-  /**
-   * Maneja el cambio de filtros. Actualiza el estado y recarga los productos.
-   * La clave para el filtrado en tiempo real es llamar a fetchProducts() aquí.
-   */
   onFiltersChanged(filters: Record<string, string | string[]>): void {
-    // 1. Actualizar el estado interno de los filtros
     this.selectedFilters = filters;
-
-    // 2. Resetear la paginación a la página 1.
     if (this.currentPage() !== 1) {
       this.currentPage.set(1);
     }
-
-    // 3. Forzar la recarga de productos con los nuevos filtros (Real-time filtering)
     this.fetchProducts();
-
-    // Nota: Eliminamos la navegación aquí para forzar el filtrado en tiempo real.
-    // Si quieres que el filtro se refleje en la URL, puedes reintroducir la navegación,
-    // pero debe estar sincronizado con fetchProducts.
   }
 
   /**
-   * Maneja el cambio de orden. Actualiza el estado y recarga los productos.
+   * Se dispara desde el NUEVO dropdown en el HTML.
    */
-  onSortChanged(sortValue: string): void {
+  onSortChanged(event: Event): void {
+    const sortValue = (event.target as HTMLSelectElement).value;
     this.selectedSort = sortValue;
-
-    // 1. Resetear la paginación a la página 1.
     if (this.currentPage() !== 1) {
       this.currentPage.set(1);
     }
-
-    // 2. Forzar la recarga de productos con el nuevo orden.
     this.fetchProducts();
-
-    // Nota: Igual que en onFiltersChanged, eliminamos la navegación para forzar la reactividad.
   }
 }

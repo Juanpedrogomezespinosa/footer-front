@@ -1,70 +1,67 @@
+<!--
+  --- ¡TARJETA REDISEÑADA CON FUNCIONALIDAD RESTAURADA! ---
+-->
 <div
-  class="w-full max-w-xs bg-white rounded-xl shadow-md overflow-hidden flex flex-col transition duration-300 hover:shadow-lg cursor-pointer group mx-auto my-4"
+  class="w-full bg-white rounded-xl flex flex-col transition duration-300 group mx-auto"
   (click)="goToProductDetail()"
   tabindex="0"
   role="button"
   [attr.aria-label]="'Ver detalles de ' + product.name"
 >
-  <div class="h-64 w-full flex items-center justify-center bg-gray-100">
+  <!-- 1. Contenedor de la Imagen -->
+  <div
+    class="relative h-64 w-full flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden"
+  >
     <img
       [src]="getProductImage()"
       [alt]="product.name"
-      class="h-40 w-full object-contain transition-transform duration-300 group-hover:scale-105"
+      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
       (error)="onImageError($event)"
       loading="lazy"
     />
   </div>
 
-  <div class="px-4 py-4">
+  <!-- 2. Contenedor de Texto -->
+  <div class="px-2 py-4">
+    <!-- Marca (Nuevo) -->
+    <p
+      *ngIf="product.brand"
+      class="text-sm text-text-light-secondary capitalize mb-1"
+    >
+      {{ product.brand }}
+    </p>
+
+    <!-- Nombre del Producto -->
     <h2
-      class="text-lg font-bold text-gray-900 capitalize mb-2 whitespace-normal break-words"
+      class="text-base font-semibold text-gray-900 truncate"
       [title]="product.name"
     >
       {{ product.name }}
     </h2>
 
-    <div class="flex items-center mb-3" *ngIf="product.rating !== undefined">
-      <ng-container *ngFor="let star of getStars()">
-        <img
-          *ngIf="star === 'full'"
-          src="assets/icons/star-full.svg"
-          alt="estrella llena"
-          class="w-4 h-4"
-        />
-        <img
-          *ngIf="star === 'half'"
-          src="assets/icons/star-half.svg"
-          alt="estrella media"
-          class="w-4 h-4"
-        />
-        <img
-          *ngIf="star === 'empty'"
-          src="assets/icons/star-empty.svg"
-          alt="estrella vacía"
-          class="w-4 h-4"
-        />
-      </ng-container>
-      <span
-        class="text-sm text-gray-500 ml-2"
-        *ngIf="product.ratingCount !== undefined"
-      >
-        ({{ product.ratingCount }})
-      </span>
-    </div>
+    <!-- Precios (Nuevo) -->
+    <div class="flex items-center justify-between gap-3 mt-2">
+      <div class="flex items-center gap-3">
+        <p class="text-base font-semibold text-black">
+          {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
+        </p>
+        <p
+          *ngIf="product.oldPrice"
+          class="text-sm text-text-light-secondary line-through"
+        >
+          {{ product.oldPrice | currency : "EUR" : "symbol" : "1.2-2" }}
+        </p>
+      </div>
 
-    <div class="flex items-center">
-      <p class="text-lg font-semibold text-black">
-        {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
-      </p>
-
-      <!-- --- 👇 CAMBIO AQUÍ --- -->
-      <!-- Cambiado de <div> a <button> -->
-      <!-- Añadido (click)="addToCart($event)" -->
+      <!--
+        --- ¡FUNCIONALIDAD RESTAURADA! ---
+        Botón "Añadir al Carrito" que tenías en tu diseño original.
+      -->
       <button
         type="button"
         (click)="addToCart($event)"
         aria-label="Añadir al carrito"
-        class="ml-auto text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
+        class="text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +80,7 @@
           />
         </svg>
       </button>
-      <!-- --- FIN DEL CAMBIO --- -->
+      <!-- --- FIN DE LA FUNCIONALIDAD RESTAURADA --- -->
     </div>
   </div>
 </div>

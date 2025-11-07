@@ -1,5 +1,4 @@
-<!-- Botón para abrir filtros (visible en todas las resoluciones) -->
-<!-- 👇 CAMBIO: Quitado 'md:hidden' y añadido #filterButton -->
+<!-- Botón para abrir filtros (sin cambios) -->
 <button
   #filterButton
   [class.hidden]="isMobileMenuOpen()"
@@ -24,10 +23,47 @@
 <!-- Contenido principal -->
 <div class="max-w-7xl mx-auto px-4 py-10">
   <section>
+    <!--
+      --- ¡NUEVA CABECERA DE LISTA AÑADIDA! ---
+      (Basada en el diseño objetivo)
+    -->
+    <div
+      id="product-list-header"
+      class="flex flex-col md:flex-row md:items-center md:justify-between mb-6"
+    >
+      <div>
+        <h1 class="text-3xl font-bold text-text-light-primary tracking-tight">
+          {{ listTitle() }}
+        </h1>
+        <p class="text-sm text-text-light-secondary mt-1">
+          Mostrando {{ totalItems() }} productos
+        </p>
+      </div>
+      <!-- Dropdown de Ordenación (Movido aquí desde el modal) -->
+      <div class="mt-4 md:mt-0">
+        <label for="sort" class="sr-only">Ordenar por:</label>
+        <select
+          id="sort"
+          [value]="selectedSort"
+          (change)="onSortChanged($event)"
+          class="w-full md:w-auto p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary bg-white text-gray-800 text-sm"
+        >
+          <option *ngFor="let option of sortOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <!-- --- FIN DE LA NUEVA CABECERA --- -->
+
     <!-- Grid de Productos -->
+    <!--
+      --- CLASE DE GRID MODIFICADA ---
+      Cambiamos a un grid de 3 columnas en desktop
+    -->
     <div
       *ngIf="products() && products().length > 0; else noProducts"
-      class="grid [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))] gap-4"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
     >
       <app-product-card
         *ngFor="let product of products()"
@@ -35,7 +71,7 @@
       ></app-product-card>
     </div>
 
-    <!-- Estado de no productos -->
+    <!-- Estado de no productos (sin cambios) -->
     <ng-template #noProducts>
       <div class="flex flex-col items-center justify-center py-20 text-center">
         <svg
@@ -64,39 +100,85 @@
       </div>
     </ng-template>
 
-    <!-- Paginación -->
+    <!--
+      --- ¡NUEVA PAGINACIÓN NUMÉRICA! ---
+      (Basada en el diseño objetivo)
+    -->
     <div
       *ngIf="totalPages() > 1"
-      class="flex justify-center items-center gap-4 mt-8"
+      class="flex justify-center items-center gap-2 mt-12"
     >
+      <!-- Botón Anterior -->
       <button
         [disabled]="currentPage() <= 1"
-        class="px-4 py-2 text-sm font-medium rounded-lg border border-subtle-light dark:border-subtle-dark hover:bg-background-light dark:hover:bg-card-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         (click)="goToPreviousPage()"
-        type="button"
+        class="flex items-center justify-center h-10 w-10 rounded-lg border border-subtle-light dark:border-subtle-dark hover:bg-background-light dark:hover:bg-card-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        aria-label="Página anterior"
       >
-        Anterior
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
       </button>
 
-      <span
-        class="text-sm text-text-secondary-light dark:text-text-secondary-dark"
-      >
-        Página {{ currentPage() }} de {{ totalPages() }}
-      </span>
+      <!-- Números de Página -->
+      <ng-container *ngFor="let page of pageNumbers()">
+        <button
+          *ngIf="page !== -1"
+          (click)="goToPage(page)"
+          class="flex items-center justify-center h-10 w-10 rounded-lg border text-sm font-medium transition-colors"
+          [ngClass]="{
+            'bg-secondary text-white border-secondary': currentPage() === page,
+            'border-subtle-light dark:border-subtle-dark hover:bg-background-light dark:hover:bg-card-dark':
+              currentPage() !== page
+          }"
+        >
+          {{ page }}
+        </button>
+        <!-- Puntos suspensivos (...) -->
+        <span
+          *ngIf="page === -1"
+          class="flex items-center justify-center h-10 w-10 text-sm text-text-light-secondary"
+        >
+          ...
+        </span>
+      </ng-container>
 
+      <!-- Botón Siguiente -->
       <button
         [disabled]="currentPage() >= totalPages()"
-        class="px-4 py-2 text-sm font-medium rounded-lg border border-subtle-light dark:border-subtle-dark hover:bg-background-light dark:hover:bg-card-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         (click)="goToNextPage()"
-        type="button"
+        class="flex items-center justify-center h-10 w-10 rounded-lg border border-subtle-light dark:border-subtle-dark hover:bg-background-light dark:hover:bg-card-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        aria-label="Página siguiente"
       >
-        Siguiente
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </button>
     </div>
   </section>
 </div>
 
-<!-- Sidebar de filtros (móvil y escritorio) -->
+<!-- Sidebar de filtros (MODIFICADO) -->
 <div
   *ngIf="showFilters"
   class="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-end z-50 transition-opacity duration-300"
@@ -124,9 +206,12 @@
 
     <!-- Contenido del Filtro -->
     <div class="flex-1 overflow-y-auto p-4">
+      <!--
+        --- ¡MODIFICADO! ---
+        Se ha quitado (sortChanged)
+      -->
       <app-products-filters
         (filtersChanged)="onFiltersChanged($event)"
-        (sortChanged)="onSortChanged($event)"
       ></app-products-filters>
     </div>
 

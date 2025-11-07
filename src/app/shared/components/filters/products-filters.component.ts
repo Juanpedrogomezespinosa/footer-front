@@ -14,9 +14,7 @@ export class ProductsFiltersComponent {
   public filtersChanged: EventEmitter<Record<string, string[]>> =
     new EventEmitter<Record<string, string[]>>();
 
-  // Emite el valor de orden seleccionado: cadena (por ejemplo "price_asc")
-  @Output()
-  public sortChanged: EventEmitter<string> = new EventEmitter<string>();
+  // --- 'sortChanged' ELIMINADO ---
 
   // Estado interno de filtros seleccionados
   public selectedFilters: Record<string, string[]> = {
@@ -65,45 +63,33 @@ export class ProductsFiltersComponent {
     const inputElement = event.target as HTMLInputElement;
     const value = inputElement.value;
 
-    // 1. Clonar el array existente para el filtro específico (inmutabilidad).
     let currentValues = [...(this.selectedFilters[key] || [])];
 
     if (inputElement.checked) {
-      // Agregar valor si está marcado
       if (!currentValues.includes(value)) {
         currentValues.push(value);
       }
     } else {
-      // Remover valor creando un nuevo array filtrado
       currentValues = currentValues.filter((v: string) => v !== value);
     }
 
-    // 2. CREAR UN NUEVO OBJETO para selectedFilters (inmutabilidad en el nivel raíz).
-    // Esto es CRUCIAL para que Angular detecte el cambio de la propiedad [checked]
     this.selectedFilters = {
       ...this.selectedFilters,
       [key]: currentValues,
     };
 
-    // 3. Emitimos una COPIA SUPERFICIAL del objeto de filtros para garantizar la reactividad en el componente padre.
     this.filtersChanged.emit({ ...this.selectedFilters });
   }
 
-  // Maneja el cambio del select de orden
-  public onSortChange(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    this.sortChanged.emit(selectElement.value);
-  }
+  // --- 'onSortChange' ELIMINADO ---
 
-  // Función de rastreo (trackBy) para el *ngFor en las opciones.
-  // Necesario para que Angular sepa qué elementos del DOM debe reevaluar.
+  // Función de rastreo (trackBy)
   public trackByFn(index: number, option: string): string {
-    return option; // Usamos el valor de la opción como clave única
+    return option;
   }
 
   // Método para resetear todos los filtros seleccionados
   public resetFilters(): void {
-    // Creamos un nuevo objeto de filtros vacío
     this.selectedFilters = {
       brand: [],
       gender: [],
@@ -111,7 +97,6 @@ export class ProductsFiltersComponent {
       material: [],
       color: [],
     };
-    // Emitimos una COPIA SUPERFICIAL del estado vacío.
     this.filtersChanged.emit({ ...this.selectedFilters });
   }
 }

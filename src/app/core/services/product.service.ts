@@ -4,15 +4,13 @@ import { Observable } from "rxjs";
 
 /**
  * Interfaz para los productos recibidos desde la API.
- * --- ACTUALIZADA ---
- * Ahora incluye los campos 'category' y 'sub_category'
- * y usa tipos literales para 'category'.
+ * (Sin cambios)
  */
 export interface ProductApiResponse {
   id: number;
   name: string;
   description?: string;
-  price: number; // La API devuelve string, pero HttpClient lo puede parsear
+  price: number;
   image?: string;
   averageRating?: number;
   ratingCount?: number;
@@ -20,15 +18,14 @@ export interface ProductApiResponse {
   brand?: string;
   color?: string;
   stock?: number;
-  category: "zapatillas" | "ropa" | "complementos"; // Tipado estricto
+  category: "zapatillas" | "ropa" | "complementos";
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
-  // Otros campos según respuesta de la API
 }
 
 /**
  * Interfaz de producto para uso interno del frontend.
- * --- ACTUALIZADA ---
+ * --- ¡MODIFICADA! ---
  */
 export interface Product {
   id: number;
@@ -36,22 +33,26 @@ export interface Product {
   description?: string;
   price: number;
   image?: string;
-  rating?: number;
-  ratingCount?: number;
+  rating?: number; // Lo mantenemos por si lo usas en el detalle
+  ratingCount?: number; // Lo mantenemos por si lo usas en el detalle
   size?: string;
   category: "zapatillas" | "ropa" | "complementos";
-  // Otros campos que necesites
+
+  // --- ¡CAMPOS AÑADIDOS PARA EL NUEVO DISEÑO! ---
+  brand?: string; // Para mostrar "Nike", "Adidas", etc.
+  oldPrice?: number; // Para el precio tachado (opcional)
 }
 
 /**
  * Estructura de la respuesta paginada desde el backend.
+ * (Sin cambios)
  */
 export interface PaginatedProductResponse {
   currentPage: number;
   totalPages: number;
   totalItems: number;
   nextPage: number | null;
-  prevPage: number | null; // Corregido de 'previousPage' a 'prevPage' para que coincida con tu API
+  prevPage: number | null;
   products: ProductApiResponse[];
 }
 
@@ -64,13 +65,12 @@ export class ProductService {
   constructor(private httpClient: HttpClient) {}
 
   /**
-   * Obtiene productos desde la API con soporte para paginación, filtros y ordenamiento.
-   * --- REFACTORIZADO ---
+   * Obtiene productos desde la API...
+   * (Sin cambios en la lógica del servicio)
    */
   getProducts(
     page: number,
     limit: number,
-    // El 'Record' es la clave. Aceptará { category: ['ropa'], brand: ['Adidas'] }
     filters: Record<string, string | string[]> = {},
     sort: string = ""
   ): Observable<PaginatedProductResponse> {
@@ -78,28 +78,19 @@ export class ProductService {
       .set("page", page.toString())
       .set("limit", limit.toString());
 
-    // --- MEJORA ---
-    // Ya no se hardcodea 'stock=true'.
-    // El componente que llame al servicio debe incluirlo en los filtros si lo desea.
-    // Ej: filters: { stock: 'true', category: 'zapatillas' }
-
     for (const key in filters) {
       if (Object.prototype.hasOwnProperty.call(filters, key)) {
         const value = filters[key];
-
-        // Comprobamos si el valor es un array (como 'category' o 'brand')
         if (Array.isArray(value)) {
           value.forEach((v) => {
             params = params.append(key, v);
           });
         } else {
-          // Si es un valor único (como 'stock' o 'minPrice')
           params = params.set(key, value as string);
         }
       }
     }
 
-    // El switch de ordenación está perfecto, sin cambios.
     switch (sort) {
       case "price_asc":
         params = params.set("sortBy", "price").set("order", "ASC");
@@ -113,7 +104,6 @@ export class ProductService {
       case "rating_count_desc":
         params = params.set("sortBy", "ratingCount").set("order", "DESC");
         break;
-      // ... más casos si los necesitas
     }
 
     return this.httpClient.get<PaginatedProductResponse>(this.apiUrl, {
@@ -123,6 +113,7 @@ export class ProductService {
 
   /**
    * Obtiene un producto específico por su ID.
+   * (Sin cambios)
    */
   getProductById(productId: number): Observable<ProductApiResponse> {
     return this.httpClient.get<ProductApiResponse>(
