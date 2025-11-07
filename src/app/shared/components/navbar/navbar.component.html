@@ -62,10 +62,7 @@
     </form>
 
     <nav class="flex items-center gap-1 sm:gap-2 shrink-0">
-      <!-- 
-        💡 CAMBIO AQUÍ: 
-        Añadido *ngIf="isLoggedIn" para ocultar el carrito si no está logueado.
-      -->
+      <!-- Icono del Carrito -->
       <a
         *ngIf="isLoggedIn"
         routerLink="/cart"
@@ -88,12 +85,12 @@
         </svg>
       </a>
 
-      <!-- Avatar (ya tiene el *ngIf="isLoggedIn") -->
+      <!-- Avatar -->
       <a
         *ngIf="isLoggedIn"
         routerLink="/profile"
         aria-label="Ver perfil de usuario"
-        class="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:ring-2 hover: dark:hover:ring-offset-card-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+        class="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:ring-2 hover:ring-secondary dark:hover:ring-offset-card-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
       >
         <div
           class="bg-center bg-cover w-9 h-9 rounded-full ring-2 ring-primary dark:ring-primary-20 overflow-hidden flex items-center justify-center"
@@ -103,13 +100,23 @@
         ></div>
       </a>
 
-      <div class="hidden sm:block">
+      <!--
+        --- ¡LA CORRECCIÓN DEFINITIVA! ---
+        1. Cambiado 'sm:block' por 'sm:flex items-center'
+           para que este div se alinee con el resto de items del flexbox (<nav>).
+      -->
+      <div class="hidden sm:flex items-center">
         <ng-container *ngIf="isLoggedIn; else loginButton">
           <button
             (click)="logout()"
             aria-label="Cerrar sesión"
             class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-text-primary-light dark:text-text-primary-dark hover:bg-background-light dark:hover:bg-background-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
+            <!--
+              --- ¡ICONO CAMBIADO! ---
+              2. He cambiado el icono por el de "Power" (Apagado)
+                 como sugeriste, para descartar problemas de SVG.
+            -->
             <svg
               class="w-5 h-5"
               xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +128,7 @@
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m-3 0-3-3m0 0-3 3m3-3V12"
+                d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
               />
             </svg>
             <span class="hidden lg:inline">Salir</span>
@@ -131,7 +138,7 @@
         <ng-template #loginButton>
           <a
             routerLink="/login"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-primary hover:bg-secondary hover:bg-opacity-10 active:bg-secondary transition-all shadow-sm hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-primary hover:bg-opacity-10 transition-all shadow-sm hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <svg
               class="w-5 h-5"
@@ -152,6 +159,7 @@
         </ng-template>
       </div>
 
+      <!-- Botón de Menú Móvil (sin cambios) -->
       <button
         class="flex md:hidden items-center justify-center h-10 w-10 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         (click)="toggleMobileMenu()"
@@ -192,6 +200,7 @@
     </nav>
   </div>
 
+  <!-- Links de Navegación Desktop (sin cambios) -->
   <nav
     class="hidden md:block w-full border-t border-subtle-light dark:border-subtle-dark"
   >
@@ -341,10 +350,6 @@
       <hr class="border-subtle-light" />
 
       <!-- Carrito y Perfil Móvil -->
-      <!-- 
-        💡 CAMBIO AQUÍ: 
-        Añadido *ngIf="isLoggedIn" para ocultar "Carrito" si no está logueado.
-      -->
       <a
         *ngIf="isLoggedIn"
         routerLink="/cart"
@@ -368,10 +373,6 @@
         <span class="font-medium">Carrito</span>
       </a>
 
-      <!-- 
-        💡 CAMBIO AQUÍ: 
-        Añadido *ngIf="isLoggedIn" para ocultar "Mi Perfil" si no está logueado.
-      -->
       <a
         *ngIf="isLoggedIn"
         routerLink="/profile"
@@ -403,6 +404,7 @@
           (click)="logout()"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-accent hover:bg-accent/10 transition-all w-full text-left group"
         >
+          <!-- (Icono corregido a "Power") -->
           <svg
             class="w-5 h-5 group-hover:scale-110 transition-transform"
             xmlns="http://www.w3.org/2000/svg"
@@ -414,7 +416,7 @@
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m-3 0-3-3m0 0-3 3m3-3V12"
+              d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
             />
           </svg>
           <span class="font-medium">Cerrar sesión</span>
