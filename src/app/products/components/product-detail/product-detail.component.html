@@ -1,34 +1,84 @@
+<!--
+  --- ¡PÁGINA DE DETALLE REDISEÑADA CON GALERÍA! ---
+-->
 <main
   class="max-w-6xl mx-auto px-4 py-12"
-  *ngIf="!isLoading && product; else loadingOrError"
+  *ngIf="!isLoading() && product() as prod; else loadingOrError"
 >
   <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-    <!-- Imagen del producto -->
-    <div class="w-full flex justify-center">
-      <img
-        [src]="getProductImage()"
-        [alt]="product.name"
-        class="w-full max-w-md object-cover rounded-3xl shadow-lg"
-        loading="lazy"
-      />
+    <!-- 
+      1. GALERÍA DE IMÁGENES (NUEVA)
+    -->
+    <div class="w-full flex flex-col gap-4">
+      <!-- Imagen Principal -->
+      <div
+        class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden"
+      >
+        <img
+          [src]="getProductImage()"
+          [alt]="prod.name"
+          class="w-full h-full object-cover rounded-xl shadow-lg"
+          loading="lazy"
+        />
+      </div>
+      <!-- Miniaturas (Thumbnails) -->
+      <div class="grid grid-cols-5 gap-3">
+        <button
+          *ngFor="let image of prod.images"
+          (click)="selectImage(image.imageUrl)"
+          class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all"
+          [ngClass]="{
+            'border-secondary': selectedImageUrl() === image.imageUrl,
+            'border-transparent opacity-70 hover:opacity-100':
+              selectedImageUrl() !== image.imageUrl
+          }"
+          [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
+        >
+          <img
+            [src]="backendUrl + image.imageUrl"
+            [alt]="prod.name + ' vista ' + (image.displayOrder + 1)"
+            class="w-full h-full object-cover"
+          />
+        </button>
+      </div>
     </div>
 
-    <!-- Detalle del producto -->
+    <!-- 
+      2. DETALLE DEL PRODUCTO (ACTUALIZADO)
+    -->
     <div class="flex flex-col gap-6">
       <div>
-        <h1 class="text-4xl font-semibold text-gray-900 leading-tight">
-          {{ product.name }}
-        </h1>
-        <p class="text-3xl font-bold text-primary mt-3">
-          {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
+        <!-- Marca (Nuevo) -->
+        <p
+          *ngIf="prod.brand"
+          class="text-sm font-medium text-secondary uppercase tracking-wide"
+        >
+          {{ prod.brand }}
         </p>
+        <!-- Título -->
+        <h1 class="text-4xl font-semibold text-gray-900 leading-tight mt-1">
+          {{ prod.name }}
+        </h1>
+        <!-- Precio (con precio tachado) -->
+        <div class="flex items-center gap-4 mt-3">
+          <p class="text-3xl font-bold text-primary">
+            {{ prod.price | currency : "EUR" : "symbol" : "1.2-2" }}
+          </p>
+          <p
+            *ngIf="prod.oldPrice"
+            class="text-2xl font-medium text-gray-400 line-through"
+          >
+            {{ prod.oldPrice | currency : "EUR" : "symbol" : "1.2-2" }}
+          </p>
+        </div>
+        <!-- (Aquí irían las estrellas si las tuvieras) -->
       </div>
 
       <p class="text-gray-600 leading-relaxed text-lg">
-        {{ product.description }}
+        {{ prod.description }}
       </p>
 
-      <!-- Selector de talla -->
+      <!-- Selector de talla (sin cambios) -->
       <div>
         <label for="talla" class="block text-gray-800 font-medium mb-2"
           >Selecciona tu talla:</label
@@ -45,7 +95,7 @@
         </select>
       </div>
 
-      <!-- Botones de acción -->
+      <!-- Botones de acción (sin cambios) -->
       <div class="flex flex-col sm:flex-row gap-4 mt-2">
         <button
           class="bg-primary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -67,14 +117,14 @@
   </div>
 </main>
 
-<!-- Estado de carga o error -->
+<!-- Estado de carga o error (convertido a signals) -->
 <ng-template #loadingOrError>
   <main class="max-w-4xl mx-auto px-4 py-24 text-center">
-    <div *ngIf="isLoading" class="animate-pulse text-lg text-gray-500">
+    <div *ngIf="isLoading()" class="animate-pulse text-lg text-gray-500">
       Cargando producto...
     </div>
-    <div *ngIf="error" class="text-red-500 font-medium">
-      {{ error }}
+    <div *ngIf="error()" class="text-red-500 font-medium">
+      {{ error() }}
     </div>
   </main>
 </ng-template>

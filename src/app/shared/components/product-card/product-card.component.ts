@@ -31,8 +31,10 @@ export class ProductCardComponent {
 
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
-      // Ruta corregida para incluir /uploads/
-      return `${this.backendUrl}/uploads/${this.product.image}`;
+      // --- ¡ESTA ES LA CORRECCIÓN! ---
+      // La ruta (this.product.image) ya viene completa desde el backend
+      // (ej: "/uploads/imagen.png"), solo necesitamos añadir el host.
+      return `${this.backendUrl}${this.product.image}`;
     } else {
       return this.defaultImage;
     }

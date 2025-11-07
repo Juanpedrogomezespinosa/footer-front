@@ -8,7 +8,7 @@ import {
   ViewChild,
   ElementRef,
   Renderer2,
-  computed, // Importar computed
+  computed, // <-- 1. Importar computed
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
@@ -48,43 +48,49 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // --- ¡CORRECCIÓN! Declarar las propiedades de la clase ---
+  // --- ¡AQUÍ ESTÁ LA CORRECCIÓN DE TYPESCRIPT! ---
+  // (Declaramos las propiedades que faltaban)
   private currentCategory: string | null = null;
   private currentSearchTerm: string | null = null;
   // --- FIN DE LA CORRECCIÓN ---
 
-  // Estado
+  // --- 2. ESTADO MODIFICADO ---
   products = signal<Product[]>([]);
   currentPage = signal(1);
   totalPages = signal(1);
-  totalItems = signal(0); // Para el contador "Mostrando X productos"
-  listTitle = signal("Todos los productos"); // Para el título
+  totalItems = signal(0); // <-- Añadido para el contador "Mostrando X productos"
+  listTitle = signal("Todos los productos"); // <-- Añadido para el título
 
   readonly itemsPerPage = 18;
   selectedFilters: Record<string, string | string[]> = {};
-  selectedSort: string = ""; // La ordenación se controla aquí ahora
+  selectedSort: string = ""; // <-- La ordenación se controla aquí ahora
   showFilters = false;
 
-  // Lógica de Ordenación (Movida desde el componente de filtros)
+  // --- 3. NUEVA LÓGICA DE ORDENACIÓN (MOVIdA DESDE FILTERS) ---
   public sortOptions = [
     { value: "", label: "Más Relevante" },
     { value: "price_asc", label: "Precio: Menor a Mayor" },
     { value: "price_desc", label: "Precio: Mayor a Menor" },
     { value: "rating_desc", label: "Mejor Valorados" },
+    // { value: "rating_count_desc", label: "Más Populares" }, // Descomenta si quieres esta
   ];
 
-  // Lógica de Paginación Numérica
+  // --- 4. NUEVA LÓGICA DE PAGINACIÓN NUMÉRICA ---
   public pageNumbers: Signal<number[]> = computed(() => {
     const total = this.totalPages();
     const current = this.currentPage();
     if (total <= 7) {
+      // Mostrar todas las páginas si son 7 o menos
       return Array.from({ length: total }, (_, i) => i + 1);
     }
+
+    // Lógica para "..."
     const pages: number[] = [];
     if (current > 3) {
       pages.push(1);
       if (current > 4) pages.push(-1); // -1 representa "..."
     }
+
     for (let i = -2; i <= 2; i++) {
       const page = current + i;
       if (page > 0 && page <= total) {
@@ -93,11 +99,12 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
+
     if (current < total - 2) {
       if (current < total - 3) pages.push(-1); // -1 representa "..."
       pages.push(total);
     }
-    return pages.filter((p, i) => p !== -1 || pages[i - 1] !== -1);
+    return pages.filter((p, i) => p !== -1 || pages[i - 1] !== -1); // Evitar "..." duplicados
   });
 
   ngOnInit(): void {
@@ -109,11 +116,13 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentSearchTerm = queryParams.get("name");
       const pageFromUrl = parseInt(queryParams.get("page") || "1", 10);
 
+      // --- 5. LÓGICA DE TÍTULO AÑADIDA ---
       this.updateListTitle();
 
       if (this.currentPage() !== pageFromUrl) {
         this.currentPage.set(pageFromUrl);
       }
+
       this.fetchProducts();
     });
   }
@@ -167,11 +176,12 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showFilters = !this.showFilters;
   }
 
-  // Lógica de Título
+  // --- 6. NUEVA LÓGICA DE TÍTULO ---
   private updateListTitle(): void {
     if (this.currentSearchTerm) {
       this.listTitle.set(`Resultados para "${this.currentSearchTerm}"`);
     } else if (this.currentCategory) {
+      // Capitalizar la primera letra
       const cleanTitle =
         this.currentCategory.charAt(0).toUpperCase() +
         this.currentCategory.slice(1);
@@ -198,21 +208,22 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
-          // --- Mapeo Actualizado para la nueva Card ---
+          // --- 7. MAPEO ACTUALIZADO ---
           const mappedProducts: Product[] = response.products.map(
-            (product) => ({
+            (product: any) => ({
+              // Usamos 'any' temporalmente para 'image'
               id: product.id,
               name: product.name,
               price: Number(product.price),
-              // Simulamos un precio anterior si el precio es bajo
               oldPrice:
                 Number(product.price) < 80
                   ? Number(product.price) + 20
                   : undefined,
+              // 'image' ahora viene de la relación,
+              // y 'getAllProducts' la mapea como la imagen principal
               image: product.image,
-              brand: product.brand, // <-- Pasamos la marca
+              brand: product.brand,
               category: product.category,
-              // Pasamos los ratings (aunque la card no los use, el tipo Product los tiene)
               rating: product.averageRating ?? 0,
               ratingCount: product.ratingCount ?? 0,
             })
@@ -264,6 +275,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * --- 8. LÓGICA DE ORDENACIÓN (MOVIdA DESDE FILTERS) ---
    * Se dispara desde el NUEVO dropdown en el HTML.
    */
   onSortChanged(event: Event): void {

@@ -10,10 +10,8 @@ import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { CartService, CartItem } from "../core/services/cart.service";
 import { OrderService, OrderItemInput } from "../core/services/order.service";
-// --- 1. Imports añadidos ---
 import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
-// --- Fin de Imports añadidos ---
 import { ProductApiResponse } from "../core/services/product.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -26,14 +24,12 @@ import { HttpErrorResponse } from "@angular/common/http";
 })
 export class CartComponent implements OnInit {
   public cartItems: WritableSignal<CartItem[]> = signal([]);
-  public isLoading = signal(true); // Carga principal
+  public isLoading = signal(true);
   public error: WritableSignal<string | null> = signal(null);
 
-  // --- 2. Nuevos signals para Direcciones ---
   public addresses = signal<UserAddress[]>([]);
   public isLoadingAddresses = signal(true);
   public selectedAddressId = signal<number | null>(null);
-  // --- Fin de nuevos signals ---
 
   public subtotal: Signal<number> = computed(() => {
     return this.cartItems().reduce((sum, item) => {
@@ -48,7 +44,6 @@ export class CartComponent implements OnInit {
     private cartService: CartService,
     private orderService: OrderService,
     private router: Router,
-    // --- 3. Inyectar UserService y ToastService ---
     private userService: UserService,
     private toastService: ToastService
   ) {}
@@ -56,7 +51,7 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     console.log("CartComponent re-inicializado.");
     this.loadCart();
-    this.loadAddresses(); // <-- 4. Cargar direcciones al iniciar
+    this.loadAddresses();
   }
 
   loadCart(): void {
@@ -74,13 +69,11 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // --- 5. Nueva función para cargar direcciones ---
   loadAddresses(): void {
     this.isLoadingAddresses.set(true);
     this.userService.getAddresses().subscribe({
       next: (addresses) => {
         this.addresses.set(addresses);
-        // Autoseleccionar la dirección por defecto si existe
         const defaultAddress = addresses.find((addr) => addr.isDefault);
         if (defaultAddress) {
           this.selectedAddressId.set(defaultAddress.id);
@@ -122,16 +115,11 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // --- 6. Nueva función para seleccionar dirección ---
   onSelectAddress(addressId: number): void {
     this.selectedAddressId.set(addressId);
   }
 
-  /**
-   * --- LÓGICA DE CHECKOUT MODIFICADA ---
-   */
   onCheckout(): void {
-    // 7. Validación de dirección
     if (!this.selectedAddressId()) {
       this.toastService.showError(
         "Por favor, selecciona una dirección de envío."
@@ -148,7 +136,6 @@ export class CartComponent implements OnInit {
       price: Number(item.Product.price),
     }));
 
-    // 8. Enviar items Y la dirección seleccionada
     this.orderService
       .createOrder(itemsToOrder, this.selectedAddressId()!)
       .subscribe({
@@ -162,11 +149,13 @@ export class CartComponent implements OnInit {
         },
       });
   }
-  // --- FIN DE LA LÓGICA MODIFICADA ---
 
   getProductImage(imageName: string | undefined | null): string {
     if (imageName) {
-      return `http://localhost:3000/uploads/${imageName}`;
+      // --- ¡ESTA ES LA CORRECCIÓN! ---
+      // La 'imageName' ya es la ruta completa (ej: /uploads/imagen.png)
+      // Solo necesitamos añadir el host.
+      return `http://localhost:3000${imageName}`;
     }
     return `https://placehold.co/400x400/eeeeee/aaaaaa?text=Producto`;
   }
