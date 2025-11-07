@@ -10,7 +10,7 @@ export interface ProductApiResponse {
   id: number;
   name: string;
   description?: string;
-  price: number; // La API devuelve string, pero HttpClient lo puede parsear
+  price: number;
   image?: string;
   averageRating?: number;
   ratingCount?: number;
@@ -18,14 +18,12 @@ export interface ProductApiResponse {
   brand?: string;
   color?: string;
   stock?: number;
-  category: "zapatillas" | "ropa" | "complementos"; // Tipado estricto
+  category: "zapatillas" | "ropa" | "complementos";
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
-  // Otros campos según respuesta de la API
 }
 
 /**
- * --- ¡NUEVO! ---
  * Interfaz para las imágenes de la galería
  */
 export interface ProductImage {
@@ -36,22 +34,20 @@ export interface ProductImage {
 
 /**
  * Interfaz de producto para uso interno del frontend.
- * --- ¡MODIFICADA Y CORREGIDA! ---
+ * (Completa)
  */
 export interface Product {
   id: number;
   name: string;
   description?: string;
   price: number;
-  image?: string; // (Este 'image' lo rellenamos nosotros con la imagen principal)
+  image?: string;
   rating?: number;
   ratingCount?: number;
   size?: string;
   category: "zapatillas" | "ropa" | "complementos";
   brand?: string;
   oldPrice?: number;
-
-  // --- ¡CAMPOS AÑADIDOS QUE FALTABAN! ---
   color?: string;
   material?: string;
   gender?: "hombre" | "mujer" | "unisex";
@@ -80,7 +76,7 @@ export class ProductService {
 
   /**
    * Obtiene productos desde la API...
-   * (Sin cambios en la lógica del servicio)
+   * (Sin cambios)
    */
   getProducts(
     page: number,
@@ -132,6 +128,17 @@ export class ProductService {
   getProductById(productId: number): Observable<ProductApiResponse> {
     return this.httpClient.get<ProductApiResponse>(
       `${this.apiUrl}/${productId}`
+    );
+  }
+
+  /**
+   * --- ¡NUEVO MÉTODO AÑADIDO! ---
+   * Obtiene los productos relacionados para "Completa tu look"
+   * Llama a GET /api/products/:id/related
+   */
+  getRelatedProducts(productId: number): Observable<Product[]> {
+    return this.httpClient.get<Product[]>(
+      `${this.apiUrl}/${productId}/related`
     );
   }
 }

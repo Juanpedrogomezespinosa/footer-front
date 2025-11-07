@@ -1,0 +1,17 @@
+<!--
+  Sección "Completa tu look".
+  Solo se muestra si no está cargando Y si ha encontrado productos.
+-->
+<div *ngIf="!isLoading() && relatedProducts().length > 0">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6">Completa tu look</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!--
+      Reutilizamos el 'app-product-card'
+      que ya teníamos para la lista de productos.
+    -->
+    <app-product-card
+      *ngFor="let product of relatedProducts()"
+      [product]="product"
+    ></app-product-card>
+  </div>
+</div>

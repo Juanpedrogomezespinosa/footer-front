@@ -12,11 +12,14 @@ import {
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
 
+// --- 3. IMPORTAR EL NUEVO COMPONENTE ---
+import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
+
 @Component({
   selector: "app-product-detail",
   standalone: true,
-  // --- 3. AÑADIR 'RouterModule' A LOS IMPORTS ---
-  imports: [CommonModule, FormsModule, RouterModule],
+  // --- 4. AÑADIR 'RouterModule' y 'RelatedProductsComponent' A LOS IMPORTS ---
+  imports: [CommonModule, FormsModule, RouterModule, RelatedProductsComponent],
   templateUrl: "./product-detail.component.html",
   styleUrls: [],
 })
@@ -27,12 +30,10 @@ export class ProductDetailComponent implements OnInit {
   error = signal<string | null>(null);
 
   // Señales para interacción
-  selectedSize = signal<string>(""); // Cambiado a signal
+  selectedSize = signal<string>("");
   selectedImageUrl = signal<string>("");
-  quantity = signal(1); // Signal para la cantidad
-  activeTab = signal("description"); // Signal para las pestañas
-
-  // (He quitado 'isWishlisted' ya que restauraremos tus dos botones)
+  quantity = signal(1);
+  activeTab = signal("description");
 
   // Datos y utilidades
   availableSizes: string[] = [
@@ -58,20 +59,32 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const productIdParam = this.route.snapshot.paramMap.get("id");
-    const productId = Number(productIdParam);
+    // --- 5. LÓGICA DE 'SCROLL AL INICIO' ---
+    // (Usamos 'paramMap' para detectar cambios de ID y subir)
+    this.route.paramMap.subscribe((params) => {
+      const productIdParam = params.get("id");
+      const productId = Number(productIdParam);
 
-    if (isNaN(productId)) {
-      this.error.set("ID de producto inválido.");
-      this.isLoading.set(false);
-      return;
-    }
+      // Resetear estado y subir
+      this.isLoading.set(true);
+      this.product.set(null);
+      window.scrollTo(0, 0); // <-- Scroll al inicio
 
+      if (isNaN(productId)) {
+        this.error.set("ID de producto inválido.");
+        this.isLoading.set(false);
+        return;
+      }
+
+      this.loadProduct(productId);
+    });
+  }
+
+  loadProduct(productId: number): void {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: any) => {
         if (foundProduct) {
-          // --- 4. ¡MAPEADO CORREGIDO! ---
-          // (Añadimos los campos que faltaban para las pestañas)
+          // --- 6. MAPEADO COMPLETO (con campos de specs) ---
           const productData = {
             ...foundProduct,
             price: Number(foundProduct.price),
@@ -84,7 +97,6 @@ export class ProductDetailComponent implements OnInit {
               Number(foundProduct.price) < 150
                 ? Number(foundProduct.price) + 30
                 : undefined,
-            // --- Campos que faltaban: ---
             color: foundProduct.color,
             material: foundProduct.material,
             gender: foundProduct.gender,
@@ -107,8 +119,7 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Métodos de la Galería (sin cambios) ---
-
+  // --- Métodos de la Galería ---
   getProductImage(): string {
     if (this.selectedImageUrl()) {
       return `${this.backendUrl}${this.selectedImageUrl()}`;
@@ -125,7 +136,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   // --- Métodos de Acciones de Producto ---
-
   selectSize(size: string): void {
     this.selectedSize.set(size);
   }
@@ -159,7 +169,6 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- 5. ¡MÉTODO 'buyNow' RESTAURADO! ---
   buyNow(): void {
     if (!this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
@@ -168,10 +177,8 @@ export class ProductDetailComponent implements OnInit {
     const product = this.product();
     if (!product) return;
 
-    // Añade la cantidad seleccionada al carrito
     this.cartService.addToCart(product.id, this.quantity()).subscribe({
       next: () => {
-        // Al tener éxito, navega directo al carrito para el checkout
         this.router.navigate(["/cart"]);
       },
       error: (err: HttpErrorResponse) => {
@@ -183,13 +190,12 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Métodos de Pestañas (sin cambios) ---
-
+  // --- Métodos de Pestañas ---
   setActiveTab(tab: string): void {
     this.activeTab.set(tab);
   }
 
-  // --- Métodos de Valoración (Estrellas) (sin cambios) ---
+  // --- Métodos de Valoración (Estrellas) ---
   getStars(): ("full" | "half" | "empty")[] {
     const stars: ("full" | "half" | "empty")[] = [];
     let rating = this.product()?.rating ?? 0;
