@@ -1,39 +1,40 @@
-import { Component, OnInit, signal } from "@angular/core"; // <-- 1. Importar signal
-import { ActivatedRoute, Router } from "@angular/router";
+import { Component, OnInit, signal } from "@angular/core";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router"; // <-- 1. IMPORTAR RouterModule
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
-import { ProductService, Product } from "app/core/services/product.service";
+// --- 2. IMPORTAR 'ProductImage' DESDE EL SERVICIO ---
+import {
+  ProductService,
+  Product,
+  ProductImage,
+} from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
-
-// --- 2. IMPORTAR LA NUEVA INTERFAZ DE IMAGEN ---
-// (Necesitamos la interfaz ProductImage que está en productModel.js...
-// la definiremos aquí temporalmente, aunque lo ideal sería moverla
-// a 'product.service.ts' junto a 'Product')
-interface ProductImage {
-  id: number;
-  imageUrl: string;
-  displayOrder: number;
-}
 
 @Component({
   selector: "app-product-detail",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  // --- 3. AÑADIR 'RouterModule' A LOS IMPORTS ---
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: "./product-detail.component.html",
   styleUrls: [],
 })
 export class ProductDetailComponent implements OnInit {
-  // --- 3. MODIFICAR 'product' PARA QUE ACEPTE LA GALERÍA ---
-  // Hacemos 'product' un Signal para mejor reactividad
-  product = signal<
-    (Product & { images: ProductImage[] }) | null // El producto AHORA incluye un array 'images'
-  >(null);
+  // Señales de estado
+  product = signal<(Product & { images: ProductImage[] }) | null>(null);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
 
-  isLoading = signal(true); // <-- Convertido a signal
-  error = signal<string | null>(null); // <-- Convertido a signal
-  selectedSize = "";
+  // Señales para interacción
+  selectedSize = signal<string>(""); // Cambiado a signal
+  selectedImageUrl = signal<string>("");
+  quantity = signal(1); // Signal para la cantidad
+  activeTab = signal("description"); // Signal para las pestañas
+
+  // (He quitado 'isWishlisted' ya que restauraremos tus dos botones)
+
+  // Datos y utilidades
   availableSizes: string[] = [
     "36",
     "37",
@@ -45,10 +46,6 @@ export class ProductDetailComponent implements OnInit {
     "43",
     "44",
   ];
-
-  // --- 4. NUEVO SIGNAL PARA LA IMAGEN SELECCIONADA ---
-  selectedImageUrl = signal<string>("");
-
   backendUrl = "http://localhost:3000";
   defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=Footer";
 
@@ -72,20 +69,28 @@ export class ProductDetailComponent implements OnInit {
 
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: any) => {
-        // Usamos 'any' para aceptar 'images'
         if (foundProduct) {
+          // --- 4. ¡MAPEADO CORREGIDO! ---
+          // (Añadimos los campos que faltaban para las pestañas)
           const productData = {
             ...foundProduct,
             price: Number(foundProduct.price),
             rating: foundProduct.averageRating,
-            // Asegurarnos de que 'images' sea un array
+            ratingCount: foundProduct.ratingCount,
             images: Array.isArray(foundProduct.images)
               ? foundProduct.images
               : [],
+            oldPrice:
+              Number(foundProduct.price) < 150
+                ? Number(foundProduct.price) + 30
+                : undefined,
+            // --- Campos que faltaban: ---
+            color: foundProduct.color,
+            material: foundProduct.material,
+            gender: foundProduct.gender,
           };
           this.product.set(productData);
 
-          // --- 5. ESTABLECER LA IMAGEN PRINCIPAL ---
           if (productData.images.length > 0) {
             this.selectedImageUrl.set(productData.images[0].imageUrl);
           }
@@ -102,12 +107,12 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- 6. FUNCIÓN DE IMAGEN PRINCIPAL (AHORA USA EL SIGNAL) ---
+  // --- Métodos de la Galería (sin cambios) ---
+
   getProductImage(): string {
     if (this.selectedImageUrl()) {
       return `${this.backendUrl}${this.selectedImageUrl()}`;
     }
-    // Fallback si no hay imagen seleccionada (aunque ngOnInit debería cubrirlo)
     const product = this.product();
     if (product && product.images.length > 0) {
       return `${this.backendUrl}${product.images[0].imageUrl}`;
@@ -115,21 +120,33 @@ export class ProductDetailComponent implements OnInit {
     return this.defaultImage;
   }
 
-  // --- 7. NUEVA FUNCIÓN para cambiar la imagen principal ---
   selectImage(imageUrl: string): void {
     this.selectedImageUrl.set(imageUrl);
   }
 
-  // --- Lógica de "Añadir al Carrito" (sin cambios) ---
+  // --- Métodos de Acciones de Producto ---
+
+  selectSize(size: string): void {
+    this.selectedSize.set(size);
+  }
+
+  incrementQuantity(): void {
+    this.quantity.update((q) => q + 1);
+  }
+
+  decrementQuantity(): void {
+    this.quantity.update((q) => (q > 1 ? q - 1 : 1));
+  }
+
   addToCart(): void {
-    if (!this.selectedSize) {
+    if (!this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
     }
-    const product = this.product(); // Obtenemos el valor del signal
+    const product = this.product();
     if (!product) return;
 
-    this.cartService.addToCart(product.id, 1).subscribe({
+    this.cartService.addToCart(product.id, this.quantity()).subscribe({
       next: () => {
         this.toastService.showSuccess("¡Producto añadido a la cesta!");
       },
@@ -142,17 +159,19 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Lógica de "Comprar Ahora" (sin cambios) ---
+  // --- 5. ¡MÉTODO 'buyNow' RESTAURADO! ---
   buyNow(): void {
-    if (!this.selectedSize) {
+    if (!this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
     }
-    const product = this.product(); // Obtenemos el valor del signal
+    const product = this.product();
     if (!product) return;
 
-    this.cartService.addToCart(product.id, 1).subscribe({
+    // Añade la cantidad seleccionada al carrito
+    this.cartService.addToCart(product.id, this.quantity()).subscribe({
       next: () => {
+        // Al tener éxito, navega directo al carrito para el checkout
         this.router.navigate(["/cart"]);
       },
       error: (err: HttpErrorResponse) => {
@@ -162,5 +181,29 @@ export class ProductDetailComponent implements OnInit {
         );
       },
     });
+  }
+
+  // --- Métodos de Pestañas (sin cambios) ---
+
+  setActiveTab(tab: string): void {
+    this.activeTab.set(tab);
+  }
+
+  // --- Métodos de Valoración (Estrellas) (sin cambios) ---
+  getStars(): ("full" | "half" | "empty")[] {
+    const stars: ("full" | "half" | "empty")[] = [];
+    let rating = this.product()?.rating ?? 0;
+
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= 1) {
+        stars.push("full");
+      } else if (rating >= 0.5) {
+        stars.push("half");
+      } else {
+        stars.push("empty");
+      }
+      rating -= 1;
+    }
+    return stars;
   }
 }

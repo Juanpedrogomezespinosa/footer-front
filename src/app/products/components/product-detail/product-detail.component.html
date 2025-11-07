@@ -1,24 +1,47 @@
-<!--
-  --- ¡PÁGINA DE DETALLE REDISEÑADA CON GALERÍA! ---
--->
 <main
-  class="max-w-6xl mx-auto px-4 py-12"
+  class="max-w-7xl mx-auto px-4 py-8 sm:py-12"
   *ngIf="!isLoading() && product() as prod; else loadingOrError"
 >
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-    <!-- 
-      1. GALERÍA DE IMÁGENES (NUEVA)
-    -->
-    <div class="w-full flex flex-col gap-4">
+  <!-- 1. Breadcrumbs (Corregido) -->
+  <nav class="text-sm mb-4" aria-label="Breadcrumb">
+    <ol class="flex items-center gap-2 text-text-light-secondary">
+      <li>
+        <a routerLink="/" class="hover:text-primary transition-colors"
+          >Inicio</a
+        >
+      </li>
+      <li>
+        <span class="select-none">/</span>
+      </li>
+      <li>
+        <a
+          [routerLink]="['/products/category', prod.category]"
+          class="hover:text-primary transition-colors capitalize"
+          >{{ prod.category }}</a
+        >
+      </li>
+      <li>
+        <span class="select-none">/</span>
+      </li>
+      <li class="font-medium text-text-light-primary truncate">
+        {{ prod.name }}
+      </li>
+    </ol>
+  </nav>
+
+  <!-- 2. Contenedor Principal (Grid) -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+    <!-- 2a. Columna de Galería de Imágenes -->
+    <div class="w-full flex flex-col gap-4 sticky top-28">
       <!-- Imagen Principal -->
       <div
-        class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden"
+        class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm"
       >
         <img
           [src]="getProductImage()"
           [alt]="prod.name"
-          class="w-full h-full object-cover rounded-xl shadow-lg"
-          loading="lazy"
+          class="w-full h-full object-cover"
+          loading="eager"
         />
       </div>
       <!-- Miniaturas (Thumbnails) -->
@@ -26,10 +49,11 @@
         <button
           *ngFor="let image of prod.images"
           (click)="selectImage(image.imageUrl)"
-          class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all"
+          class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all duration-150"
           [ngClass]="{
-            'border-secondary': selectedImageUrl() === image.imageUrl,
-            'border-transparent opacity-70 hover:opacity-100':
+            'border-secondary ring-2 ring-secondary/30':
+              selectedImageUrl() === image.imageUrl,
+            'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400':
               selectedImageUrl() !== image.imageUrl
           }"
           [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
@@ -43,23 +67,59 @@
       </div>
     </div>
 
-    <!-- 
-      2. DETALLE DEL PRODUCTO (ACTUALIZADO)
-    -->
+    <!-- 2b. Columna de Información y Acciones -->
     <div class="flex flex-col gap-6">
+      <!-- Info Header -->
       <div>
-        <!-- Marca (Nuevo) -->
         <p
           *ngIf="prod.brand"
-          class="text-sm font-medium text-secondary uppercase tracking-wide"
+          class="text-sm font-semibold text-secondary uppercase tracking-wide"
         >
           {{ prod.brand }}
         </p>
-        <!-- Título -->
-        <h1 class="text-4xl font-semibold text-gray-900 leading-tight mt-1">
+        <h1 class="text-4xl font-bold text-gray-900 leading-tight mt-1">
           {{ prod.name }}
         </h1>
-        <!-- Precio (con precio tachado) -->
+
+        <!-- Valoraciones (Estrellas) -->
+        <div
+          class="flex items-center gap-2 mt-3"
+          *ngIf="prod.ratingCount && prod.ratingCount > 0"
+        >
+          <div class="flex items-center gap-0.5">
+            <svg
+              *ngFor="let star of getStars()"
+              class="w-5 h-5"
+              [ngClass]="{
+                'text-yellow-400': star !== 'empty',
+                'text-gray-300': star === 'empty'
+              }"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                *ngIf="star === 'full'"
+                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"
+              />
+              <path
+                *ngIf="star === 'half'"
+                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0v15z"
+              />
+              <path
+                *ngIf="star === 'empty'"
+                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545L10 15zm0 0"
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                fill-opacity="0.5"
+              />
+            </svg>
+          </div>
+          <span class="text-sm text-gray-500"
+            >({{ prod.ratingCount }} valoraciones)</span
+          >
+        </div>
+
+        <!-- Precio -->
         <div class="flex items-center gap-4 mt-3">
           <p class="text-3xl font-bold text-primary">
             {{ prod.price | currency : "EUR" : "symbol" : "1.2-2" }}
@@ -71,48 +131,162 @@
             {{ prod.oldPrice | currency : "EUR" : "symbol" : "1.2-2" }}
           </p>
         </div>
-        <!-- (Aquí irían las estrellas si las tuvieras) -->
       </div>
 
-      <p class="text-gray-600 leading-relaxed text-lg">
-        {{ prod.description }}
-      </p>
-
-      <!-- Selector de talla (sin cambios) -->
+      <!-- Selector de talla (Botones) -->
       <div>
-        <label for="talla" class="block text-gray-800 font-medium mb-2"
-          >Selecciona tu talla:</label
-        >
-        <select
-          id="talla"
-          [(ngModel)]="selectedSize"
-          class="w-full border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/50 transition"
-        >
-          <option value="" disabled selected>-- Selecciona --</option>
-          <option *ngFor="let size of availableSizes" [value]="size">
+        <div class="flex justify-between items-center mb-2">
+          <label class="block text-gray-800 font-medium"
+            >Selecciona tu talla:</label
+          >
+          <a href="#" class="text-sm font-medium text-secondary hover:underline"
+            >Guía de tallas</a
+          >
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button
+            *ngFor="let size of availableSizes"
+            (click)="selectSize(size)"
+            type="button"
+            class="h-10 px-4 rounded-lg border text-sm font-medium transition-colors"
+            [ngClass]="{
+              'bg-secondary text-white border-secondary':
+                selectedSize() === size,
+              'bg-white text-gray-700 border-gray-300 hover:bg-gray-50':
+                selectedSize() !== size
+            }"
+          >
             {{ size }}
-          </option>
-        </select>
+          </button>
+        </div>
       </div>
 
-      <!-- Botones de acción (sin cambios) -->
+      <!-- Selector de Cantidad -->
+      <div>
+        <label class="block text-gray-800 font-medium mb-2">Cantidad:</label>
+        <div class="flex items-center border border-gray-300 rounded-lg w-fit">
+          <button
+            (click)="decrementQuantity()"
+            [disabled]="quantity() <= 1"
+            class="h-10 w-10 text-xl text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+          >
+            -
+          </button>
+          <span class="w-12 text-center font-medium">{{ quantity() }}</span>
+          <button
+            (click)="incrementQuantity()"
+            class="h-10 w-10 text-xl text-gray-600 hover:bg-gray-100"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <!--
+        --- ¡BOTONES RESTAURADOS! ---
+        Restauramos tu layout original de dos botones,
+        pero con los nuevos estilos más limpios.
+      -->
       <div class="flex flex-col sm:flex-row gap-4 mt-2">
         <button
-          class="bg-primary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 bg-secondary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:bg-secondary-light disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="buyNow()"
-          [disabled]="!selectedSize"
+          [disabled]="!selectedSize()"
         >
           Comprar ahora
         </button>
-
         <button
-          class="py-3 px-8 rounded-xl font-medium text-lg text-primary bg-primary/10 hover:bg-primary/20 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 py-3 px-8 rounded-xl font-medium text-lg text-primary bg-secondary/10 hover:bg-secondary/20 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="addToCart()"
-          [disabled]="!selectedSize"
+          [disabled]="!selectedSize()"
         >
           Añadir a la cesta
         </button>
       </div>
+      <!-- (Botón de Wishlist eliminado para mantener tu flujo original) -->
+    </div>
+  </div>
+
+  <!-- 3. Pestañas de Información (Corregido) -->
+  <div class="mt-16">
+    <!-- Navegación de Pestañas -->
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px gap-6">
+        <button
+          (click)="setActiveTab('description')"
+          class="py-4 px-1 text-sm font-medium border-b-2 transition-colors"
+          [ngClass]="{
+            'border-secondary text-secondary': activeTab() === 'description',
+            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300':
+              activeTab() !== 'description'
+          }"
+        >
+          Descripción
+        </button>
+        <button
+          (click)="setActiveTab('specs')"
+          class="py-4 px-1 text-sm font-medium border-b-2 transition-colors"
+          [ngClass]="{
+            'border-secondary text-secondary': activeTab() === 'specs',
+            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300':
+              activeTab() !== 'specs'
+          }"
+        >
+          Especificaciones
+        </button>
+        <button
+          *ngIf="prod.ratingCount && prod.ratingCount > 0"
+          (click)="setActiveTab('reviews')"
+          class="py-4 px-1 text-sm font-medium border-b-2 transition-colors"
+          [ngClass]="{
+            'border-secondary text-secondary': activeTab() === 'reviews',
+            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300':
+              activeTab() !== 'reviews'
+          }"
+        >
+          Valoraciones ({{ prod.ratingCount }})
+        </button>
+      </nav>
+    </div>
+    <!-- Contenido de las Pestañas -->
+    <div class="py-6">
+      <div *ngIf="activeTab() === 'description'">
+        <p class="text-gray-600 leading-relaxed">{{ prod.description }}</p>
+      </div>
+      <div *ngIf="activeTab() === 'specs'">
+        <ul class="list-disc list-inside text-gray-600 space-y-2">
+          <li *ngIf="prod.brand">
+            <span class="font-medium">Marca:</span> {{ prod.brand }}
+          </li>
+          <li *ngIf="prod.color">
+            <span class="font-medium">Color:</span> {{ prod.color }}
+          </li>
+          <li *ngIf="prod.material">
+            <span class="font-medium">Material:</span> {{ prod.material }}
+          </li>
+          <li *ngIf="prod.gender">
+            <span class="font-medium">Género:</span> {{ prod.gender }}
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="activeTab() === 'reviews'">
+        <p class="text-gray-600">
+          Mostrando {{ prod.ratingCount }} valoraciones... (Funcionalidad
+          pendiente)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. "Completa tu look" (Placeholder) -->
+  <div class="mt-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Completa tu look</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Placeholder cards -->
+      <div
+        *ngFor="let i of [1, 2, 3, 4]"
+        class="bg-gray-100 rounded-xl animate-pulse h-80"
+      ></div>
     </div>
   </div>
 </main>

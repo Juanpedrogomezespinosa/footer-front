@@ -10,7 +10,7 @@ export interface ProductApiResponse {
   id: number;
   name: string;
   description?: string;
-  price: number;
+  price: number; // La API devuelve string, pero HttpClient lo puede parsear
   image?: string;
   averageRating?: number;
   ratingCount?: number;
@@ -18,29 +18,43 @@ export interface ProductApiResponse {
   brand?: string;
   color?: string;
   stock?: number;
-  category: "zapatillas" | "ropa" | "complementos";
+  category: "zapatillas" | "ropa" | "complementos"; // Tipado estricto
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
+  // Otros campos según respuesta de la API
+}
+
+/**
+ * --- ¡NUEVO! ---
+ * Interfaz para las imágenes de la galería
+ */
+export interface ProductImage {
+  id: number;
+  imageUrl: string;
+  displayOrder: number;
 }
 
 /**
  * Interfaz de producto para uso interno del frontend.
- * --- ¡MODIFICADA! ---
+ * --- ¡MODIFICADA Y CORREGIDA! ---
  */
 export interface Product {
   id: number;
   name: string;
   description?: string;
   price: number;
-  image?: string;
-  rating?: number; // Lo mantenemos por si lo usas en el detalle
-  ratingCount?: number; // Lo mantenemos por si lo usas en el detalle
+  image?: string; // (Este 'image' lo rellenamos nosotros con la imagen principal)
+  rating?: number;
+  ratingCount?: number;
   size?: string;
   category: "zapatillas" | "ropa" | "complementos";
+  brand?: string;
+  oldPrice?: number;
 
-  // --- ¡CAMPOS AÑADIDOS PARA EL NUEVO DISEÑO! ---
-  brand?: string; // Para mostrar "Nike", "Adidas", etc.
-  oldPrice?: number; // Para el precio tachado (opcional)
+  // --- ¡CAMPOS AÑADIDOS QUE FALTABAN! ---
+  color?: string;
+  material?: string;
+  gender?: "hombre" | "mujer" | "unisex";
 }
 
 /**
