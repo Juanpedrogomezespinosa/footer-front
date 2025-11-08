@@ -1,3 +1,4 @@
+<!-- src/app/admin/dashboard/dashboard.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
   <div class="flex flex-wrap justify-between items-center gap-4">
     <div class="flex flex-col gap-1">
@@ -22,16 +23,17 @@
 
   <ng-container *ngIf="stats$ | async as stats; else loadingStats">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Tarjeta: Ingresos Totales (MODIFICADA) -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
         <p
-          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+          class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal"
         >
           Ingresos Totales
         </p>
         <p
-          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+          class="text-text-light-primary dark:text-text-dark-primary text-4xl font-bold leading-tight"
         >
           {{ stats.totalRevenue.amount || 0 | number : "1.2-2" }}€
         </p>
@@ -43,19 +45,21 @@
           "
           class="text-sm font-medium leading-normal"
         >
-          {{ formatPercentage(stats.totalRevenue.percentage) }}
+          {{ formatPercentage(stats.totalRevenue.percentage) }} vs mes pasado
         </p>
       </div>
+
+      <!-- Tarjeta: Pedidos (Hoy) (MODIFICADA) -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
         <p
-          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+          class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal"
         >
           Pedidos (Hoy)
         </p>
         <p
-          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+          class="text-text-light-primary dark:text-text-dark-primary text-4xl font-bold leading-tight"
         >
           {{ stats.ordersToday.count }}
         </p>
@@ -67,19 +71,21 @@
           "
           class="text-sm font-medium leading-normal"
         >
-          {{ formatPercentage(stats.ordersToday.percentage) }}
+          {{ formatPercentage(stats.ordersToday.percentage) }} vs ayer
         </p>
       </div>
+
+      <!-- Tarjeta: Nuevos Usuarios (MODIFICADA) -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
         <p
-          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+          class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal"
         >
           Nuevos Usuarios
         </p>
         <p
-          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+          class="text-text-light-primary dark:text-text-dark-primary text-4xl font-bold leading-tight"
         >
           {{ stats.newUsers.count }}
         </p>
@@ -89,19 +95,21 @@
           "
           class="text-sm font-medium leading-normal"
         >
-          {{ formatPercentage(stats.newUsers.percentage) }}
+          {{ formatPercentage(stats.newUsers.percentage) }} vs semana pasada
         </p>
       </div>
+
+      <!-- Tarjeta: Envíos Pendientes (MODIFICADA) -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
         <p
-          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+          class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal"
         >
           Envíos Pendientes
         </p>
         <p
-          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+          class="text-text-light-primary dark:text-text-dark-primary text-4xl font-bold leading-tight"
         >
           {{ stats.pendingShipments.count }}
         </p>
@@ -113,12 +121,13 @@
           "
           class="text-sm font-medium leading-normal"
         >
-          {{ formatPercentage(stats.pendingShipments.percentage) }}
+          {{ formatPercentage(stats.pendingShipments.percentage) }} vs ayer
         </p>
       </div>
     </div>
   </ng-container>
 
+  <!-- El resto del fichero no se toca -->
   <div
     *ngIf="salesGraphData$ | async as salesGraph"
     class="grid grid-cols-1 lg:grid-cols-3 gap-6"
