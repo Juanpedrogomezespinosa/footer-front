@@ -8,15 +8,158 @@
       </p>
     </div>
     <button
+      (click)="openProductModal()"
       class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity"
     >
       <span>Añadir Producto</span>
     </button>
   </div>
 
-  <div
-    class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
-  >
-    <p class="p-6 text-text-light-secondary">Tabla de productos irá aquí...</p>
+  <div *ngIf="productsResponse; else loading" class="flex flex-col gap-4">
+    <div
+      class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
+    >
+      <table class="w-full text-left">
+        <thead class="border-b border-border-light dark:border-border-dark">
+          <tr>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Imagen
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Nombre
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Categoría
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Precio
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Stock
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="productsResponse.products.length === 0">
+            <td
+              colspan="6"
+              class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              No se encontraron productos. ¡Intenta crear uno!
+            </td>
+          </tr>
+          <tr
+            *ngFor="let product of productsResponse.products"
+            class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
+          >
+            <td class="p-4">
+              <img
+                [src]="
+                  product.image ||
+                  'https://placehold.co/64x64/eee/ccc?text=Sin+Img'
+                "
+                alt="Imagen de {{ product.name }}"
+                class="w-12 h-12 object-cover rounded-lg border border-border-light"
+              />
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              {{ product.name }}
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary capitalize"
+            >
+              {{ product.category }}
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              {{ product.price | number : "1.2-2" }}€
+            </td>
+            <td class="p-4 text-sm">
+              <span
+                *ngIf="product.stock > 0; else noStock"
+                class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
+              >
+                En Stock ({{ product.stock }})
+              </span>
+              <ng-template #noStock>
+                <span
+                  class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
+                >
+                  Sin Stock
+                </span>
+              </ng-template>
+            </td>
+            <td class="p-4">
+              <div class="flex gap-2">
+                <button
+                  class="text-primary hover:underline text-sm font-medium"
+                >
+                  Editar
+                </button>
+                <button
+                  class="text-red-600 hover:underline text-sm font-medium"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      *ngIf="productsResponse.totalPages > 1"
+      class="flex items-center justify-between p-4"
+    >
+      <span
+        class="text-sm text-text-light-secondary dark:text-text-dark-secondary"
+      >
+        Página {{ productsResponse.currentPage }} de
+        {{ productsResponse.totalPages }}
+      </span>
+      <div class="flex gap-2">
+        <button
+          (click)="onPrevPage()"
+          [disabled]="!productsResponse.prevPage"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Anterior
+        </button>
+        <button
+          (click)="onNextPage()"
+          [disabled]="!productsResponse.nextPage"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
   </div>
 </div>
+
+<ng-template #loading>
+  <div class="w-full text-center p-10">
+    <p class="text-text-light-secondary dark:text-text-dark-secondary">
+      Cargando productos...
+    </p>
+  </div>
+</ng-template>

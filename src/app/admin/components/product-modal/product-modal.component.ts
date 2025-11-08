@@ -32,6 +32,7 @@ export class ProductModalComponent implements OnInit {
       name: ["", Validators.required],
       description: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
+      stock: [0, [Validators.required, Validators.min(0)]], // <-- ¡CAMBIO AÑADIDO!
       size: ["", Validators.required],
       color: ["", Validators.required],
       brand: ["", Validators.required],
@@ -85,7 +86,6 @@ export class ProductModalComponent implements OnInit {
       }
     });
 
-    // --- ¡LA CORRECCIÓN MÁS IMPORTANTE! ---
     // Tu backend espera 'images' (plural) según 'productRoutes.js'
     formData.append("images", this.selectedFile, this.selectedFile.name);
 
@@ -93,7 +93,6 @@ export class ProductModalComponent implements OnInit {
       next: (response) => {
         this.toast.showSuccess("¡Producto creado con éxito!");
         this.close();
-        // Aquí deberías emitir un evento para refrescar la lista de productos
       },
       error: (err) => {
         console.error("Error al crear producto:", err);
@@ -106,7 +105,8 @@ export class ProductModalComponent implements OnInit {
 
   close(): void {
     this.modalService.closeProductModal();
-    this.productForm.reset({ is_new: true, price: 0 });
+    // ¡CAMBIO AÑADIDO! Reseteamos 'stock' a 0 también
+    this.productForm.reset({ is_new: true, price: 0, stock: 0 });
     this.selectedFile = null;
     this.fileName = "Ningún archivo seleccionado";
   }

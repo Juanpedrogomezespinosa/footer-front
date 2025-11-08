@@ -7,6 +7,7 @@ import {
   AdminUser,
   DashboardStats,
   SalesGraph,
+  AdminProductsResponse, // 1. Importar la nueva interfaz
 } from "../models/admin.types";
 
 @Injectable({
@@ -18,7 +19,6 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
   /**
    * Obtiene las estadísticas principales para el dashboard.
    * GET /api/admin/stats/dashboard
@@ -27,7 +27,6 @@ export class AdminService {
     return this.http.get<DashboardStats>(`${this.apiUrl}/stats/dashboard`);
   }
 
-  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
   /**
    * Obtiene los datos para la gráfica de ventas.
    * GET /api/admin/stats/sales-graph
@@ -61,7 +60,25 @@ export class AdminService {
     });
   }
 
-  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Obtiene la lista de productos con paginación.
+   * GET /api/products
+   */
+  getProducts(
+    page: number = 1,
+    limit: number = 10
+  ): Observable<AdminProductsResponse> {
+    const params = new HttpParams()
+      .set("page", page.toString())
+      .set("limit", limit.toString());
+
+    // Nota: Usamos 'productsApiUrl' (público), no 'apiUrl' (admin)
+    return this.http.get<AdminProductsResponse>(this.productsApiUrl, {
+      params,
+    });
+  }
+
   /**
    * Crea un nuevo producto.
    * Llama a: POST /api/products

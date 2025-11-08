@@ -30,6 +30,8 @@ export interface AdminOrdersResponse {
   totalPages: number;
   totalItems: number;
   orders: AdminOrder[];
+  nextPage: number | null;
+  prevPage: number | null;
 }
 
 export interface AdminOrder {
@@ -70,4 +72,29 @@ export interface AdminUser {
   avatarUrl: string | null;
   role: "admin" | "client";
   created_at: string;
+}
+
+// --- ¡NUEVAS INTERFACES AÑADIDAS! ---
+
+// --- Para: GET /api/products (Listado de productos) ---
+export interface AdminProductsResponse {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  products: AdminProduct[];
+  nextPage: number | null;
+  prevPage: number | null;
+}
+
+export interface AdminProduct {
+  id: number;
+  name: string;
+  price: string; // La API lo devuelve como string
+  stock: number;
+  category: string;
+  brand: string;
+  image: string | null; // La imagen principal
+  averageRating: number;
+  ratingCount: number;
+  // Añade más campos si los necesitas en la tabla
 }
