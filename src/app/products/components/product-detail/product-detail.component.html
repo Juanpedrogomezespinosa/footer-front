@@ -2,13 +2,13 @@
   class="max-w-7xl mx-auto px-4 py-8 sm:py-12"
   *ngIf="!isLoading() && product() as prod; else loadingOrError"
 >
-  <!-- 1. Breadcrumbs (Corregido) -->
+  <!-- 1. Breadcrumbs -->
   <nav class="text-sm mb-4" aria-label="Breadcrumb">
     <ol class="flex items-center gap-2 text-text-light-secondary">
       <li>
-        <a routerLink="/" class="hover:text-primary transition-colors"
-          >Inicio</a
-        >
+        <a routerLink="/" class="hover:text-primary transition-colors">
+          Inicio
+        </a>
       </li>
       <li>
         <span class="select-none">/</span>
@@ -17,8 +17,9 @@
         <a
           [routerLink]="['/products/category', prod.category]"
           class="hover:text-primary transition-colors capitalize"
-          >{{ prod.category }}</a
         >
+          {{ prod.category }}
+        </a>
       </li>
       <li>
         <span class="select-none">/</span>
@@ -29,17 +30,15 @@
     </ol>
   </nav>
 
-  <!-- 2. Contenedor Principal (Grid) -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-    <!-- 
-      --- ¡FIX 1: WRAPPER PARA STICKY! ---
-      Este 'div' exterior actúa como la celda del grid,
-      permitiendo que el 'div' interior sea 'sticky'
-      sin salirse de los márgenes.
-    -->
-    <div class="w-full">
-      <!-- 2a. Columna de Galería de Imágenes -->
-      <div class="w-full flex flex-col gap-4 sticky top-28">
+  <!-- 2. Contenedor Principal -->
+  <div
+    class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start"
+    style="overflow: hidden"
+  >
+    <!-- Columna de Galería -->
+    <div class="w-full min-w-0">
+      <!-- FIX: min-w-0 evita que el contenido rompa los márgenes -->
+      <div class="flex flex-col gap-4 sticky top-28 w-full">
         <!-- Imagen Principal -->
         <div
           class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm"
@@ -47,21 +46,23 @@
           <img
             [src]="getProductImage()"
             [alt]="prod.name"
-            class="w-full h-full object-cover"
+            class="max-w-full max-h-full object-contain rounded-xl"
             loading="eager"
           />
         </div>
-        <!-- Miniaturas (Thumbnails) -->
+
+        <!-- Miniaturas -->
         <div class="grid grid-cols-5 gap-3">
           <button
             *ngFor="let image of prod.images"
             (click)="selectImage(image.imageUrl)"
             (mouseenter)="selectImage(image.imageUrl)"
-            class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all duration-150"
+            type="button"
+            class="aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 group hover:opacity-95 hover:border-primary"
             [ngClass]="{
-              'border-secondary ring-2 ring-secondary/30':
+              'border-primary  opacity-100':
                 selectedImageUrl() === image.imageUrl,
-              'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400':
+              'border-secondary opacity-70':
                 selectedImageUrl() !== image.imageUrl
             }"
             [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
@@ -69,17 +70,20 @@
             <img
               [src]="backendUrl + image.imageUrl"
               [alt]="prod.name + ' vista ' + (image.displayOrder + 1)"
-              class="w-full h-full object-cover"
+              class="w-full h-full object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-105"
+              [ngClass]="{
+                'opacity-100': selectedImageUrl() === image.imageUrl,
+                'opacity-70': selectedImageUrl() !== image.imageUrl
+              }"
             />
           </button>
         </div>
       </div>
     </div>
-    <!-- --- FIN DEL FIX DE LAYOUT --- -->
 
-    <!-- 2b. Columna de Información y Acciones -->
-    <div class="flex flex-col gap-6">
-      <!-- Info Header -->
+    <!-- Columna de Información -->
+    <div class="flex flex-col gap-6 min-w-0">
+      <!-- Marca y Nombre -->
       <div>
         <p
           *ngIf="prod.brand"
@@ -91,7 +95,7 @@
           {{ prod.name }}
         </h1>
 
-        <!-- Valoraciones (Estrellas) -->
+        <!-- Valoraciones -->
         <div
           class="flex items-center gap-2 mt-3"
           *ngIf="prod.ratingCount && prod.ratingCount > 0"
@@ -124,9 +128,9 @@
               />
             </svg>
           </div>
-          <span class="text-sm text-gray-500"
-            >({{ prod.ratingCount }} valoraciones)</span
-          >
+          <span class="text-sm text-gray-500">
+            ({{ prod.ratingCount }} valoraciones)
+          </span>
         </div>
 
         <!-- Precio -->
@@ -143,15 +147,18 @@
         </div>
       </div>
 
-      <!-- Selector de talla (Botones) -->
+      <!-- Selector de Talla -->
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label class="block text-gray-800 font-medium"
-            >Selecciona tu talla:</label
+          <label class="block text-gray-800 font-medium">
+            Selecciona tu talla:
+          </label>
+          <a
+            href="#"
+            class="text-sm font-medium text-secondary hover:underline"
           >
-          <a href="#" class="text-sm font-medium text-secondary hover:underline"
-            >Guía de tallas</a
-          >
+            Guía de tallas
+          </a>
         </div>
         <div class="flex flex-wrap gap-3">
           <button
@@ -173,7 +180,7 @@
 
       <!-- Selector de Cantidad -->
       <div>
-        <label class="block text-gray-800 font-medium mb-2">Cantidad:</label>
+        <label class="block text-gray-800 font-medium mb-2"> Cantidad: </label>
         <div class="flex items-center border border-gray-300 rounded-lg w-fit">
           <button
             (click)="decrementQuantity()"
@@ -182,7 +189,9 @@
           >
             -
           </button>
-          <span class="w-12 text-center font-medium">{{ quantity() }}</span>
+          <span class="w-12 text-center font-medium">
+            {{ quantity() }}
+          </span>
           <button
             (click)="incrementQuantity()"
             class="h-10 w-10 text-xl text-gray-600 hover:bg-gray-100"
@@ -212,9 +221,8 @@
     </div>
   </div>
 
-  <!-- 3. Pestañas de Información (Corregido) -->
+  <!-- 3. Pestañas de Información -->
   <div class="mt-16">
-    <!-- Navegación de Pestañas -->
     <div class="border-b border-gray-200">
       <nav class="flex -mb-px gap-6">
         <button
@@ -253,10 +261,12 @@
         </button>
       </nav>
     </div>
-    <!-- Contenido de las Pestañas -->
+
     <div class="py-6">
       <div *ngIf="activeTab() === 'description'">
-        <p class="text-gray-600 leading-relaxed">{{ prod.description }}</p>
+        <p class="text-gray-600 leading-relaxed">
+          {{ prod.description }}
+        </p>
       </div>
       <div *ngIf="activeTab() === 'specs'">
         <ul class="list-disc list-inside text-gray-600 space-y-2">
@@ -283,10 +293,7 @@
     </div>
   </div>
 
-  <!-- 
-    --- ¡FIX 3: "COMPLETA TU LOOK" IMPLEMENTADO! ---
-    Reemplazamos el placeholder por el componente real.
-  -->
+  <!-- Sección de Productos Relacionados -->
   <div class="mt-16">
     <app-related-products
       *ngIf="prod"
@@ -295,7 +302,7 @@
   </div>
 </main>
 
-<!-- Estado de carga o error (convertido a signals) -->
+<!-- Estado de carga o error -->
 <ng-template #loadingOrError>
   <main class="max-w-4xl mx-auto px-4 py-24 text-center">
     <div *ngIf="isLoading()" class="animate-pulse text-lg text-gray-500">
