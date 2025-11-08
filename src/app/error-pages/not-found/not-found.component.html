@@ -1,0 +1,75 @@
+<!-- src/app/error-pages/not-found/not-found.component.html -->
+<div
+  class="relative flex flex-col items-center justify-center min-h-[80vh] bg-background-light dark:bg-background-dark p-6 overflow-hidden"
+>
+  <!-- 1. Logo Gigante de Fondo (La parte "currada") -->
+  <!-- 
+    Usamos tu logo SVG, lo hacemos enorme (h-[80vh]), 
+    lo rotamos y le damos opacidad con 'text-primary/10' 
+  -->
+  <div
+    class="absolute inset-0 z-10 flex items-center justify-center overflow-hidden"
+  >
+    <svg
+      class="w-auto h-[90vh] text-primary/10 dark:text-primary/5 -rotate-12"
+      fill="none"
+      viewBox="0 0 48 48"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        clip-rule="evenodd"
+        d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+        fill="#FFAC93"
+        fill-rule="evenodd"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- 2. Contenido Principal (por encima del fondo) -->
+  <div class="relative z-20 flex flex-col items-center text-center max-w-lg">
+    <h1
+      class="text-8xl md:text-9xl font-extrabold text-primary tracking-tighter"
+    >
+      404
+    </h1>
+    <h2
+      class="mt-4 text-3xl md:text-4xl font-bold text-text-light-primary dark:text-text-dark-primary"
+    >
+      ¡Zapatilla no encontrada!
+    </h2>
+    <p
+      class="mt-4 text-lg text-text-light-secondary dark:text-text-dark-secondary"
+    >
+      Parece que esta página se ha perdido en el almacén. No te preocupes, usa
+      nuestro buscador para encontrar lo que necesitas.
+    </p>
+
+    <!-- Barra de Búsqueda (Funcional) -->
+    <form (ngSubmit)="submitSearch()" class="w-full max-w-md mt-10">
+      <label for="search-404" class="sr-only">Buscar productos</label>
+      <div class="relative w-full">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none"
+        >
+          >
+        </div>
+        <input
+          type="search"
+          id="search-404"
+          placeholder="Buscar zapatillas, ropa, complementos..."
+          [(ngModel)]="searchTerm"
+          name="search"
+          class="w-full pl-12 pr-4 py-3 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-lg text-base text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+        />
+      </div>
+    </form>
+
+    <!-- Botón de Acción -->
+    <a
+      routerLink="/home"
+      class="mt-8 flex items-center justify-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg font-medium hover:opacity-90 transition-opacity text-base"
+    >
+      Volver al Inicio
+    </a>
+  </div>
+</div>

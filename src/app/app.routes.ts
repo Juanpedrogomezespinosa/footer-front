@@ -1,7 +1,7 @@
 // src/app/app.routes.ts
 import { Routes } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
-import { AdminGuard } from "./core/guards/admin.guard"; // 1. Importamos el AdminGuard
+import { AdminGuard } from "./core/guards/admin.guard";
 
 export const routes: Routes = [
   {
@@ -61,16 +61,12 @@ export const routes: Routes = [
       },
     ],
   },
-
-  // --- ¡NUEVA RUTA DE ADMIN AÑADIDA! ---
   {
     path: "admin",
     loadChildren: () =>
       import("./admin/admin.module").then((m) => m.AdminModule),
-    canActivate: [AuthGuard, AdminGuard], // 2. Protegida por AMBOS guards
+    canActivate: [AuthGuard, AdminGuard],
   },
-  // -------------------------------------
-
   {
     path: "cart",
     loadComponent: () =>
@@ -90,8 +86,16 @@ export const routes: Routes = [
     redirectTo: "home",
     pathMatch: "full",
   },
+
+  // --- ¡CAMBIO AQUÍ! ---
+  // La ruta comodín (**) ahora carga el componente NotFoundComponent
+  // en lugar de redirigir a 'home'.
   {
     path: "**",
-    redirectTo: "home",
+    loadComponent: () =>
+      import("./error-pages/not-found/not-found.component").then(
+        (m) => m.NotFoundComponent
+      ),
+    title: "404 - Página no encontrada",
   },
 ];
