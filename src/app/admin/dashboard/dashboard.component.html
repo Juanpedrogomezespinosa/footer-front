@@ -13,6 +13,7 @@
       </p>
     </div>
     <button
+      (click)="openProductModal()"
       class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity"
     >
       <span>Añadir Producto</span>
@@ -145,7 +146,7 @@
           {{ formatPercentage(salesGraph.percentage) }}
         </p>
       </div>
-      <div class="flex min-h-[300px] flex-1 flex-col justify-end pt-4">
+      <div class="flex max-h-[350px] flex-1 flex-col justify-end pt-4">
         <canvas
           baseChart
           [data]="lineChartData"

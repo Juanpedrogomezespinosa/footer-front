@@ -1,0 +1,248 @@
+<div
+  (click)="close()"
+  class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in"
+></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    class="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-card-dark rounded-xl shadow-lg flex flex-col animate-scale-in"
+    (click)="$event.stopPropagation()"
+  >
+    <div
+      class="flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark"
+    >
+      <h2
+        class="text-xl font-bold text-text-light-primary dark:text-text-dark-primary"
+      >
+        Añadir Nuevo Producto
+      </h2>
+      <button
+        (click)="close()"
+        class="text-text-light-secondary hover:text-primary dark:hover:text-primary transition-colors rounded-full p-1"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label
+            for="name"
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Nombre del Producto</label
+          >
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            for="description"
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Descripción</label
+          >
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="3"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            required
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              for="price"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Precio (€)</label
+            >
+            <input
+              type="number"
+              id="price"
+              formControlName="price"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              step="0.01"
+              required
+            />
+          </div>
+          <div>
+            <label
+              for="size"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Talla</label
+            >
+            <input
+              type="text"
+              id="size"
+              formControlName="size"
+              placeholder="Ej: 42, M, 9.5"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              required
+            />
+          </div>
+          <div>
+            <label
+              for="color"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Color</label
+            >
+            <input
+              type="text"
+              id="color"
+              formControlName="color"
+              placeholder="Ej: Rojo, Negro"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              required
+            />
+          </div>
+          <div>
+            <label
+              for="brand"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Marca</label
+            >
+            <input
+              type="text"
+              id="brand"
+              formControlName="brand"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              required
+            />
+          </div>
+          <div>
+            <label
+              for="category"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Categoría</label
+            >
+            <select
+              id="category"
+              formControlName="category"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              required
+            >
+              <option value="" disabled>Selecciona...</option>
+              <option value="zapatillas">Zapatillas</option>
+              <option value="ropa">Ropa</option>
+              <option value="complementos">Complementos</option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="gender"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Género</label
+            >
+            <select
+              id="gender"
+              formControlName="gender"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+              required
+            >
+              <option value="" disabled>Selecciona...</option>
+              <option value="unisex">Unisex</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="material"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Material (Opcional)</label
+            >
+            <input
+              type="text"
+              id="material"
+              formControlName="material"
+              placeholder="Ej: Cuero, Algodón"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            />
+          </div>
+          <div>
+            <label
+              for="season"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Temporada (Opcional)</label
+            >
+            <select
+              id="season"
+              formControlName="season"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            >
+              <option value="">N/A</option>
+              <option value="invierno">Invierno</option>
+              <option value="verano">Verano</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="is_new"
+            formControlName="is_new"
+            class="h-4 w-4 rounded text-primary border-border-light focus:ring-primary"
+          />
+          <label
+            for="is_new"
+            class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+            >Marcar como "Nuevo"</label
+          >
+        </div>
+
+        <div>
+          <label
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Imagen del Producto</label
+          >
+          <label
+            for="image"
+            class="w-full flex items-center px-4 py-2 bg-background-light border-2 border-border-light border-dashed rounded-lg cursor-pointer hover:bg-gray-100"
+          >
+            <span class="material-symbols-outlined text-primary mr-2"
+              >upload_file</span
+            >
+            <span class="text-sm text-text-light-secondary">{{
+              fileName
+            }}</span>
+          </label>
+          <input
+            type="file"
+            id="image"
+            (change)="onFileChange($event)"
+            class="hidden"
+            accept="image/png, image/jpeg, image/webp"
+          />
+        </div>
+      </form>
+    </div>
+
+    <div
+      class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-2"
+    >
+      <button
+        (click)="close()"
+        type="button"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="onSubmit()"
+        type="submit"
+        [disabled]="productForm.invalid"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-secondary hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Crear Producto
+      </button>
+    </div>
+  </div>
+</div>

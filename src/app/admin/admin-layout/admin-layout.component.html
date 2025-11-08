@@ -115,3 +115,10 @@
     </main>
   </div>
 </div>
+
+<!-- 
+  --- ¡CAMBIO AÑADIDO AQUÍ! ---
+  Este modal vivirá "encima" de todo el layout y se mostrará
+  cuando el observable 'isProductModalOpen$' sea true.
+-->
+<app-product-modal *ngIf="isProductModalOpen$ | async"></app-product-modal>

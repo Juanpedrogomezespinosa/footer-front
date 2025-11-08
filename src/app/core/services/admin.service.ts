@@ -7,32 +7,47 @@ import {
   AdminUser,
   DashboardStats,
   SalesGraph,
-} from "../models/admin.types"; // <-- Importa las interfaces
+} from "../models/admin.types";
 
 @Injectable({
   providedIn: "root",
 })
 export class AdminService {
-  private apiUrl = "/api/admin"; // Usando el proxy
+  private apiUrl = "/api/admin";
+  private productsApiUrl = "/api/products"; // URL base de productos
 
   constructor(private http: HttpClient) {}
 
-  // Para las tarjetas del Dashboard
+  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
+  /**
+   * Obtiene las estadísticas principales para el dashboard.
+   * GET /api/admin/stats/dashboard
+   */
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/stats/dashboard`);
   }
 
-  // Para la gráfica de ventas
+  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
+  /**
+   * Obtiene los datos para la gráfica de ventas.
+   * GET /api/admin/stats/sales-graph
+   */
   getSalesGraph(): Observable<SalesGraph> {
     return this.http.get<SalesGraph>(`${this.apiUrl}/stats/sales-graph`);
   }
 
-  // Para la lista de usuarios
+  /**
+   * Obtiene la lista de todos los usuarios.
+   * GET /api/admin/users
+   */
   getUsers(): Observable<AdminUser[]> {
     return this.http.get<AdminUser[]>(`${this.apiUrl}/users`);
   }
 
-  // Para la lista de pedidos (con paginación)
+  /**
+   * Obtiene la lista de pedidos con paginación.
+   * GET /api/admin/orders
+   */
   getOrders(
     page: number = 1,
     limit: number = 10
@@ -46,7 +61,13 @@ export class AdminService {
     });
   }
 
-  // Aquí añadiremos los métodos para CRUD de productos, eliminar usuarios, etc.
-  // deleteUser(userId: number): Observable<any> { ... }
-  // updateProduct(productId: number, data: any): Observable<any> { ... }
+  // --- ¡MÉTODO AÑADIDO QUE FALTABA! ---
+  /**
+   * Crea un nuevo producto.
+   * Llama a: POST /api/products
+   */
+  createProduct(productData: FormData): Observable<any> {
+    // No se necesita 'Content-Type', HttpClient lo pone solo con FormData
+    return this.http.post<any>(this.productsApiUrl, productData);
+  }
 }
