@@ -85,13 +85,9 @@ export class ProductModalComponent implements OnInit {
       }
     });
 
-    // Añadimos la imagen
-    formData.append("image", this.selectedFile, this.selectedFile.name);
-
-    // (Opcional) Ver lo que se va a enviar
-    // for (let [key, value] of formData.entries()) {
-    //   console.log(key, value);
-    // }
+    // --- ¡LA CORRECCIÓN MÁS IMPORTANTE! ---
+    // Tu backend espera 'images' (plural) según 'productRoutes.js'
+    formData.append("images", this.selectedFile, this.selectedFile.name);
 
     this.adminService.createProduct(formData).subscribe({
       next: (response) => {
