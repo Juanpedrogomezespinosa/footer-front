@@ -8,7 +8,8 @@ import { User } from "../../core/services/auth.service";
 import { ModalService } from "../../core/services/modal.service";
 import { ProductModalComponent } from "../components/product-modal/product-modal.component";
 import { EditProductModalComponent } from "../components/edit-product-modal/edit-product-modal.component";
-import { DeleteProductModalComponent } from "../components/delete-product-modal/delete-product-modal.component"; // 1. Importar
+import { DeleteProductModalComponent } from "../components/delete-product-modal/delete-product-modal.component";
+import { OrderDetailsModalComponent } from "../components/order-details-modal/order-details-modal.component"; // 1. Importar
 
 @Component({
   selector: "app-admin-layout",
@@ -18,7 +19,8 @@ import { DeleteProductModalComponent } from "../components/delete-product-modal/
     RouterModule,
     ProductModalComponent,
     EditProductModalComponent,
-    DeleteProductModalComponent, // 2. Añadir a imports
+    DeleteProductModalComponent,
+    OrderDetailsModalComponent, // 2. Añadir a imports
   ],
   templateUrl: "./admin-layout.component.html",
 })
@@ -26,7 +28,8 @@ export class AdminLayoutComponent {
   user$: Observable<User | null>;
   isProductModalOpen$: Observable<boolean>;
   isEditModalOpen$: Observable<boolean>;
-  isDeleteModalOpen$: Observable<boolean>; // 3. Añadir observable
+  isDeleteModalOpen$: Observable<boolean>;
+  isOrderDetailsModalOpen$: Observable<boolean>; // 3. Añadir observable
 
   constructor(
     private authService: AuthService,
@@ -36,7 +39,8 @@ export class AdminLayoutComponent {
     this.user$ = this.authService.user$;
     this.isProductModalOpen$ = this.modalService.isProductModalOpen$;
     this.isEditModalOpen$ = this.modalService.isEditModalOpen$;
-    this.isDeleteModalOpen$ = this.modalService.isDeleteModalOpen$; // 4. Asignar observable
+    this.isDeleteModalOpen$ = this.modalService.isDeleteModalOpen$;
+    this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$; // 4. Asignar observable
   }
 
   logout(): void {

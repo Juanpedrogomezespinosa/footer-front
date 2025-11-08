@@ -74,8 +74,6 @@ export interface AdminUser {
   created_at: string;
 }
 
-// --- ¡NUEVAS INTERFACES AÑADIDAS! ---
-
 // --- Para: GET /api/products (Listado de productos) ---
 export interface AdminProductsResponse {
   currentPage: number;
@@ -99,6 +97,7 @@ export interface AdminProduct {
   // Añade más campos si los necesitas en la tabla
 }
 
+// --- Para: GET /api/products/:id (Detalle de producto para editar) ---
 export interface FullAdminProduct {
   id: number;
   name: string;
@@ -116,4 +115,57 @@ export interface FullAdminProduct {
   is_new: boolean;
   images: { id: number; imageUrl: string; displayOrder: number }[];
   averageRating: number;
+}
+
+// --- ¡NUEVAS INTERFACES AÑADIDAS! ---
+
+// --- Para: GET /api/orders/:id (Detalle de un pedido) ---
+
+/**
+ * Información de la dirección tal como se devuelve en un pedido
+ */
+export interface AdminOrderUserAddress {
+  id: number;
+  alias: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone?: string | null;
+}
+
+/**
+ * Información simplificada del producto dentro de un OrderItem
+ */
+export interface AdminOrderItemProduct {
+  id: number;
+  name: string;
+  image: string | null; // Asumimos que el backend devuelve la imagen principal
+}
+
+/**
+ * Un item (producto) dentro de un pedido
+ */
+export interface AdminOrderItem {
+  quantity: number;
+  price: string; // La API devuelve 'price' como string
+  Product: AdminOrderItemProduct;
+}
+
+/**
+ * El objeto completo de detalles de un pedido para el modal de admin
+ */
+export interface FullAdminOrder {
+  id: number;
+  status: string;
+  total: string;
+  createdAt: string;
+  User: {
+    id: number;
+    username: string;
+    email: string;
+  };
+  Address: AdminOrderUserAddress;
+  OrderItems: AdminOrderItem[];
 }

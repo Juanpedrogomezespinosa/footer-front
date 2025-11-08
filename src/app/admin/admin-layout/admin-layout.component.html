@@ -110,11 +110,13 @@
 </div>
 
 <app-product-modal *ngIf="isProductModalOpen$ | async"></app-product-modal>
-
 <app-edit-product-modal
   *ngIf="isEditModalOpen$ | async"
 ></app-edit-product-modal>
-
 <app-delete-product-modal
   *ngIf="isDeleteModalOpen$ | async"
 ></app-delete-product-modal>
+
+<app-order-details-modal
+  *ngIf="isOrderDetailsModalOpen$ | async"
+></app-order-details-modal>

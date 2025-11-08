@@ -25,16 +25,23 @@ export class ModalService {
   );
   productToEdit$ = this.productToEditSubject.asObservable();
 
-  // --- ¡NUEVO! Modal de ELIMINAR producto ---
+  // --- Modal de ELIMINAR producto ---
   private deleteModalSubject = new BehaviorSubject<boolean>(false);
   isDeleteModalOpen$ = this.deleteModalSubject.asObservable();
   private productToDeleteSubject =
     new BehaviorSubject<ProductDeleteInfo | null>(null);
   productToDelete$ = this.productToDeleteSubject.asObservable();
 
+  // --- ¡NUEVO! Modal de DETALLES DE PEDIDO ---
+  private orderDetailsModalSubject = new BehaviorSubject<boolean>(false);
+  isOrderDetailsModalOpen$ = this.orderDetailsModalSubject.asObservable();
+  // Subject para pasar el ID del pedido a ver
+  private orderToViewIdSubject = new BehaviorSubject<number | null>(null);
+  orderToViewId$ = this.orderToViewIdSubject.asObservable();
+
   constructor() {}
 
-  // --- Métodos para el modal de CREAR ---
+  // --- Métodos CREAR ---
   openProductModal() {
     this.productModalSubject.next(true);
   }
@@ -42,7 +49,7 @@ export class ModalService {
     this.productModalSubject.next(false);
   }
 
-  // --- Métodos para el modal de EDITAR ---
+  // --- Métodos EDITAR ---
   openEditModal(product: FullAdminProduct) {
     this.productToEditSubject.next(product);
     this.editModalSubject.next(true);
@@ -52,7 +59,7 @@ export class ModalService {
     this.productToEditSubject.next(null);
   }
 
-  // --- ¡NUEVO! Métodos para el modal de ELIMINAR ---
+  // --- Métodos ELIMINAR ---
   openDeleteModal(productInfo: ProductDeleteInfo) {
     this.productToDeleteSubject.next(productInfo);
     this.deleteModalSubject.next(true);
@@ -60,5 +67,15 @@ export class ModalService {
   closeDeleteModal() {
     this.deleteModalSubject.next(false);
     this.productToDeleteSubject.next(null);
+  }
+
+  // --- ¡NUEVO! Métodos DETALLES DE PEDIDO ---
+  openOrderDetailsModal(orderId: number) {
+    this.orderToViewIdSubject.next(orderId);
+    this.orderDetailsModalSubject.next(true);
+  }
+  closeOrderDetailsModal() {
+    this.orderDetailsModalSubject.next(false);
+    this.orderToViewIdSubject.next(null);
   }
 }

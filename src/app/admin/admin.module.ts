@@ -13,7 +13,8 @@ import { AdminOrdersComponent } from "./pages/admin-orders/admin-orders.componen
 import { AdminUsersComponent } from "./pages/admin-users/admin-users.component";
 import { ProductModalComponent } from "./components/product-modal/product-modal.component";
 import { EditProductModalComponent } from "./components/edit-product-modal/edit-product-modal.component";
-import { DeleteProductModalComponent } from "./components/delete-product-modal/delete-product-modal.component"; // 1. Importar
+import { DeleteProductModalComponent } from "./components/delete-product-modal/delete-product-modal.component";
+import { OrderDetailsModalComponent } from "./components/order-details-modal/order-details-modal.component"; // 1. Importar
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { DeleteProductModalComponent } from "./components/delete-product-modal/d
     AdminUsersComponent,
     ProductModalComponent,
     EditProductModalComponent,
-    DeleteProductModalComponent, // 2. Añadir a imports
+    DeleteProductModalComponent,
+    OrderDetailsModalComponent, // 2. Añadir a imports
   ],
 })
 export class AdminModule {}

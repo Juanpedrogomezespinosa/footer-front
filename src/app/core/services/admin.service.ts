@@ -8,19 +8,21 @@ import {
   DashboardStats,
   SalesGraph,
   AdminProductsResponse,
-  FullAdminProduct, // 1. Importar la nueva interfaz
+  FullAdminProduct,
+  FullAdminOrder,
 } from "../models/admin.types";
 
 @Injectable({
   providedIn: "root",
 })
 export class AdminService {
-  private apiUrl = "/api/admin";
-  private productsApiUrl = "/api/products"; // URL base de productos
+  private apiUrl = "/api/admin"; // <-- Ruta de Admin
+  private productsApiUrl = "/api/products";
+  private ordersApiUrl = "/api/orders"; // <-- Ruta de Usuario
 
   constructor(private http: HttpClient) {}
 
-  // ... (getDashboardStats, getSalesGraph, getUsers, getOrders, getProducts, createProduct se quedan igual) ...
+  // ... (getDashboardStats, getSalesGraph, getUsers, getOrders, getProducts, createProduct, getProductById, updateProduct, deleteProduct se quedan igual) ...
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/stats/dashboard`);
   }
@@ -55,32 +57,23 @@ export class AdminService {
   createProduct(productData: FormData): Observable<any> {
     return this.http.post<any>(this.productsApiUrl, productData);
   }
-
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Obtiene un solo producto por su ID (para el modal de edición).
-   * GET /api/products/:id
-   */
   getProductById(id: number): Observable<FullAdminProduct> {
     return this.http.get<FullAdminProduct>(`${this.productsApiUrl}/${id}`);
   }
-
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Actualiza un producto (solo campos de texto).
-   * PUT /api/products/:id
-   */
   updateProduct(id: number, productData: any): Observable<any> {
-    // Tu backend no espera FormData aquí, solo JSON
     return this.http.put<any>(`${this.productsApiUrl}/${id}`, productData);
   }
-
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Elimina un producto.
-   * DELETE /api/products/:id
-   */
   deleteProduct(id: number): Observable<any> {
     return this.http.delete<any>(`${this.productsApiUrl}/${id}`);
+  }
+
+  // --- ¡MÉTODO CORREGIDO! ---
+  /**
+   * Obtiene los detalles de un solo pedido por su ID (como Admin).
+   * GET /api/admin/orders/:id  <-- ¡Ruta corregida!
+   */
+  getAdminOrderById(id: number): Observable<FullAdminOrder> {
+    // Usamos 'apiUrl' (la ruta de admin)
+    return this.http.get<FullAdminOrder>(`${this.apiUrl}/orders/${id}`);
   }
 }

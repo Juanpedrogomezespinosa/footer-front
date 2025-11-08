@@ -146,7 +146,7 @@
           {{ formatPercentage(salesGraph.percentage) }}
         </p>
       </div>
-      <div class="flex max-h-[350px] flex-1 flex-col justify-end pt-4">
+      <div class="flex h-80 flex-1 flex-col justify-end pt-4">
         <canvas
           baseChart
           [data]="lineChartData"
@@ -255,7 +255,10 @@
               </span>
             </td>
             <td class="p-4">
-              <button class="text-primary hover:underline text-sm font-medium">
+              <button
+                (click)="openOrderDetailsModal(order.id)"
+                class="text-primary hover:underline text-sm font-medium"
+              >
                 Ver Detalles
               </button>
             </td>

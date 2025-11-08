@@ -17,7 +17,7 @@ import {
   ChartOptions,
   TooltipItem,
 } from "chart.js";
-import { ModalService } from "../../core/services/modal.service"; // 1. Importar ModalService
+import { ModalService } from "../../core/services/modal.service";
 
 @Component({
   selector: "app-dashboard",
@@ -26,7 +26,6 @@ import { ModalService } from "../../core/services/modal.service"; // 1. Importar
   imports: [CommonModule, BaseChartDirective],
 })
 export class DashboardComponent implements OnInit {
-  // Observables para datos
   stats$!: Observable<DashboardStats>;
   recentUsers$!: Observable<AdminUser[]>;
   recentOrders$!: Observable<AdminOrdersResponse>;
@@ -36,7 +35,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private modalService: ModalService // 2. Inyectar ModalService
+    private modalService: ModalService
   ) {
     Chart.register(...registerables);
 
@@ -110,12 +109,11 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // Estas líneas dejarán de dar error cuando 'admin.service.ts' esté actualizado
     this.stats$ = this.adminService.getDashboardStats();
     this.recentUsers$ = this.adminService.getUsers();
-    this.recentOrders$ = this.adminService.getOrders(1, 10);
-    this.salesGraphData$ = this.adminService.getSalesGraph();
+    this.recentOrders$ = this.adminService.getOrders(1, 10); // Solo la primera página
 
+    this.salesGraphData$ = this.adminService.getSalesGraph();
     this.salesGraphData$.subscribe((salesGraph) => {
       this.lineChartData = {
         labels: salesGraph.graphData.labels,
@@ -140,5 +138,13 @@ export class DashboardComponent implements OnInit {
    */
   openProductModal(): void {
     this.modalService.openProductModal();
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Abre el modal para ver los detalles de un pedido.
+   */
+  openOrderDetailsModal(orderId: number): void {
+    this.modalService.openOrderDetailsModal(orderId);
   }
 }
