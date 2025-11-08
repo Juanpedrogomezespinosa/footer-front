@@ -7,7 +7,8 @@ import { Observable } from "rxjs";
 import { User } from "../../core/services/auth.service";
 import { ModalService } from "../../core/services/modal.service";
 import { ProductModalComponent } from "../components/product-modal/product-modal.component";
-import { EditProductModalComponent } from "../components/edit-product-modal/edit-product-modal.component"; // 1. Importar el nuevo modal
+import { EditProductModalComponent } from "../components/edit-product-modal/edit-product-modal.component";
+import { DeleteProductModalComponent } from "../components/delete-product-modal/delete-product-modal.component"; // 1. Importar
 
 @Component({
   selector: "app-admin-layout",
@@ -16,14 +17,16 @@ import { EditProductModalComponent } from "../components/edit-product-modal/edit
     CommonModule,
     RouterModule,
     ProductModalComponent,
-    EditProductModalComponent, // 2. Añadir el nuevo modal
+    EditProductModalComponent,
+    DeleteProductModalComponent, // 2. Añadir a imports
   ],
   templateUrl: "./admin-layout.component.html",
 })
 export class AdminLayoutComponent {
   user$: Observable<User | null>;
   isProductModalOpen$: Observable<boolean>;
-  isEditModalOpen$: Observable<boolean>; // 3. Añadir observable para el modal de edición
+  isEditModalOpen$: Observable<boolean>;
+  isDeleteModalOpen$: Observable<boolean>; // 3. Añadir observable
 
   constructor(
     private authService: AuthService,
@@ -32,7 +35,8 @@ export class AdminLayoutComponent {
   ) {
     this.user$ = this.authService.user$;
     this.isProductModalOpen$ = this.modalService.isProductModalOpen$;
-    this.isEditModalOpen$ = this.modalService.isEditModalOpen$; // 4. Asignar el observable
+    this.isEditModalOpen$ = this.modalService.isEditModalOpen$;
+    this.isDeleteModalOpen$ = this.modalService.isDeleteModalOpen$; // 4. Asignar observable
   }
 
   logout(): void {

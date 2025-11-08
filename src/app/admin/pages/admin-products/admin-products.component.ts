@@ -5,7 +5,7 @@ import { ModalService } from "../../../core/services/modal.service";
 import { AdminService } from "../../../core/services/admin.service";
 import { AdminProductsResponse } from "../../../core/models/admin.types";
 import { filter, skip } from "rxjs/operators";
-import { ToastService } from "../../../core/services/toast.service"; // 1. Importar ToastService
+import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
   selector: "app-admin-products",
@@ -19,7 +19,7 @@ export class AdminProductsComponent implements OnInit {
   constructor(
     private modalService: ModalService,
     private adminService: AdminService,
-    private toast: ToastService // 2. Inyectar ToastService
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -35,8 +35,19 @@ export class AdminProductsComponent implements OnInit {
         this.loadProducts(this.productsResponse?.currentPage || 1);
       });
 
-    // 3. Escuchar el cierre del modal de EDITAR para refrescar
+    // Escuchar el cierre del modal de EDITAR para refrescar
     this.modalService.isEditModalOpen$
+      .pipe(
+        skip(1),
+        filter((isOpen) => !isOpen)
+      )
+      .subscribe(() => {
+        this.loadProducts(this.productsResponse?.currentPage || 1);
+      });
+
+    // --- ¡CAMBIO AÑADIDO! ---
+    // Escuchar el cierre del modal de ELIMINAR para refrescar
+    this.modalService.isDeleteModalOpen$
       .pipe(
         skip(1),
         filter((isOpen) => !isOpen)
@@ -86,41 +97,22 @@ export class AdminProductsComponent implements OnInit {
     this.modalService.openProductModal();
   }
 
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  // --- ¡MÉTODO MODIFICADO! ---
   /**
-   * Pide confirmación y elimina un producto.
+   * Abre el modal de confirmación para eliminar un producto.
    */
   onDelete(id: number, name: string): void {
-    const confirmation = window.confirm(
-      `¿Estás seguro de que quieres eliminar el producto "${name}" (ID: ${id})? Esta acción no se puede deshacer.`
-    );
-
-    if (confirmation) {
-      this.adminService.deleteProduct(id).subscribe({
-        next: () => {
-          this.toast.showSuccess("Producto eliminado correctamente.");
-          // Recargar la página actual
-          this.loadProducts(this.productsResponse?.currentPage || 1);
-        },
-        error: (err) => {
-          console.error("Error al eliminar producto:", err);
-          this.toast.showError(
-            err.error?.message || "Error al eliminar el producto."
-          );
-        },
-      });
-    }
+    // Ya no usamos window.confirm ni llamamos al adminService aquí
+    // Solo le pasamos la info al servicio del modal
+    this.modalService.openDeleteModal({ id, name });
   }
 
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
   /**
    * Obtiene los datos completos de un producto y abre el modal de edición.
    */
   onEdit(id: number): void {
-    // 1. Obtenemos los datos completos del producto
     this.adminService.getProductById(id).subscribe({
       next: (product) => {
-        // 2. Le pasamos los datos al modal service y lo abrimos
         this.modalService.openEditModal(product);
       },
       error: (err) => {

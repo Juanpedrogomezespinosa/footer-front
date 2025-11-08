@@ -12,7 +12,8 @@ import { AdminProductsComponent } from "./pages/admin-products/admin-products.co
 import { AdminOrdersComponent } from "./pages/admin-orders/admin-orders.component";
 import { AdminUsersComponent } from "./pages/admin-users/admin-users.component";
 import { ProductModalComponent } from "./components/product-modal/product-modal.component";
-import { EditProductModalComponent } from "./components/edit-product-modal/edit-product-modal.component"; // 1. Importar nuevo modal
+import { EditProductModalComponent } from "./components/edit-product-modal/edit-product-modal.component";
+import { DeleteProductModalComponent } from "./components/delete-product-modal/delete-product-modal.component"; // 1. Importar
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { EditProductModalComponent } from "./components/edit-product-modal/edit-
     AdminOrdersComponent,
     AdminUsersComponent,
     ProductModalComponent,
-    EditProductModalComponent, // 2. Añadir nuevo modal a imports
+    EditProductModalComponent,
+    DeleteProductModalComponent, // 2. Añadir a imports
   ],
 })
 export class AdminModule {}

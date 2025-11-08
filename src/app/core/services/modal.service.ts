@@ -1,7 +1,13 @@
 // src/app/core/services/modal.service.ts
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { FullAdminProduct } from "../models/admin.types"; // 1. Importar la nueva interfaz
+import { FullAdminProduct } from "../models/admin.types";
+
+// Simple interface para los datos del modal de borrado
+export interface ProductDeleteInfo {
+  id: number;
+  name: string;
+}
 
 @Injectable({
   providedIn: "root",
@@ -14,12 +20,17 @@ export class ModalService {
   // --- Modal de EDITAR producto ---
   private editModalSubject = new BehaviorSubject<boolean>(false);
   isEditModalOpen$ = this.editModalSubject.asObservable();
-
-  // Subject para pasar los datos del producto al modal de edición
   private productToEditSubject = new BehaviorSubject<FullAdminProduct | null>(
     null
   );
   productToEdit$ = this.productToEditSubject.asObservable();
+
+  // --- ¡NUEVO! Modal de ELIMINAR producto ---
+  private deleteModalSubject = new BehaviorSubject<boolean>(false);
+  isDeleteModalOpen$ = this.deleteModalSubject.asObservable();
+  private productToDeleteSubject =
+    new BehaviorSubject<ProductDeleteInfo | null>(null);
+  productToDelete$ = this.productToDeleteSubject.asObservable();
 
   constructor() {}
 
@@ -27,19 +38,27 @@ export class ModalService {
   openProductModal() {
     this.productModalSubject.next(true);
   }
-
   closeProductModal() {
     this.productModalSubject.next(false);
   }
 
   // --- Métodos para el modal de EDITAR ---
   openEditModal(product: FullAdminProduct) {
-    this.productToEditSubject.next(product); // 1. Guardar el producto
-    this.editModalSubject.next(true); // 2. Abrir el modal
+    this.productToEditSubject.next(product);
+    this.editModalSubject.next(true);
   }
-
   closeEditModal() {
     this.editModalSubject.next(false);
-    this.productToEditSubject.next(null); // Limpiar el producto al cerrar
+    this.productToEditSubject.next(null);
+  }
+
+  // --- ¡NUEVO! Métodos para el modal de ELIMINAR ---
+  openDeleteModal(productInfo: ProductDeleteInfo) {
+    this.productToDeleteSubject.next(productInfo);
+    this.deleteModalSubject.next(true);
+  }
+  closeDeleteModal() {
+    this.deleteModalSubject.next(false);
+    this.productToDeleteSubject.next(null);
   }
 }

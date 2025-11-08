@@ -1,0 +1,58 @@
+<div
+  (click)="close()"
+  class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in"
+></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    class="relative w-full max-w-md bg-white dark:bg-card-dark rounded-xl shadow-lg flex flex-col animate-scale-in"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="p-6">
+      <div class="flex items-start gap-4">
+        <div
+          class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100"
+        >
+          <span class="material-symbols-outlined text-red-600">warning</span>
+        </div>
+
+        <div class="flex-1">
+          <h3
+            class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary"
+          >
+            Eliminar Producto
+          </h3>
+          <p
+            class="text-sm text-text-light-secondary dark:text-text-dark-secondary mt-2"
+          >
+            ¿Estás seguro de que quieres eliminar el producto
+            <strong class="text-text-light-primary dark:text-text-dark-primary"
+              >"{{ productInfo?.name }}"</strong
+            >?
+            <br />
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-2 bg-gray-50 dark:bg-card-dark rounded-b-xl"
+    >
+      <button
+        (click)="close()"
+        type="button"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-200 hover:bg-gray-300"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="confirmDelete()"
+        [disabled]="isDeleting"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-secondary hover:bg-secondary-dark transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ isDeleting ? "Eliminando..." : "Confirmar Borrado" }}
+      </button>
+    </div>
+  </div>
+</div>
