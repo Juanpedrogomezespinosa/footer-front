@@ -7,7 +7,8 @@ import {
   AdminUser,
   DashboardStats,
   SalesGraph,
-  AdminProductsResponse, // 1. Importar la nueva interfaz
+  AdminProductsResponse,
+  FullAdminProduct, // 1. Importar la nueva interfaz
 } from "../models/admin.types";
 
 @Injectable({
@@ -19,34 +20,16 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Obtiene las estadísticas principales para el dashboard.
-   * GET /api/admin/stats/dashboard
-   */
+  // ... (getDashboardStats, getSalesGraph, getUsers, getOrders, getProducts, createProduct se quedan igual) ...
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/stats/dashboard`);
   }
-
-  /**
-   * Obtiene los datos para la gráfica de ventas.
-   * GET /api/admin/stats/sales-graph
-   */
   getSalesGraph(): Observable<SalesGraph> {
     return this.http.get<SalesGraph>(`${this.apiUrl}/stats/sales-graph`);
   }
-
-  /**
-   * Obtiene la lista de todos los usuarios.
-   * GET /api/admin/users
-   */
   getUsers(): Observable<AdminUser[]> {
     return this.http.get<AdminUser[]>(`${this.apiUrl}/users`);
   }
-
-  /**
-   * Obtiene la lista de pedidos con paginación.
-   * GET /api/admin/orders
-   */
   getOrders(
     page: number = 1,
     limit: number = 10
@@ -54,17 +37,10 @@ export class AdminService {
     const params = new HttpParams()
       .set("page", page.toString())
       .set("limit", limit.toString());
-
     return this.http.get<AdminOrdersResponse>(`${this.apiUrl}/orders`, {
       params,
     });
   }
-
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Obtiene la lista de productos con paginación.
-   * GET /api/products
-   */
   getProducts(
     page: number = 1,
     limit: number = 10
@@ -72,19 +48,39 @@ export class AdminService {
     const params = new HttpParams()
       .set("page", page.toString())
       .set("limit", limit.toString());
-
-    // Nota: Usamos 'productsApiUrl' (público), no 'apiUrl' (admin)
     return this.http.get<AdminProductsResponse>(this.productsApiUrl, {
       params,
     });
   }
-
-  /**
-   * Crea un nuevo producto.
-   * Llama a: POST /api/products
-   */
   createProduct(productData: FormData): Observable<any> {
-    // No se necesita 'Content-Type', HttpClient lo pone solo con FormData
     return this.http.post<any>(this.productsApiUrl, productData);
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Obtiene un solo producto por su ID (para el modal de edición).
+   * GET /api/products/:id
+   */
+  getProductById(id: number): Observable<FullAdminProduct> {
+    return this.http.get<FullAdminProduct>(`${this.productsApiUrl}/${id}`);
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Actualiza un producto (solo campos de texto).
+   * PUT /api/products/:id
+   */
+  updateProduct(id: number, productData: any): Observable<any> {
+    // Tu backend no espera FormData aquí, solo JSON
+    return this.http.put<any>(`${this.productsApiUrl}/${id}`, productData);
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Elimina un producto.
+   * DELETE /api/products/:id
+   */
+  deleteProduct(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.productsApiUrl}/${id}`);
   }
 }

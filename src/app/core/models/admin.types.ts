@@ -98,3 +98,22 @@ export interface AdminProduct {
   ratingCount: number;
   // Añade más campos si los necesitas en la tabla
 }
+
+export interface FullAdminProduct {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  stock: number;
+  size: string;
+  color: string;
+  brand: string;
+  category: string;
+  sub_category?: string | null;
+  gender: string;
+  material: string | null;
+  season: string | null;
+  is_new: boolean;
+  images: { id: number; imageUrl: string; displayOrder: number }[];
+  averageRating: number;
+}

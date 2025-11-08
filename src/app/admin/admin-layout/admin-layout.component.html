@@ -1,12 +1,9 @@
-<!-- src/app/admin/admin-layout/admin-layout.component.html -->
 <div class="relative flex min-h-screen w-full flex-col">
   <div class="flex h-full w-full">
-    <!-- SideNavBar -->
     <aside
       class="flex h-screen min-h-screen flex-col justify-between bg-card-light dark:bg-card-dark p-4 border-r border-border-light dark:border-border-dark w-64 sticky top-0"
     >
       <div class="flex flex-col gap-8">
-        <!-- Logo (Extraído de tu Navbar) -->
         <a
           routerLink="/admin/dashboard"
           class="flex items-center gap-3 px-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -35,7 +32,6 @@
           </h2>
         </a>
 
-        <!-- Links de Navegación (Traducidos) -->
         <div class="flex flex-col gap-2">
           <a
             routerLink="/admin/dashboard"
@@ -69,13 +65,11 @@
         </div>
       </div>
 
-      <!-- Perfil de Admin y Logout (Traducido) -->
       <div
         *ngIf="user$ | async as user"
         class="flex flex-col gap-4 border-t border-border-light dark:border-border-dark pt-4"
       >
         <div class="flex gap-3 items-center">
-          <!-- Usamos un placeholder si no hay avatar, o el avatar del usuario -->
           <img
             [src]="
               user.avatarUrl ||
@@ -107,7 +101,6 @@
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main
       class="flex-1 p-8 overflow-y-auto bg-background-light dark:bg-background-dark"
     >
@@ -116,9 +109,8 @@
   </div>
 </div>
 
-<!-- 
-  --- ¡CAMBIO AÑADIDO AQUÍ! ---
-  Este modal vivirá "encima" de todo el layout y se mostrará
-  cuando el observable 'isProductModalOpen$' sea true.
--->
 <app-product-modal *ngIf="isProductModalOpen$ | async"></app-product-modal>
+
+<app-edit-product-modal
+  *ngIf="isEditModalOpen$ | async"
+></app-edit-product-modal>

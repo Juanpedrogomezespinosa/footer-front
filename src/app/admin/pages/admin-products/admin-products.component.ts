@@ -1,10 +1,11 @@
 // src/app/admin/pages/admin-products/admin-products.component.ts
-import { Component, OnInit } from "@angular/core"; // 1. Importar OnInit
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ModalService } from "../../../core/services/modal.service";
-import { AdminService } from "../../../core/services/admin.service"; // 2. Importar AdminService
-import { AdminProductsResponse } from "../../../core/models/admin.types"; // 3. Importar la interfaz de respuesta
+import { AdminService } from "../../../core/services/admin.service";
+import { AdminProductsResponse } from "../../../core/models/admin.types";
 import { filter, skip } from "rxjs/operators";
+import { ToastService } from "../../../core/services/toast.service"; // 1. Importar ToastService
 
 @Component({
   selector: "app-admin-products",
@@ -13,28 +14,34 @@ import { filter, skip } from "rxjs/operators";
   templateUrl: "./admin-products.component.html",
 })
 export class AdminProductsComponent implements OnInit {
-  // 4. Implementar OnInit
-
-  // 5. Propiedad para almacenar la respuesta completa (incluyendo paginación)
   productsResponse: AdminProductsResponse | null = null;
 
   constructor(
     private modalService: ModalService,
-    private adminService: AdminService // 6. Inyectar AdminService
+    private adminService: AdminService,
+    private toast: ToastService // 2. Inyectar ToastService
   ) {}
 
   ngOnInit(): void {
-    // 7. Cargar productos al iniciar el componente
     this.loadProducts(1);
 
-    // 8. Escuchar el cierre del modal para refrescar la lista
+    // Escuchar el cierre del modal de CREAR para refrescar
     this.modalService.isProductModalOpen$
       .pipe(
-        skip(1), // Ignorar el valor inicial
-        filter((isOpen) => !isOpen) // Filtrar solo cuando isOpen es 'false' (se ha cerrado)
+        skip(1),
+        filter((isOpen) => !isOpen)
       )
       .subscribe(() => {
-        // Recargar la página actual en la que estábamos
+        this.loadProducts(this.productsResponse?.currentPage || 1);
+      });
+
+    // 3. Escuchar el cierre del modal de EDITAR para refrescar
+    this.modalService.isEditModalOpen$
+      .pipe(
+        skip(1),
+        filter((isOpen) => !isOpen)
+      )
+      .subscribe(() => {
         this.loadProducts(this.productsResponse?.currentPage || 1);
       });
   }
@@ -49,7 +56,7 @@ export class AdminProductsComponent implements OnInit {
       },
       error: (err) => {
         console.error("Error al cargar productos:", err);
-        // Aquí podrías usar tu ToastService
+        this.toast.showError("Error al cargar productos.");
       },
     });
   }
@@ -79,7 +86,47 @@ export class AdminProductsComponent implements OnInit {
     this.modalService.openProductModal();
   }
 
-  // Futuros métodos
-  // editProduct(productId: number): void { ... }
-  // deleteProduct(productId: number): void { ... }
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Pide confirmación y elimina un producto.
+   */
+  onDelete(id: number, name: string): void {
+    const confirmation = window.confirm(
+      `¿Estás seguro de que quieres eliminar el producto "${name}" (ID: ${id})? Esta acción no se puede deshacer.`
+    );
+
+    if (confirmation) {
+      this.adminService.deleteProduct(id).subscribe({
+        next: () => {
+          this.toast.showSuccess("Producto eliminado correctamente.");
+          // Recargar la página actual
+          this.loadProducts(this.productsResponse?.currentPage || 1);
+        },
+        error: (err) => {
+          console.error("Error al eliminar producto:", err);
+          this.toast.showError(
+            err.error?.message || "Error al eliminar el producto."
+          );
+        },
+      });
+    }
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Obtiene los datos completos de un producto y abre el modal de edición.
+   */
+  onEdit(id: number): void {
+    // 1. Obtenemos los datos completos del producto
+    this.adminService.getProductById(id).subscribe({
+      next: (product) => {
+        // 2. Le pasamos los datos al modal service y lo abrimos
+        this.modalService.openEditModal(product);
+      },
+      error: (err) => {
+        console.error("Error al obtener detalles del producto:", err);
+        this.toast.showError("No se pudieron cargar los datos para editar.");
+      },
+    });
+  }
 }
