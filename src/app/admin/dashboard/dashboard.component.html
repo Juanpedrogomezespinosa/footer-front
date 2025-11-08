@@ -1,0 +1,274 @@
+<div class="flex flex-col gap-8 max-w-7xl mx-auto">
+  <div class="flex flex-wrap justify-between items-center gap-4">
+    <div class="flex flex-col gap-1">
+      <p
+        class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+      >
+        Dashboard
+      </p>
+      <p
+        class="text-text-light-secondary dark:text-text-dark-secondary text-base font-normal leading-normal"
+      >
+        ¡Bienvenido de nuevo, Admin! Aquí tienes un resumen de la actividad.
+      </p>
+    </div>
+    <button
+      class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity"
+    >
+      <span>Añadir Producto</span>
+    </button>
+  </div>
+
+  <ng-container *ngIf="stats$ | async as stats; else loadingStats">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div
+        class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+      >
+        <p
+          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+        >
+          Ingresos Totales
+        </p>
+        <p
+          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+        >
+          {{ stats.totalRevenue.amount || 0 | number : "1.2-2" }}€
+        </p>
+        <p
+          [ngClass]="
+            stats.totalRevenue.percentage >= 0
+              ? 'text-green-600'
+              : 'text-red-600'
+          "
+          class="text-sm font-medium leading-normal"
+        >
+          {{ formatPercentage(stats.totalRevenue.percentage) }}
+        </p>
+      </div>
+      <div
+        class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+      >
+        <p
+          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+        >
+          Pedidos (Hoy)
+        </p>
+        <p
+          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+        >
+          {{ stats.ordersToday.count }}
+        </p>
+        <p
+          [ngClass]="
+            stats.ordersToday.percentage >= 0
+              ? 'text-green-600'
+              : 'text-red-600'
+          "
+          class="text-sm font-medium leading-normal"
+        >
+          {{ formatPercentage(stats.ordersToday.percentage) }}
+        </p>
+      </div>
+      <div
+        class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+      >
+        <p
+          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+        >
+          Nuevos Usuarios
+        </p>
+        <p
+          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+        >
+          {{ stats.newUsers.count }}
+        </p>
+        <p
+          [ngClass]="
+            stats.newUsers.percentage >= 0 ? 'text-green-600' : 'text-red-600'
+          "
+          class="text-sm font-medium leading-normal"
+        >
+          {{ formatPercentage(stats.newUsers.percentage) }}
+        </p>
+      </div>
+      <div
+        class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+      >
+        <p
+          class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal uppercase tracking-wide"
+        >
+          Envíos Pendientes
+        </p>
+        <p
+          class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
+        >
+          {{ stats.pendingShipments.count }}
+        </p>
+        <p
+          [ngClass]="
+            stats.pendingShipments.percentage >= 0
+              ? 'text-green-600'
+              : 'text-red-600'
+          "
+          class="text-sm font-medium leading-normal"
+        >
+          {{ formatPercentage(stats.pendingShipments.percentage) }}
+        </p>
+      </div>
+    </div>
+  </ng-container>
+
+  <div
+    *ngIf="salesGraphData$ | async as salesGraph"
+    class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+  >
+    <div
+      class="lg:col-span-3 flex flex-col gap-2 rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm"
+    >
+      <p
+        class="text-text-light-primary dark:text-text-dark-primary text-lg font-semibold leading-normal"
+      >
+        Ventas (Últimos 30 días)
+      </p>
+      <div class="flex items-baseline gap-2">
+        <p
+          class="text-text-light-primary dark:text-text-dark-primary text-4xl font-bold leading-tight"
+        >
+          {{ salesGraph.totalSales || 0 | number : "1.2-2" }}€
+        </p>
+        <p
+          [ngClass]="
+            salesGraph.percentage >= 0 ? 'text-green-600' : 'text-red-600'
+          "
+          class="text-base font-medium leading-normal"
+        >
+          {{ formatPercentage(salesGraph.percentage) }}
+        </p>
+      </div>
+      <div class="flex min-h-[300px] flex-1 flex-col justify-end pt-4">
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'"
+          role="img"
+          aria-label="Gráfica de ventas de los últimos 30 días"
+        >
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="recentOrders$ | async as ordersResponse; else loadingOrders"
+    class="flex flex-col gap-4"
+  >
+    <h2
+      class="text-text-light-primary dark:text-text-dark-primary text-xl font-bold leading-tight"
+    >
+      Pedidos Recientes
+    </h2>
+    <div
+      class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
+    >
+      <table class="w-full text-left">
+        <thead class="border-b border-border-light dark:border-border-dark">
+          <tr>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              ID Pedido
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Cliente
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Fecha
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Total
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Estado
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="ordersResponse.orders.length === 0">
+            <td
+              colspan="6"
+              class="p-4 text-center text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              No hay pedidos recientes.
+            </td>
+          </tr>
+          <tr
+            *ngFor="let order of ordersResponse.orders"
+            class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
+          >
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              #{{ order.id }}
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary"
+            >
+              {{ order.User.username }}
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              {{ order.createdAt | date : "dd/MM/yyyy" }}
+            </td>
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              {{ order.total | number : "1.2-2" }}€
+            </td>
+            <td class="p-4 text-sm">
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full"
+                [ngClass]="{
+                  'bg-green-100 text-green-800':
+                    order.status === 'pagado' || order.status === 'entregado',
+                  'bg-blue-100 text-blue-800': order.status === 'enviado',
+                  'bg-yellow-100 text-yellow-800': order.status === 'pendiente',
+                  'bg-red-100 text-red-800': order.status === 'cancelado'
+                }"
+              >
+                {{ order.status | titlecase }}
+              </span>
+            </td>
+            <td class="p-4">
+              <button class="text-primary hover:underline text-sm font-medium">
+                Ver Detalles
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingStats>
+  <p class="text-gray-500">Cargando estadísticas...</p>
+</ng-template>
+
+<ng-template #loadingOrders>
+  <p class="text-gray-500">Cargando pedidos...</p>
+</ng-template>

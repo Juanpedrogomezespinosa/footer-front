@@ -1,0 +1,117 @@
+<!-- src/app/admin/admin-layout/admin-layout.component.html -->
+<div class="relative flex min-h-screen w-full flex-col">
+  <div class="flex h-full w-full">
+    <!-- SideNavBar -->
+    <aside
+      class="flex h-screen min-h-screen flex-col justify-between bg-card-light dark:bg-card-dark p-4 border-r border-border-light dark:border-border-dark w-64 sticky top-0"
+    >
+      <div class="flex flex-col gap-8">
+        <!-- Logo (Extraído de tu Navbar) -->
+        <a
+          routerLink="/admin/dashboard"
+          class="flex items-center gap-3 px-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+          aria-label="Ir al dashboard"
+        >
+          <div
+            class="size-8 text-primary transition-transform group-hover:rotate-90"
+          >
+            <svg
+              fill="none"
+              viewBox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+                fill="#FF5A1F"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <h2
+            class="text-2xl font-bold leading-tight text-text-light-primary dark:text-text-dark-primary group-hover:text-primary transition-colors"
+          >
+            Footer
+          </h2>
+        </a>
+
+        <!-- Links de Navegación (Traducidos) -->
+        <div class="flex flex-col gap-2">
+          <a
+            routerLink="/admin/dashboard"
+            routerLinkActive="bg-secondary/80 text-primary"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary/50 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary"
+          >
+            <p class="text-sm font-medium leading-normal">Dashboard</p>
+          </a>
+          <a
+            routerLink="/admin/products"
+            routerLinkActive="bg-secondary/80 text-primary"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary/50 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary"
+          >
+            <p class="text-sm font-medium leading-normal">Productos</p>
+          </a>
+          <a
+            routerLink="/admin/orders"
+            routerLinkActive="bg-secondary/80 text-primary"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary/50 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary"
+          >
+            <p class="text-sm font-medium leading-normal">Pedidos</p>
+          </a>
+          <a
+            routerLink="/admin/users"
+            routerLinkActive="bg-secondary/80 text-primary"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary/50 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary"
+          >
+            <p class="text-sm font-medium leading-normal">Usuarios</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- Perfil de Admin y Logout (Traducido) -->
+      <div
+        *ngIf="user$ | async as user"
+        class="flex flex-col gap-4 border-t border-border-light dark:border-border-dark pt-4"
+      >
+        <div class="flex gap-3 items-center">
+          <!-- Usamos un placeholder si no hay avatar, o el avatar del usuario -->
+          <img
+            [src]="
+              user.avatarUrl ||
+              'https://placehold.co/40x40/f97306/FFFFFF?text=' +
+                (user.username ? user.username.charAt(0) : 'A')
+            "
+            alt="Avatar del administrador"
+            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 object-cover border-2 border-primary/50"
+          />
+          <div class="flex flex-col overflow-hidden">
+            <h1
+              class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal truncate"
+            >
+              {{ user.username }}
+            </h1>
+            <p
+              class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal"
+            >
+              Administrador
+            </p>
+          </div>
+        </div>
+        <button
+          (click)="logout()"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary/80 text-text-light-secondary dark:text-text-dark-secondary w-full"
+        >
+          <p class="text-sm font-medium leading-normal">Cerrar Sesión</p>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main
+      class="flex-1 p-8 overflow-y-auto bg-background-light dark:bg-background-dark"
+    >
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

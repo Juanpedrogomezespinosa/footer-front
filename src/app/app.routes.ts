@@ -1,6 +1,7 @@
 // src/app/app.routes.ts
 import { Routes } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
+import { AdminGuard } from "./core/guards/admin.guard"; // 1. Importamos el AdminGuard
 
 export const routes: Routes = [
   {
@@ -27,15 +28,12 @@ export const routes: Routes = [
         (m) => m.RegisterComponent
       ),
   },
-
-  // --- Ruta de Perfil de Usuario (Modificada) ---
   {
     path: "profile",
     loadComponent: () =>
       import("./profile/profile.component").then((m) => m.ProfileComponent),
     canActivate: [AuthGuard],
     title: "Mi Perfil",
-    // --- Rutas Hijas ---
     children: [
       {
         path: "", // Ruta por defecto: /profile
@@ -53,7 +51,6 @@ export const routes: Routes = [
           ).then((m) => m.OrderHistoryComponent),
         title: "Historial de Pedidos",
       },
-      // --- ¡NUEVA RUTA AÑADIDA! ---
       {
         path: "addresses", // Ruta de direcciones: /profile/addresses
         loadComponent: () =>
@@ -62,11 +59,17 @@ export const routes: Routes = [
           ).then((m) => m.ProfileAddressesComponent),
         title: "Mis Direcciones",
       },
-      // ----------------------------
     ],
-    // -------------------
   },
-  // ----------------------------------------
+
+  // --- ¡NUEVA RUTA DE ADMIN AÑADIDA! ---
+  {
+    path: "admin",
+    loadChildren: () =>
+      import("./admin/admin.module").then((m) => m.AdminModule),
+    canActivate: [AuthGuard, AdminGuard], // 2. Protegida por AMBOS guards
+  },
+  // -------------------------------------
 
   {
     path: "cart",
