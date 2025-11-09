@@ -14,7 +14,6 @@ import { filter, skip } from "rxjs/operators";
   templateUrl: "./admin-orders.component.html",
 })
 export class AdminOrdersComponent implements OnInit {
-  // Propiedad para almacenar la respuesta completa (incluyendo paginación)
   ordersResponse: AdminOrdersResponse | null = null;
   isLoading: boolean = true;
 
@@ -31,17 +30,25 @@ export class AdminOrdersComponent implements OnInit {
     // Escuchar el cierre del modal de detalles para refrescar la lista
     this.modalService.isOrderDetailsModalOpen$
       .pipe(
-        skip(1), // Ignorar el valor inicial
-        filter((isOpen) => !isOpen) // Filtrar solo cuando se cierra
+        skip(1),
+        filter((isOpen) => !isOpen)
+      )
+      .subscribe(() => {
+        this.loadOrders(this.ordersResponse?.currentPage || 1);
+      });
+
+    // --- ¡AÑADIDO! ---
+    // Escuchar el cierre del modal de ESTADO para refrescar la lista
+    this.modalService.isStatusUpdateModalOpen$
+      .pipe(
+        skip(1),
+        filter((isOpen) => !isOpen)
       )
       .subscribe(() => {
         this.loadOrders(this.ordersResponse?.currentPage || 1);
       });
   }
 
-  /**
-   * Carga la lista de pedidos para una página específica.
-   */
   loadOrders(page: number): void {
     this.isLoading = true;
     this.adminService.getOrders(page).subscribe({
@@ -57,36 +64,31 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
-  /**
-   * Navega a la página siguiente.
-   */
   onNextPage(): void {
     if (this.ordersResponse && this.ordersResponse.nextPage) {
       this.loadOrders(this.ordersResponse.nextPage);
     }
   }
 
-  /**
-   * Navega a la página anterior.
-   */
   onPrevPage(): void {
     if (this.ordersResponse && this.ordersResponse.prevPage) {
       this.loadOrders(this.ordersResponse.prevPage);
     }
   }
 
-  /**
-   * Abre el modal de detalles para un pedido específico.
-   */
   openOrderDetailsModal(orderId: number): void {
     this.modalService.openOrderDetailsModal(orderId);
   }
 
+  // --- ¡MÉTODO MODIFICADO! ---
   /**
-   * (FUTURO) Abre un modal o menú para cambiar el estado del pedido.
+   * Abre el modal para cambiar el estado del pedido.
    */
   openChangeStatusModal(orderId: number, currentStatus: string): void {
-    // ¡CAMBIO AQUÍ! Usamos showSuccess en lugar de showInfo
-    this.toast.showSuccess(`(Demo) Cambiar estado del pedido #${orderId}`);
+    // Ya no es un demo, llama al servicio del modal
+    this.modalService.openStatusUpdateModal({
+      id: orderId,
+      status: currentStatus,
+    });
   }
 }

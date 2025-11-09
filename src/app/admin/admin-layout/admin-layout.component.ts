@@ -9,7 +9,8 @@ import { ModalService } from "../../core/services/modal.service";
 import { ProductModalComponent } from "../components/product-modal/product-modal.component";
 import { EditProductModalComponent } from "../components/edit-product-modal/edit-product-modal.component";
 import { DeleteProductModalComponent } from "../components/delete-product-modal/delete-product-modal.component";
-import { OrderDetailsModalComponent } from "../components/order-details-modal/order-details-modal.component"; // 1. Importar
+import { OrderDetailsModalComponent } from "../components/order-details-modal/order-details-modal.component";
+import { StatusUpdateModalComponent } from "../components/status-update-modal/status-update-modal.component"; // 1. Importar
 
 @Component({
   selector: "app-admin-layout",
@@ -20,7 +21,8 @@ import { OrderDetailsModalComponent } from "../components/order-details-modal/or
     ProductModalComponent,
     EditProductModalComponent,
     DeleteProductModalComponent,
-    OrderDetailsModalComponent, // 2. Añadir a imports
+    OrderDetailsModalComponent,
+    StatusUpdateModalComponent, // 2. Añadir a imports
   ],
   templateUrl: "./admin-layout.component.html",
 })
@@ -29,7 +31,8 @@ export class AdminLayoutComponent {
   isProductModalOpen$: Observable<boolean>;
   isEditModalOpen$: Observable<boolean>;
   isDeleteModalOpen$: Observable<boolean>;
-  isOrderDetailsModalOpen$: Observable<boolean>; // 3. Añadir observable
+  isOrderDetailsModalOpen$: Observable<boolean>;
+  isStatusUpdateModalOpen$: Observable<boolean>; // 3. Añadir observable
 
   constructor(
     private authService: AuthService,
@@ -40,7 +43,8 @@ export class AdminLayoutComponent {
     this.isProductModalOpen$ = this.modalService.isProductModalOpen$;
     this.isEditModalOpen$ = this.modalService.isEditModalOpen$;
     this.isDeleteModalOpen$ = this.modalService.isDeleteModalOpen$;
-    this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$; // 4. Asignar observable
+    this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$;
+    this.isStatusUpdateModalOpen$ = this.modalService.isStatusUpdateModalOpen$; // 4. Asignar observable
   }
 
   logout(): void {

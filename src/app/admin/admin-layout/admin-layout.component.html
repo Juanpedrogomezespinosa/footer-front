@@ -1,3 +1,4 @@
+<!-- src/app/admin/admin-layout/admin-layout.component.html -->
 <div class="relative flex min-h-screen w-full flex-col">
   <div class="flex h-full w-full">
     <aside
@@ -116,7 +117,11 @@
 <app-delete-product-modal
   *ngIf="isDeleteModalOpen$ | async"
 ></app-delete-product-modal>
-
 <app-order-details-modal
   *ngIf="isOrderDetailsModalOpen$ | async"
 ></app-order-details-modal>
+
+<!-- ¡NUEVO MODAL AÑADIDO! -->
+<app-status-update-modal
+  *ngIf="isStatusUpdateModalOpen$ | async"
+></app-status-update-modal>

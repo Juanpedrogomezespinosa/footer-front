@@ -3,10 +3,17 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { FullAdminProduct } from "../models/admin.types";
 
-// Simple interface para los datos del modal de borrado
+// Interface para los datos del modal de borrado
 export interface ProductDeleteInfo {
   id: number;
   name: string;
+}
+
+// --- ¡NUEVA INTERFAZ! ---
+// Interface para los datos del modal de estado
+export interface OrderStatusInfo {
+  id: number;
+  status: string;
 }
 
 @Injectable({
@@ -32,12 +39,19 @@ export class ModalService {
     new BehaviorSubject<ProductDeleteInfo | null>(null);
   productToDelete$ = this.productToDeleteSubject.asObservable();
 
-  // --- ¡NUEVO! Modal de DETALLES DE PEDIDO ---
+  // --- Modal de DETALLES DE PEDIDO ---
   private orderDetailsModalSubject = new BehaviorSubject<boolean>(false);
   isOrderDetailsModalOpen$ = this.orderDetailsModalSubject.asObservable();
-  // Subject para pasar el ID del pedido a ver
   private orderToViewIdSubject = new BehaviorSubject<number | null>(null);
   orderToViewId$ = this.orderToViewIdSubject.asObservable();
+
+  // --- ¡NUEVO! Modal de ACTUALIZAR ESTADO ---
+  private statusUpdateModalSubject = new BehaviorSubject<boolean>(false);
+  isStatusUpdateModalOpen$ = this.statusUpdateModalSubject.asObservable();
+  private orderToUpdateSubject = new BehaviorSubject<OrderStatusInfo | null>(
+    null
+  );
+  orderToUpdate$ = this.orderToUpdateSubject.asObservable();
 
   constructor() {}
 
@@ -69,7 +83,7 @@ export class ModalService {
     this.productToDeleteSubject.next(null);
   }
 
-  // --- ¡NUEVO! Métodos DETALLES DE PEDIDO ---
+  // --- Métodos DETALLES DE PEDIDO ---
   openOrderDetailsModal(orderId: number) {
     this.orderToViewIdSubject.next(orderId);
     this.orderDetailsModalSubject.next(true);
@@ -77,5 +91,15 @@ export class ModalService {
   closeOrderDetailsModal() {
     this.orderDetailsModalSubject.next(false);
     this.orderToViewIdSubject.next(null);
+  }
+
+  // --- ¡NUEVO! Métodos ACTUALIZAR ESTADO ---
+  openStatusUpdateModal(orderInfo: OrderStatusInfo) {
+    this.orderToUpdateSubject.next(orderInfo);
+    this.statusUpdateModalSubject.next(true);
+  }
+  closeStatusUpdateModal() {
+    this.statusUpdateModalSubject.next(false);
+    this.orderToUpdateSubject.next(null);
   }
 }

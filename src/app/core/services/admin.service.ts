@@ -22,7 +22,6 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  // ... (getDashboardStats, getSalesGraph, getUsers, getOrders, getProducts, createProduct, getProductById, updateProduct, deleteProduct se quedan igual) ...
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/stats/dashboard`);
   }
@@ -67,13 +66,16 @@ export class AdminService {
     return this.http.delete<any>(`${this.productsApiUrl}/${id}`);
   }
 
-  // --- ¡MÉTODO CORREGIDO! ---
-  /**
-   * Obtiene los detalles de un solo pedido por su ID (como Admin).
-   * GET /api/admin/orders/:id  <-- ¡Ruta corregida!
-   */
   getAdminOrderById(id: number): Observable<FullAdminOrder> {
-    // Usamos 'apiUrl' (la ruta de admin)
     return this.http.get<FullAdminOrder>(`${this.apiUrl}/orders/${id}`);
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Actualiza el estado de un pedido.
+   * PUT /api/admin/orders/:id/status
+   */
+  updateOrderStatus(id: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/orders/${id}/status`, { status });
   }
 }
