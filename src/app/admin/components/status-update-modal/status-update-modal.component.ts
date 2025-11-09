@@ -27,12 +27,10 @@ export class StatusUpdateModalComponent implements OnInit, OnDestroy {
   isSaving: boolean = false;
   statusForm: FormGroup;
 
-  // Esta lista es la que debe coincidir con tu ENUM de la base de datos
   orderStatuses = [
-    { value: "pendiente", label: "Pendiente de Pago" },
     { value: "pagado", label: "Por Enviar" },
     { value: "enviado", label: "Enviado" },
-    { value: "entregado", label: "Entregado" }, // <-- El valor que da el error
+    { value: "entregado", label: "Entregado" },
     { value: "cancelado", label: "Cancelado" },
   ];
 

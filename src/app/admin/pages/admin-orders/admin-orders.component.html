@@ -179,14 +179,14 @@
         <button
           (click)="onPrevPage()"
           [disabled]="!ordersResponse.prevPage"
-          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-secondary-light hover:bg-secondary disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed"
         >
           Anterior
         </button>
         <button
           (click)="onNextPage()"
           [disabled]="!ordersResponse.nextPage"
-          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-secondary-light hover:bg-secondary disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed"
         >
           Siguiente
         </button>
