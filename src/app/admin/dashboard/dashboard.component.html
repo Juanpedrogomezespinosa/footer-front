@@ -1,6 +1,12 @@
 <!-- src/app/admin/dashboard/dashboard.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
-  <div class="flex flex-wrap justify-between items-center gap-4">
+  <!-- 
+    Cabecera (MODIFICADA)
+    - flex-col en móvil, sm:flex-row en pantallas mayores
+  -->
+  <div
+    class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4"
+  >
     <div class="flex flex-col gap-1">
       <p
         class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
@@ -13,17 +19,19 @@
         ¡Bienvenido de nuevo, Admin! Aquí tienes un resumen de la actividad.
       </p>
     </div>
+    <!-- Botón con ancho completo en móvil (w-full) y auto en sm -->
     <button
       (click)="openProductModal()"
-      class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity"
+      class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity w-full sm:w-auto"
     >
       <span>Añadir Producto</span>
     </button>
   </div>
 
+  <!-- Tarjetas (Sin cambios, ya eran responsive) -->
   <ng-container *ngIf="stats$ | async as stats; else loadingStats">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Tarjeta: Ingresos Totales (MODIFICADA) -->
+      <!-- Tarjeta: Ingresos Totales -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
@@ -49,7 +57,7 @@
         </p>
       </div>
 
-      <!-- Tarjeta: Pedidos (Hoy) (MODIFICADA) -->
+      <!-- Tarjeta: Pedidos (Hoy) -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
@@ -75,7 +83,7 @@
         </p>
       </div>
 
-      <!-- Tarjeta: Nuevos Usuarios (MODIFICADA) -->
+      <!-- Tarjeta: Nuevos Usuarios -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
@@ -99,7 +107,7 @@
         </p>
       </div>
 
-      <!-- Tarjeta: Envíos Pendientes (MODIFICADA) -->
+      <!-- Tarjeta: Envíos Pendientes -->
       <div
         class="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
       >
@@ -127,7 +135,7 @@
     </div>
   </ng-container>
 
-  <!-- El resto del fichero no se toca -->
+  <!-- Gráfica (Sin cambios) -->
   <div
     *ngIf="salesGraphData$ | async as salesGraph"
     class="grid grid-cols-1 lg:grid-cols-3 gap-6"
@@ -157,7 +165,6 @@
         </p>
       </div>
 
-      <!-- Contenedor del gráfico con altura máxima -->
       <div class="flex flex-1 flex-col justify-end pt-4 max-h-[350px]">
         <canvas
           baseChart
@@ -172,6 +179,7 @@
     </div>
   </div>
 
+  <!-- Pedidos Recientes (Sin cambios) -->
   <div
     *ngIf="recentOrders$ | async as ordersResponse; else loadingOrders"
     class="flex flex-col gap-4"
@@ -185,6 +193,7 @@
       class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
     >
       <table class="w-full text-left">
+        <!-- La tabla puede ser tan ancha como necesite -->
         <thead class="border-b border-border-light dark:border-border-dark">
           <tr>
             <th
@@ -203,6 +212,7 @@
               Fecha
             </th>
             <th
+              classsemicolon
               class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
             >
               Total
@@ -263,7 +273,17 @@
                   'bg-red-100 text-red-800': order.status === 'cancelado'
                 }"
               >
-                {{ order.status | titlecase }}
+                <ng-container [ngSwitch]="order.status">
+                  <ng-container *ngSwitchCase="'pagado'"
+                    >Por Enviar</ng-container
+                  >
+                  <ng-container *ngSwitchCase="'pendiente'"
+                    >Pendiente de Pago</ng-container
+                  >
+                  <ng-container *ngSwitchDefault>{{
+                    order.status | titlecase
+                  }}</ng-container>
+                </ng-container>
               </span>
             </td>
             <td class="p-4">

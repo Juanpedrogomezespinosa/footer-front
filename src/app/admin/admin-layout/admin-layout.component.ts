@@ -11,7 +11,7 @@ import { EditProductModalComponent } from "../components/edit-product-modal/edit
 import { DeleteProductModalComponent } from "../components/delete-product-modal/delete-product-modal.component";
 import { OrderDetailsModalComponent } from "../components/order-details-modal/order-details-modal.component";
 import { StatusUpdateModalComponent } from "../components/status-update-modal/status-update-modal.component";
-import { DeleteUserModalComponent } from "../components/delete-user-modal/delete-user-modal.component"; // 1. Importar
+import { DeleteUserModalComponent } from "../components/delete-user-modal/delete-user-modal.component";
 
 @Component({
   selector: "app-admin-layout",
@@ -24,7 +24,7 @@ import { DeleteUserModalComponent } from "../components/delete-user-modal/delete
     DeleteProductModalComponent,
     OrderDetailsModalComponent,
     StatusUpdateModalComponent,
-    DeleteUserModalComponent, // 2. Añadir a imports
+    DeleteUserModalComponent,
   ],
   templateUrl: "./admin-layout.component.html",
 })
@@ -32,10 +32,13 @@ export class AdminLayoutComponent {
   user$: Observable<User | null>;
   isProductModalOpen$: Observable<boolean>;
   isEditModalOpen$: Observable<boolean>;
-  isDeleteModalOpen$: Observable<boolean>; // (este es para productos)
+  isDeleteModalOpen$: Observable<boolean>;
   isOrderDetailsModalOpen$: Observable<boolean>;
   isStatusUpdateModalOpen$: Observable<boolean>;
-  isDeleteUserModalOpen$: Observable<boolean>; // 3. Añadir observable
+  isDeleteUserModalOpen$: Observable<boolean>;
+
+  // Esta propiedad controla el menú móvil
+  isSidebarOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -48,11 +51,16 @@ export class AdminLayoutComponent {
     this.isDeleteModalOpen$ = this.modalService.isDeleteModalOpen$;
     this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$;
     this.isStatusUpdateModalOpen$ = this.modalService.isStatusUpdateModalOpen$;
-    this.isDeleteUserModalOpen$ = this.modalService.isDeleteUserModalOpen$; // 4. Asignar observable
+    this.isDeleteUserModalOpen$ = this.modalService.isDeleteUserModalOpen$;
   }
 
   logout(): void {
     this.authService.logout();
     this.router.navigate(["/login"]);
+  }
+
+  // Este método controla el menú móvil
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 }
