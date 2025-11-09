@@ -1,4 +1,6 @@
+<!-- src/app/admin/pages/admin-users/admin-users.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
+  <!-- Cabecera -->
   <div class="flex flex-col gap-1">
     <p
       class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
@@ -6,9 +8,126 @@
       Gestión de Usuarios
     </p>
   </div>
-  <div
-    class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
-  >
-    <p class="p-6 text-text-light-secondary">Tabla de usuarios irá aquí...</p>
+
+  <!-- Contenedor de la tabla -->
+  <div *ngIf="!isLoading; else loading" class="flex flex-col gap-4">
+    <div
+      class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
+    >
+      <table class="w-full text-left min-w-[800px]">
+        <!-- Encabezados -->
+        <thead class="border-b border-border-light dark:border-border-dark">
+          <tr>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Avatar
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Usuario
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Rol
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Miembro desde
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <!-- Cuerpo de la Tabla -->
+        <tbody *ngIf="users$ | async as users">
+          <!-- Estado vacío -->
+          <tr *ngIf="users.length === 0">
+            <td
+              colspan="5"
+              class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              No se encontraron usuarios.
+            </td>
+          </tr>
+          <!-- Fila por cada usuario -->
+          <tr
+            *ngFor="let user of users"
+            class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
+          >
+            <!-- Avatar -->
+            <td class="p-4">
+              <img
+                [src]="
+                  user.avatarUrl ||
+                  'https://placehold.co/40x40/f97306/FFFFFF?text=' +
+                    (user.username ? user.username.charAt(0) : 'U')
+                "
+                alt="Avatar de {{ user.username }}"
+                class="w-10 h-10 object-cover rounded-full border-2 border-primary/50"
+              />
+            </td>
+
+            <!-- Usuario (Nombre y Email) -->
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary"
+            >
+              <p class="font-medium">{{ user.username }}</p>
+              <p class="text-xs text-text-light-secondary">
+                {{ user.email }}
+              </p>
+            </td>
+
+            <!-- Rol -->
+            <td class="p-4 text-sm">
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full capitalize"
+                [ngClass]="{
+                  'bg-primary/20 text-primary dark:bg-primary/30 dark:text-orange-300':
+                    user.role === 'admin',
+                  'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200':
+                    user.role === 'client'
+                }"
+              >
+                {{ user.role | titlecase }}
+              </span>
+            </td>
+
+            <!-- Fecha de Creación -->
+            <td
+              class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              {{ user.created_at | date : "dd/MM/yyyy" }}
+            </td>
+
+            <!-- Acciones -->
+            <td class="p-4">
+              <button
+                (click)="onDeleteUser(user.id, user.username)"
+                [disabled]="user.id === currentAdminId"
+                class="text-sm font-medium text-red-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<!-- Estado de Carga -->
+<ng-template #loading>
+  <div class="w-full text-center p-10">
+    <p class="text-text-light-secondary dark:text-text-dark-secondary">
+      Cargando usuarios...
+    </p>
+  </div>
+</ng-template>

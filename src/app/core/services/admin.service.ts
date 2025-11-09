@@ -70,12 +70,16 @@ export class AdminService {
     return this.http.get<FullAdminOrder>(`${this.apiUrl}/orders/${id}`);
   }
 
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Actualiza el estado de un pedido.
-   * PUT /api/admin/orders/:id/status
-   */
   updateOrderStatus(id: number, status: string): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/orders/${id}/status`, { status });
+  }
+
+  // --- ¡NUEVO MÉTODO AÑADIDO! ---
+  /**
+   * Elimina un usuario por su ID.
+   * DELETE /api/admin/users/:id
+   */
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/users/${id}`);
   }
 }
