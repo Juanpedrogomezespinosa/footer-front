@@ -55,16 +55,24 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // --- ¡LÓGICA DE CARGA MODIFICADA! ---
     this.route.paramMap.subscribe((params) => {
       const productIdParam = params.get("id");
       const productId = Number(productIdParam);
 
-      // Resetear estado y subir
-      this.isLoading.set(true);
-      this.product.set(null);
-      this.selectedSize.set(""); // Resetear talla
-      this.availableSizes.set([]); // Resetear tallas
-      window.scrollTo(0, 0);
+      // 1. Comprobar si ya tenemos un producto cargado (es un cambio de variante)
+      const isVariantSwitch = this.product() !== null;
+
+      if (!isVariantSwitch) {
+        // --- Carga COMPLETA (primera vez que entras) ---
+        this.isLoading.set(true);
+        this.product.set(null);
+        window.scrollTo(0, 0); // Solo hacemos scroll al inicio aquí
+      } else {
+        // --- Carga SUAVE (cambiando de color) ---
+        // No ocultamos la página, solo reseteamos la talla seleccionada
+        this.selectedSize.set("");
+      }
 
       if (isNaN(productId)) {
         this.error.set("ID de producto inválido.");
@@ -72,6 +80,8 @@ export class ProductDetailComponent implements OnInit {
         return;
       }
 
+      // 2. Llamar a loadProduct en ambos casos.
+      // La señal 'product' se actualizará y la vista cambiará mágicamente.
       this.loadProduct(productId);
     });
   }
@@ -80,14 +90,11 @@ export class ProductDetailComponent implements OnInit {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct) => {
         if (foundProduct) {
-          // --- LÓGICA DE TALLAS ---
-          // Procesamos el string de tallas (ej: "36, 37, 38")
           let processedSizes: string[] = [];
           if (foundProduct.size && foundProduct.size.trim() !== "") {
             processedSizes = foundProduct.size.split(",").map((s) => s.trim());
           }
           this.availableSizes.set(processedSizes);
-          // ---------------------------
 
           const productData: ProductDetail = {
             ...foundProduct,
@@ -105,18 +112,19 @@ export class ProductDetailComponent implements OnInit {
                 ? Number(foundProduct.price) + 30
                 : undefined,
             color: foundProduct.color,
-            material: foundProduct.material, // <-- Esta línea ya no dará error
+            material: foundProduct.material,
             gender: foundProduct.gender,
           };
           this.product.set(productData);
 
+          // Si es un cambio de variante, actualizamos la imagen principal
           if (productData.images.length > 0) {
             this.selectedImageUrl.set(productData.images[0].imageUrl);
           }
         } else {
           this.error.set("Producto no encontrado.");
         }
-        this.isLoading.set(false);
+        this.isLoading.set(false); // Ponemos isLoading(false) en ambos casos
       },
       error: (err: HttpErrorResponse) => {
         console.error("Error al cargar el producto:", err);
@@ -156,7 +164,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart(): void {
-    // Comprobación de Talla
     if (this.availableSizes().length > 0 && !this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
@@ -178,7 +185,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   buyNow(): void {
-    // Comprobación de Talla
     if (this.availableSizes().length > 0 && !this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
