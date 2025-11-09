@@ -1,4 +1,6 @@
+<!-- src/app/admin/pages/admin-orders/admin-orders.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
+  <!-- Cabecera -->
   <div class="flex flex-col gap-1">
     <p
       class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
@@ -6,9 +8,187 @@
       Gestión de Pedidos
     </p>
   </div>
+
+  <!-- Contenedor de la tabla y paginación -->
   <div
-    class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
+    *ngIf="ordersResponse && !isLoading; else loading"
+    class="flex flex-col gap-4"
   >
-    <p class="p-6 text-text-light-secondary">Tabla de pedidos irá aquí...</p>
+    <!-- Tabla de Pedidos -->
+    <div
+      class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
+    >
+      <table class="w-full text-left min-w-[1000px]">
+        <!-- Encabezados -->
+        <thead class="border-b border-border-light dark:border-border-dark">
+          <tr>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              ID Pedido
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Cliente
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Fecha
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Dirección
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Total
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Estado
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <!-- Cuerpo de la Tabla -->
+        <tbody>
+          <!-- Estado vacío -->
+          <tr *ngIf="ordersResponse.orders.length === 0">
+            <td
+              colspan="7"
+              class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              No se encontraron pedidos.
+            </td>
+          </tr>
+          <!-- Fila por cada pedido -->
+          <tr
+            *ngFor="let order of ordersResponse.orders"
+            class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
+          >
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              #{{ order.id }}
+            </td>
+
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary"
+            >
+              <p class="font-medium">{{ order.User.username }}</p>
+              <p class="text-xs text-text-light-secondary">
+                {{ order.User.email }}
+              </p>
+            </td>
+
+            <td
+              class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              {{ order.createdAt | date : "dd/MM/yyyy HH:mm" }}
+            </td>
+
+            <td
+              class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary"
+            >
+              <p
+                *ngIf="order.Address; else noAddress"
+                class="truncate max-w-xs"
+              >
+                {{ order.Address.street }}, {{ order.Address.city }}
+              </p>
+              <ng-template #noAddress>
+                <span class="text-red-500">Sin dirección</span>
+              </ng-template>
+            </td>
+
+            <td
+              class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
+            >
+              {{ order.total | number : "1.2-2" }}€
+            </td>
+
+            <td class="p-4 text-sm">
+              <span
+                class="px-2 py-1 text-xs font-semibold rounded-full capitalize"
+                [ngClass]="{
+                  'bg-green-100 text-green-800':
+                    order.status === 'pagado' || order.status === 'entregado',
+                  'bg-blue-100 text-blue-800': order.status === 'enviado',
+                  'bg-yellow-100 text-yellow-800': order.status === 'pendiente',
+                  'bg-red-100 text-red-800': order.status === 'cancelado'
+                }"
+              >
+                {{ order.status }}
+              </span>
+            </td>
+
+            <td class="p-4">
+              <div class="flex gap-3">
+                <button
+                  (click)="openOrderDetailsModal(order.id)"
+                  class="text-primary hover:underline text-sm font-medium"
+                >
+                  Ver Detalles
+                </button>
+                <button
+                  (click)="openChangeStatusModal(order.id, order.status)"
+                  class="text-secondary hover:underline text-sm font-medium"
+                >
+                  Cambiar Estado
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div
+      *ngIf="ordersResponse.totalPages > 1"
+      class="flex items-center justify-between p-4"
+    >
+      <span
+        class="text-sm text-text-light-secondary dark:text-text-dark-secondary"
+      >
+        Página {{ ordersResponse.currentPage }} de
+        {{ ordersResponse.totalPages }}
+      </span>
+      <div class="flex gap-2">
+        <button
+          (click)="onPrevPage()"
+          [disabled]="!ordersResponse.prevPage"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Anterior
+        </button>
+        <button
+          (click)="onNextPage()"
+          [disabled]="!ordersResponse.nextPage"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Estado de Carga -->
+<ng-template #loading>
+  <div class="w-full text-center p-10">
+    <p class="text-text-light-secondary dark:text-text-dark-secondary">
+      Cargando pedidos...
+    </p>
+    <!-- Aquí podrías poner un spinner -->
+  </div>
+</ng-template>
