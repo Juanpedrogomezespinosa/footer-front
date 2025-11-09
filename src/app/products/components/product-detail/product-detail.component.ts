@@ -1,31 +1,36 @@
+// src/app/products/components/product-detail/product-detail.component.ts
 import { Component, OnInit, signal } from "@angular/core";
-import { ActivatedRoute, Router, RouterModule } from "@angular/router"; // <-- 1. IMPORTAR RouterModule
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
-// --- 2. IMPORTAR 'ProductImage' DESDE EL SERVICIO ---
 import {
   ProductService,
   Product,
   ProductImage,
+  ProductVariant,
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
 
-// --- 3. IMPORTAR EL NUEVO COMPONENTE ---
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
+
+// Definir la interfaz completa para la señal
+type ProductDetail = Product & {
+  images: ProductImage[];
+  variants: ProductVariant[];
+};
 
 @Component({
   selector: "app-product-detail",
   standalone: true,
-  // --- 4. AÑADIR 'RouterModule' y 'RelatedProductsComponent' A LOS IMPORTS ---
   imports: [CommonModule, FormsModule, RouterModule, RelatedProductsComponent],
   templateUrl: "./product-detail.component.html",
   styleUrls: [],
 })
 export class ProductDetailComponent implements OnInit {
   // Señales de estado
-  product = signal<(Product & { images: ProductImage[] }) | null>(null);
+  product = signal<ProductDetail | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
@@ -35,18 +40,9 @@ export class ProductDetailComponent implements OnInit {
   quantity = signal(1);
   activeTab = signal("description");
 
-  // Datos y utilidades
-  availableSizes: string[] = [
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-  ];
+  // Esta señal ahora se rellenará dinámicamente
+  availableSizes = signal<string[]>([]);
+
   backendUrl = "http://localhost:3000";
   defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=Footer";
 
@@ -59,8 +55,6 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // --- 5. LÓGICA DE 'SCROLL AL INICIO' ---
-    // (Usamos 'paramMap' para detectar cambios de ID y subir)
     this.route.paramMap.subscribe((params) => {
       const productIdParam = params.get("id");
       const productId = Number(productIdParam);
@@ -68,7 +62,9 @@ export class ProductDetailComponent implements OnInit {
       // Resetear estado y subir
       this.isLoading.set(true);
       this.product.set(null);
-      window.scrollTo(0, 0); // <-- Scroll al inicio
+      this.selectedSize.set(""); // Resetear talla
+      this.availableSizes.set([]); // Resetear tallas
+      window.scrollTo(0, 0);
 
       if (isNaN(productId)) {
         this.error.set("ID de producto inválido.");
@@ -82,10 +78,18 @@ export class ProductDetailComponent implements OnInit {
 
   loadProduct(productId: number): void {
     this.productService.getProductById(productId).subscribe({
-      next: (foundProduct: any) => {
+      next: (foundProduct) => {
         if (foundProduct) {
-          // --- 6. MAPEADO COMPLETO (con campos de specs) ---
-          const productData = {
+          // --- LÓGICA DE TALLAS ---
+          // Procesamos el string de tallas (ej: "36, 37, 38")
+          let processedSizes: string[] = [];
+          if (foundProduct.size && foundProduct.size.trim() !== "") {
+            processedSizes = foundProduct.size.split(",").map((s) => s.trim());
+          }
+          this.availableSizes.set(processedSizes);
+          // ---------------------------
+
+          const productData: ProductDetail = {
             ...foundProduct,
             price: Number(foundProduct.price),
             rating: foundProduct.averageRating,
@@ -93,12 +97,15 @@ export class ProductDetailComponent implements OnInit {
             images: Array.isArray(foundProduct.images)
               ? foundProduct.images
               : [],
+            variants: Array.isArray(foundProduct.variants)
+              ? foundProduct.variants
+              : [],
             oldPrice:
               Number(foundProduct.price) < 150
                 ? Number(foundProduct.price) + 30
                 : undefined,
             color: foundProduct.color,
-            material: foundProduct.material,
+            material: foundProduct.material, // <-- Esta línea ya no dará error
             gender: foundProduct.gender,
           };
           this.product.set(productData);
@@ -149,7 +156,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart(): void {
-    if (!this.selectedSize()) {
+    // Comprobación de Talla
+    if (this.availableSizes().length > 0 && !this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
     }
@@ -170,7 +178,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   buyNow(): void {
-    if (!this.selectedSize()) {
+    // Comprobación de Talla
+    if (this.availableSizes().length > 0 && !this.selectedSize()) {
       this.toastService.showError("Por favor, selecciona una talla.");
       return;
     }

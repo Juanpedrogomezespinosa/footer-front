@@ -1,10 +1,19 @@
+// src/app/core/services/product.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 
 /**
+ * Interfaz para las variantes de producto (los "hermanos")
+ */
+export interface ProductVariant {
+  id: number;
+  color: string;
+  image: string | null; // La imagen principal de la variante
+}
+
+/**
  * Interfaz para los productos recibidos desde la API.
- * (Sin cambios)
  */
 export interface ProductApiResponse {
   id: number;
@@ -21,6 +30,9 @@ export interface ProductApiResponse {
   category: "zapatillas" | "ropa" | "complementos";
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
+  material?: string | null; // <-- ¡LÍNEA IMPORTANTE!
+  images?: ProductImage[];
+  variants?: ProductVariant[];
 }
 
 /**
@@ -34,7 +46,6 @@ export interface ProductImage {
 
 /**
  * Interfaz de producto para uso interno del frontend.
- * (Completa)
  */
 export interface Product {
   id: number;
@@ -49,13 +60,14 @@ export interface Product {
   brand?: string;
   oldPrice?: number;
   color?: string;
-  material?: string;
+  material?: string | null; // <-- ¡LÍNEA IMPORTANTE!
   gender?: "hombre" | "mujer" | "unisex";
+  images: ProductImage[];
+  variants: ProductVariant[];
 }
 
 /**
  * Estructura de la respuesta paginada desde el backend.
- * (Sin cambios)
  */
 export interface PaginatedProductResponse {
   currentPage: number;
@@ -76,7 +88,6 @@ export class ProductService {
 
   /**
    * Obtiene productos desde la API...
-   * (Sin cambios)
    */
   getProducts(
     page: number,
@@ -123,7 +134,6 @@ export class ProductService {
 
   /**
    * Obtiene un producto específico por su ID.
-   * (Sin cambios)
    */
   getProductById(productId: number): Observable<ProductApiResponse> {
     return this.httpClient.get<ProductApiResponse>(
@@ -132,9 +142,7 @@ export class ProductService {
   }
 
   /**
-   * --- ¡NUEVO MÉTODO AÑADIDO! ---
    * Obtiene los productos relacionados para "Completa tu look"
-   * Llama a GET /api/products/:id/related
    */
   getRelatedProducts(productId: number): Observable<Product[]> {
     return this.httpClient.get<Product[]>(

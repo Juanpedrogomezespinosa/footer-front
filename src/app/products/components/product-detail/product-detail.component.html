@@ -1,3 +1,4 @@
+<!-- src/app/products/components/product-detail/product-detail.component.html -->
 <main
   class="max-w-7xl mx-auto px-4 py-8 sm:py-12"
   *ngIf="!isLoading() && product() as prod; else loadingOrError"
@@ -37,7 +38,6 @@
   >
     <!-- Columna de Galería -->
     <div class="w-full min-w-0">
-      <!-- FIX: min-w-0 evita que el contenido rompa los márgenes -->
       <div class="flex flex-col gap-4 sticky top-28 w-full">
         <!-- Imagen Principal -->
         <div
@@ -147,8 +147,35 @@
         </div>
       </div>
 
-      <!-- Selector de Talla -->
-      <div>
+      <!-- 
+        --- ¡NUEVA SECCIÓN DE VARIANTES (HERMANOS)! ---
+      -->
+      <div *ngIf="prod.variants.length > 0">
+        <label class="block text-gray-800 font-medium mb-2">
+          Otros Colores:
+        </label>
+        <div class="flex flex-wrap gap-3">
+          <!-- Bucle sobre las variantes -->
+          <a
+            *ngFor="let variant of prod.variants"
+            [routerLink]="['/products', 'product', variant.id]"
+            class="block w-14 h-14 rounded-lg border-2 border-transparent hover:border-primary p-0.5 transition-all"
+            [title]="variant.color | titlecase"
+          >
+            <img
+              [src]="backendUrl + (variant.image || defaultImage)"
+              alt="Variante color {{ variant.color }}"
+              class="w-full h-full object-cover rounded-md"
+            />
+          </a>
+        </div>
+      </div>
+      <!-- --- FIN DE LA SECCIÓN DE VARIANTES --- -->
+
+      <!-- 
+        --- ¡SELECTOR DE TALLA MODIFICADO! ---
+      -->
+      <div *ngIf="availableSizes().length > 0">
         <div class="flex justify-between items-center mb-2">
           <label class="block text-gray-800 font-medium">
             Selecciona tu talla:
@@ -161,8 +188,9 @@
           </a>
         </div>
         <div class="flex flex-wrap gap-3">
+          <!-- Ahora usa la señal 'availableSizes()' -->
           <button
-            *ngFor="let size of availableSizes"
+            *ngFor="let size of availableSizes()"
             (click)="selectSize(size)"
             type="button"
             class="h-10 px-4 rounded-lg border text-sm font-medium transition-colors"
@@ -177,6 +205,7 @@
           </button>
         </div>
       </div>
+      <!-- --- FIN DE TALLAS --- -->
 
       <!-- Selector de Cantidad -->
       <div>
@@ -206,14 +235,14 @@
         <button
           class="flex-1 bg-secondary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:bg-secondary-light disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="buyNow()"
-          [disabled]="!selectedSize()"
+          [disabled]="availableSizes().length > 0 && !selectedSize()"
         >
           Comprar ahora
         </button>
         <button
           class="flex-1 py-3 px-8 rounded-xl font-medium text-lg text-primary bg-secondary/10 hover:bg-secondary/20 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="addToCart()"
-          [disabled]="!selectedSize()"
+          [disabled]="availableSizes().length > 0 && !selectedSize()"
         >
           Añadir a la cesta
         </button>
