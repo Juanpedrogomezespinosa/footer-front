@@ -1,9 +1,7 @@
-<!-- src/app/products/components/product-detail/product-detail.component.html -->
 <main
   class="max-w-7xl mx-auto px-4 py-8 sm:py-12"
   *ngIf="!isLoading() && product() as prod; else loadingOrError"
 >
-  <!-- 1. Breadcrumbs -->
   <nav class="text-sm mb-4" aria-label="Breadcrumb">
     <ol class="flex items-center gap-2 text-text-light-secondary">
       <li>
@@ -31,15 +29,12 @@
     </ol>
   </nav>
 
-  <!-- 2. Contenedor Principal -->
   <div
     class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start"
     style="overflow: hidden"
   >
-    <!-- Columna de Galería -->
     <div class="w-full min-w-0">
       <div class="flex flex-col gap-4 sticky top-28 w-full">
-        <!-- Imagen Principal -->
         <div
           class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm"
         >
@@ -51,7 +46,6 @@
           />
         </div>
 
-        <!-- Miniaturas -->
         <div class="grid grid-cols-5 gap-3">
           <button
             *ngFor="let image of prod.images"
@@ -62,7 +56,7 @@
             [ngClass]="{
               'border-primary  opacity-100':
                 selectedImageUrl() === image.imageUrl,
-              'border-secondary opacity-70':
+              'border-gray-200 opacity-70':
                 selectedImageUrl() !== image.imageUrl
             }"
             [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
@@ -81,9 +75,7 @@
       </div>
     </div>
 
-    <!-- Columna de Información -->
     <div class="flex flex-col gap-6 min-w-0">
-      <!-- Marca y Nombre -->
       <div>
         <p
           *ngIf="prod.brand"
@@ -95,7 +87,6 @@
           {{ prod.name }}
         </h1>
 
-        <!-- Valoraciones -->
         <div
           class="flex items-center gap-2 mt-3"
           *ngIf="prod.ratingCount && prod.ratingCount > 0"
@@ -133,7 +124,6 @@
           </span>
         </div>
 
-        <!-- Precio -->
         <div class="flex items-center gap-4 mt-3">
           <p class="text-3xl font-bold text-primary">
             {{ prod.price | currency : "EUR" : "symbol" : "1.2-2" }}
@@ -147,34 +137,36 @@
         </div>
       </div>
 
-      <!-- 
-        --- ¡NUEVA SECCIÓN DE VARIANTES (HERMANOS)! ---
-      -->
-      <div *ngIf="prod.variants.length > 0">
+      <div *ngIf="siblings().length > 0">
         <label class="block text-gray-800 font-medium mb-2">
           Otros Colores:
+          <span class="text-gray-600 capitalize">{{ prod.color }}</span>
         </label>
         <div class="flex flex-wrap gap-3">
-          <!-- Bucle sobre las variantes -->
-          <a
-            *ngFor="let variant of prod.variants"
-            [routerLink]="['/products', 'product', variant.id]"
-            class="block w-14 h-14 rounded-lg border-2 border-transparent hover:border-primary p-0.5 transition-all"
-            [title]="variant.color | titlecase"
+          <button
+            class="block w-14 h-14 rounded-lg border-2 border-primary p-0.5"
+            [title]="prod.color | titlecase"
           >
             <img
-              [src]="backendUrl + (variant.image || defaultImage)"
-              alt="Variante color {{ variant.color }}"
+              [src]="getProductImage()"
+              alt="Variante color {{ prod.color }}"
+              class="w-full h-full object-cover rounded-md"
+            />
+          </button>
+          <a
+            *ngFor="let sibling of siblings()"
+            [routerLink]="['/products', 'product', sibling.id]"
+            class="block w-14 h-14 rounded-lg border-2 border-gray-200 hover:border-primary p-0.5 transition-all"
+            [title]="sibling.color | titlecase"
+          >
+            <img
+              [src]="backendUrl + (sibling.image || defaultImage)"
+              alt="Variante color {{ sibling.color }}"
               class="w-full h-full object-cover rounded-md"
             />
           </a>
         </div>
       </div>
-      <!-- --- FIN DE LA SECCIÓN DE VARIANTES --- -->
-
-      <!-- 
-        --- ¡SELECTOR DE TALLA MODIFICADO! ---
-      -->
       <div *ngIf="availableSizes().length > 0">
         <div class="flex justify-between items-center mb-2">
           <label class="block text-gray-800 font-medium">
@@ -188,7 +180,6 @@
           </a>
         </div>
         <div class="flex flex-wrap gap-3">
-          <!-- Ahora usa la señal 'availableSizes()' -->
           <button
             *ngFor="let size of availableSizes()"
             (click)="selectSize(size)"
@@ -205,9 +196,6 @@
           </button>
         </div>
       </div>
-      <!-- --- FIN DE TALLAS --- -->
-
-      <!-- Selector de Cantidad -->
       <div>
         <label class="block text-gray-800 font-medium mb-2"> Cantidad: </label>
         <div class="flex items-center border border-gray-300 rounded-lg w-fit">
@@ -230,7 +218,6 @@
         </div>
       </div>
 
-      <!-- Botones de acción -->
       <div class="flex flex-col sm:flex-row gap-4 mt-2">
         <button
           class="flex-1 bg-secondary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:bg-secondary-light disabled:opacity-50 disabled:cursor-not-allowed"
@@ -250,7 +237,6 @@
     </div>
   </div>
 
-  <!-- 3. Pestañas de Información -->
   <div class="mt-16">
     <div class="border-b border-gray-200">
       <nav class="flex -mb-px gap-6">
@@ -322,7 +308,6 @@
     </div>
   </div>
 
-  <!-- Sección de Productos Relacionados -->
   <div class="mt-16">
     <app-related-products
       *ngIf="prod"
@@ -331,7 +316,6 @@
   </div>
 </main>
 
-<!-- Estado de carga o error -->
 <ng-template #loadingOrError>
   <main class="max-w-4xl mx-auto px-4 py-24 text-center">
     <div *ngIf="isLoading()" class="animate-pulse text-lg text-gray-500">

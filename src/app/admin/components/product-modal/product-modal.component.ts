@@ -6,6 +6,7 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  FormArray, // <-- ¡IMPORTAR FORM ARRAY!
 } from "@angular/forms";
 import { ModalService } from "../../../core/services/modal.service";
 import { AdminService } from "../../../core/services/admin.service";
@@ -19,8 +20,8 @@ import { ToastService } from "../../../core/services/toast.service";
 })
 export class ProductModalComponent implements OnInit {
   productForm: FormGroup;
-  selectedFile: File | null = null;
-  fileName: string = "Ningún archivo seleccionado";
+  selectedFiles: File[] = []; // <-- ¡CAMBIO A PLURAL!
+  fileNames: string[] = []; // <-- ¡CAMBIO A PLURAL!
 
   constructor(
     private fb: FormBuilder,
@@ -32,33 +33,67 @@ export class ProductModalComponent implements OnInit {
       name: ["", Validators.required],
       description: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      stock: [0, [Validators.required, Validators.min(0)]], // <-- ¡CAMBIO AÑADIDO!
-      size: ["", Validators.required],
-      color: ["", Validators.required],
+      // --- CAMPOS ELIMINADOS ---
+      // stock: [0, [Validators.required, Validators.min(0)]],
+      // size: ["", Validators.required],
+      // color: ["", Validators.required],
+      // -------------------------
       brand: ["", Validators.required],
       category: ["", Validators.required], // zapatillas, ropa, complementos
       gender: ["", Validators.required], // unisex, hombre, mujer
       material: [""],
       season: [""], // invierno, verano
       is_new: [true],
-      image: [null, Validators.required], // Para el control del formulario
+      images: [null, Validators.required], // Cambiado de 'image' a 'images'
+      // --- ¡¡¡CAMPO AÑADIDO!!! ---
+      variants: this.fb.array([this.createVariantGroup()], Validators.required),
     });
   }
 
   ngOnInit(): void {}
 
+  // --- ¡NUEVO! Helper para crear un grupo de variante ---
+  createVariantGroup(): FormGroup {
+    return this.fb.group({
+      color: ["", Validators.required],
+      size: ["", Validators.required], // Ej: "36", "S", "Única"
+      stock: [0, [Validators.required, Validators.min(0)]],
+    });
+  }
+
+  // --- ¡NUEVO! Getter para acceder fácil al FormArray desde el HTML ---
+  get variantsArray(): FormArray {
+    return this.productForm.get("variants") as FormArray;
+  }
+
+  // --- ¡NUEVO! Método para añadir una nueva variante vacía ---
+  addVariant(): void {
+    this.variantsArray.push(this.createVariantGroup());
+  }
+
+  // --- ¡NUEVO! Método para eliminar una variante ---
+  removeVariant(index: number): void {
+    if (this.variantsArray.length > 1) {
+      this.variantsArray.removeAt(index);
+    } else {
+      this.toast.showError("Debe haber al menos una variante.");
+    }
+  }
+  // --- FIN DE NUEVOS MÉTODOS ---
+
   onFileChange(event: Event): void {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
+
     if (fileList && fileList.length > 0) {
-      this.selectedFile = fileList[0];
-      this.fileName = this.selectedFile.name;
-      // Validamos el formulario
-      this.productForm.patchValue({ image: this.selectedFile });
+      // Permitimos múltiples archivos
+      this.selectedFiles = Array.from(fileList);
+      this.fileNames = this.selectedFiles.map((f) => f.name);
+      this.productForm.patchValue({ images: this.selectedFiles });
     } else {
-      this.selectedFile = null;
-      this.fileName = "Ningún archivo seleccionado";
-      this.productForm.patchValue({ image: null });
+      this.selectedFiles = [];
+      this.fileNames = [];
+      this.productForm.patchValue({ images: null });
     }
   }
 
@@ -66,28 +101,46 @@ export class ProductModalComponent implements OnInit {
     if (this.productForm.invalid) {
       this.toast.showError("Por favor, completa todos los campos requeridos.");
       this.productForm.markAllAsTouched();
+      // Log para debug
+      console.log("Formulario inválido:", this.productForm.value);
+      Object.keys(this.productForm.controls).forEach((key) => {
+        const controlErrors = this.productForm.get(key)?.errors;
+        if (controlErrors) {
+          console.log("Control con error:", key, controlErrors);
+        }
+      });
       return;
     }
 
-    if (!this.selectedFile) {
+    if (this.selectedFiles.length === 0) {
       this.toast.showError(
-        "Por favor, selecciona una imagen para el producto."
+        "Por favor, selecciona al menos una imagen para el producto."
       );
       return;
     }
 
-    // Usamos FormData para enviar la imagen
     const formData = new FormData();
 
-    // Añadimos todos los campos del formulario al FormData
+    // Añadimos los campos del producto padre
     Object.keys(this.productForm.value).forEach((key) => {
-      if (key !== "image") {
+      // No añadimos 'images' (archivos) ni 'variants' (array) directamente
+      if (key !== "images" && key !== "variants") {
         formData.append(key, this.productForm.value[key]);
       }
     });
 
-    // Tu backend espera 'images' (plural) según 'productRoutes.js'
-    formData.append("images", this.selectedFile, this.selectedFile.name);
+    // --- ¡CAMBIO IMPORTANTE! ---
+    // Añadimos el array de variantes como un string JSON
+    formData.append(
+      "variants",
+      JSON.stringify(this.productForm.value.variants)
+    );
+    // ----------------------------
+
+    // Añadimos todas las imágenes seleccionadas
+    this.selectedFiles.forEach((file) => {
+      formData.append("images", file, file.name); // El backend espera 'images'
+    });
 
     this.adminService.createProduct(formData).subscribe({
       next: (response) => {
@@ -105,9 +158,15 @@ export class ProductModalComponent implements OnInit {
 
   close(): void {
     this.modalService.closeProductModal();
-    // ¡CAMBIO AÑADIDO! Reseteamos 'stock' a 0 también
-    this.productForm.reset({ is_new: true, price: 0, stock: 0 });
-    this.selectedFile = null;
-    this.fileName = "Ningún archivo seleccionado";
+    this.productForm.reset({
+      is_new: true,
+      price: 0,
+    });
+    // Reseteamos el FormArray
+    this.variantsArray.clear();
+    this.variantsArray.push(this.createVariantGroup());
+
+    this.selectedFiles = [];
+    this.fileNames = [];
   }
 }

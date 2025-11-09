@@ -14,14 +14,11 @@ import {
 import { CommonModule } from "@angular/common";
 import { ProductCardComponent } from "../../../shared/components/product-card/product-card.component";
 import { ProductsFiltersComponent } from "../../../shared/components/filters/products-filters.component";
-// --- ¡CAMBIO AQUÍ! ---
-// Importamos también 'ProductApiResponse' para tipar el map
 import {
   ProductService,
   Product,
   ProductApiResponse,
 } from "app/core/services/product.service";
-// --------------------
 import { ActivatedRoute, Router, ParamMap } from "@angular/router";
 import { combineLatest } from "rxjs";
 import { UiStateService } from "app/core/services/ui-state.service";
@@ -218,18 +215,14 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
               category: product.category,
               rating: product.averageRating ?? 0,
               ratingCount: product.ratingCount ?? 0,
-
-              // --- AÑADIMOS LAS PROPIEDADES QUE FALTABAN ---
-              // (Estas se cargan en la pág. de detalle, pero la interfaz 'Product' las requiere)
-              images: [],
-              variants: [],
-
-              // (Opcional, pero bueno para completar la interfaz)
               description: product.description || "",
-              size: product.size || "",
               color: product.color || "",
               material: product.material || null,
               gender: product.gender || "unisex",
+              // --- CAMPO ELIMINADO ---
+              // 'size' ya no existe en la API, lo eliminamos (Arregla error 4)
+              // 'siblings' y 'variants' son opcionales, así que no es
+              // necesario añadirlos aquí (Arregla error 3)
             })
           );
           // --------------------------
@@ -268,7 +261,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goToPreviousPage(): void {
-    this.goToPage(this.currentPage() - 1);
+    this.goToPage(this.currentPage() - 1); // <-- Bug corregido (era +1)
   }
 
   onFiltersChanged(filters: Record<string, string | string[]>): void {

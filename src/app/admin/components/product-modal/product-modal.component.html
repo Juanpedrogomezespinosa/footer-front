@@ -24,223 +24,249 @@
       </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-6">
-      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <form
+      [formGroup]="productForm"
+      (ngSubmit)="onSubmit()"
+      class="flex-1 overflow-y-auto p-6 space-y-4"
+    >
+      <div>
+        <label
+          for="name"
+          class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+          >Nombre del Producto</label
+        >
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+          required
+        />
+      </div>
+
+      <div>
+        <label
+          for="description"
+          class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+          >Descripción</label
+        >
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+          required
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label
-            for="name"
+            for="price"
             class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-            >Nombre del Producto</label
+            >Precio (€)</label
+          >
+          <input
+            type="number"
+            id="price"
+            formControlName="price"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            for="brand"
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Marca</label
           >
           <input
             type="text"
-            id="name"
-            formControlName="name"
+            id="brand"
+            formControlName="brand"
             class="w-full p-2 border border-border-light rounded-lg bg-background-light"
             required
           />
         </div>
-
         <div>
           <label
-            for="description"
+            for="category"
             class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-            >Descripción</label
+            >Categoría</label
           >
-          <textarea
-            id="description"
-            formControlName="description"
-            rows="3"
+          <select
+            id="category"
+            formControlName="category"
             class="w-full p-2 border border-border-light rounded-lg bg-background-light"
             required
-          ></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label
-              for="price"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Precio (€)</label
-            >
-            <input
-              type="number"
-              id="price"
-              formControlName="price"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              step="0.01"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              for="stock"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Stock (Cantidad)</label
-            >
-            <input
-              type="number"
-              id="stock"
-              formControlName="stock"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              for="size"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Talla</label
-            >
-            <input
-              type="text"
-              id="size"
-              formControlName="size"
-              placeholder="Ej: 42, M, 9.5"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            />
-          </div>
-          <div>
-            <label
-              for="color"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Color</label
-            >
-            <input
-              type="text"
-              id="color"
-              formControlName="color"
-              placeholder="Ej: Rojo, Negro"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            />
-          </div>
-          <div>
-            <label
-              for="brand"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Marca</label
-            >
-            <input
-              type="text"
-              id="brand"
-              formControlName="brand"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            />
-          </div>
-          <div>
-            <label
-              for="category"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Categoría</label
-            >
-            <select
-              id="category"
-              formControlName="category"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            >
-              <option value="" disabled>Selecciona...</option>
-              <option value="zapatillas">Zapatillas</option>
-              <option value="ropa">Ropa</option>
-              <option value="complementos">Complementos</option>
-            </select>
-          </div>
-          <div>
-            <label
-              for="gender"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Género</label
-            >
-            <select
-              id="gender"
-              formControlName="gender"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              required
-            >
-              <option value="" disabled>Selecciona...</option>
-              <option value="unisex">Unisex</option>
-              <option value="hombre">Hombre</option>
-              <option value="mujer">Mujer</option>
-            </select>
-          </div>
-          <div>
-            <label
-              for="material"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Material (Opcional)</label
-            >
-            <input
-              type="text"
-              id="material"
-              formControlName="material"
-              placeholder="Ej: Cuero, Algodón"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-            />
-          </div>
-          <div>
-            <label
-              for="season"
-              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Temporada (Opcional)</label
-            >
-            <select
-              id="season"
-              formControlName="season"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-            >
-              <option value="">N/A</option>
-              <option value="invierno">Invierno</option>
-              <option value="verano">Verano</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="is_new"
-            formControlName="is_new"
-            class="h-4 w-4 rounded text-primary border-border-light focus:ring-primary"
-          />
-          <label
-            for="is_new"
-            class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
-            >Marcar como "Nuevo"</label
           >
+            <option value="" disabled>Selecciona...</option>
+            <option value="zapatillas">Zapatillas</option>
+            <option value="ropa">Ropa</option>
+            <option value="complementos">Complementos</option>
+          </select>
         </div>
-
         <div>
           <label
+            for="gender"
             class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-            >Imagen del Producto</label
+            >Género</label
           >
+          <select
+            id="gender"
+            formControlName="gender"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+            required
+          >
+            <option value="" disabled>Selecciona...</option>
+            <option value="unisex">Unisex</option>
+            <option value="hombre">Hombre</option>
+            <option value="mujer">Mujer</option>
+          </select>
+        </div>
+        <div>
           <label
-            for="image"
-            class="w-full flex items-center px-4 py-2 bg-background-light border-2 border-border-light border-dashed rounded-lg cursor-pointer hover:bg-gray-100"
+            for="material"
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Material (Opcional)</label
           >
-            <span class="material-symbols-outlined text-primary mr-2"
-              >upload_file</span
-            >
-            <span class="text-sm text-text-light-secondary">{{
-              fileName
-            }}</span>
-          </label>
           <input
-            type="file"
-            id="image"
-            (change)="onFileChange($event)"
-            class="hidden"
-            accept="image/png, image/jpeg, image/webp"
+            type="text"
+            id="material"
+            formControlName="material"
+            placeholder="Ej: Cuero, Algodón"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
           />
         </div>
-      </form>
-    </div>
+        <div>
+          <label
+            for="season"
+            class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+            >Temporada (Opcional)</label
+          >
+          <select
+            id="season"
+            formControlName="season"
+            class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+          >
+            <option value="">N/A</option>
+            <option value="invierno">Invierno</option>
+            <option value="verano">Verano</option>
+          </select>
+        </div>
+      </div>
 
+      <div class="space-y-3 pt-2">
+        <label
+          class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+        >
+          Variantes (Color, Talla y Stock)
+        </label>
+
+        <div formArrayName="variants" class="space-y-3">
+          <div
+            *ngFor="let variant of variantsArray.controls; let i = index"
+            [formGroupName]="i"
+            class="grid grid-cols-3 md:grid-cols-4 gap-2 items-center p-3 bg-gray-50 dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-lg"
+          >
+            <div class="col-span-3 md:col-span-1">
+              <label [for]="'color-' + i" class="sr-only">Color</label>
+              <input
+                type="text"
+                [id]="'color-' + i"
+                formControlName="color"
+                placeholder="Color (Ej: Rojo)"
+                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+              />
+            </div>
+
+            <div class="col-span-3 md:col-span-1">
+              <label [for]="'size-' + i" class="sr-only">Talla</label>
+              <input
+                type="text"
+                [id]="'size-' + i"
+                formControlName="size"
+                placeholder="Talla (Ej: 42, M, Única)"
+                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+              />
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+              <label [for]="'stock-' + i" class="sr-only">Stock</label>
+              <input
+                type="number"
+                [id]="'stock-' + i"
+                formControlName="stock"
+                placeholder="Stock"
+                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+              />
+            </div>
+
+            <div class="col-span-1 flex justify-end">
+              <button
+                type="button"
+                (click)="removeVariant(i)"
+                [disabled]="variantsArray.length <= 1"
+                class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded-full"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="addVariant()"
+          class="w-full px-4 py-2 text-sm font-medium text-primary border-2 border-dashed border-primary/50 rounded-lg hover:bg-primary/10 transition-colors"
+        >
+          Añadir otra variante (Talla/Color)
+        </button>
+      </div>
+      <div class="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="is_new"
+          formControlName="is_new"
+          class="h-4 w-4 rounded text-primary border-border-light focus:ring-primary"
+        />
+        <label
+          for="is_new"
+          class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+          >Marcar como "Nuevo"</label
+        >
+      </div>
+
+      <div>
+        <label
+          class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+          >Imágenes del Producto</label
+        >
+        <label
+          for="images"
+          class="w-full flex items-center px-4 py-2 bg-background-light border-2 border-border-light border-dashed rounded-lg cursor-pointer hover:bg-gray-100"
+        >
+          <span class="material-symbols-outlined text-primary mr-2"
+            >upload_file</span
+          >
+          <span class="text-sm text-text-light-secondary">{{
+            fileNames.length > 0
+              ? fileNames.length + " archivos seleccionados"
+              : "Ningún archivo seleccionado"
+          }}</span>
+        </label>
+        <input
+          type="file"
+          id="images"
+          (change)="onFileChange($event)"
+          class="hidden"
+          accept="image/png, image/jpeg, image/webp"
+          multiple
+        />
+      </div>
+    </form>
     <div
       class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-2"
     >

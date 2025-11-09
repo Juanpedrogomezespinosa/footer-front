@@ -8,7 +8,9 @@ import {
   ProductService,
   Product,
   ProductImage,
-  ProductVariant,
+  ProductApiResponse,
+  ProductVariantStock, // <-- Importamos la interfaz correcta
+  ProductSibling, // <-- Importamos la interfaz correcta
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
@@ -16,10 +18,8 @@ import { ToastService } from "app/core/services/toast.service";
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
 
 // Definir la interfaz completa para la señal
-type ProductDetail = Product & {
-  images: ProductImage[];
-  variants: ProductVariant[];
-};
+// El tipo 'Product' del servicio ya es la interfaz completa
+type ProductDetail = Product;
 
 @Component({
   selector: "app-product-detail",
@@ -42,6 +42,8 @@ export class ProductDetailComponent implements OnInit {
 
   // Esta señal ahora se rellenará dinámicamente
   availableSizes = signal<string[]>([]);
+  // ¡NUEVA SEÑAL PARA HERMANOS!
+  siblings = signal<ProductSibling[]>([]);
 
   backendUrl = "http://localhost:3000";
   defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=Footer";
@@ -68,11 +70,12 @@ export class ProductDetailComponent implements OnInit {
         this.isLoading.set(true);
         this.product.set(null);
         window.scrollTo(0, 0); // Solo hacemos scroll al inicio aquí
-      } else {
-        // --- Carga SUAVE (cambiando de color) ---
-        // No ocultamos la página, solo reseteamos la talla seleccionada
-        this.selectedSize.set("");
       }
+
+      // En ambos casos, reseteamos la selección
+      this.selectedSize.set("");
+      this.availableSizes.set([]);
+      this.siblings.set([]);
 
       if (isNaN(productId)) {
         this.error.set("ID de producto inválido.");
@@ -81,32 +84,44 @@ export class ProductDetailComponent implements OnInit {
       }
 
       // 2. Llamar a loadProduct en ambos casos.
-      // La señal 'product' se actualizará y la vista cambiará mágicamente.
       this.loadProduct(productId);
     });
   }
 
   loadProduct(productId: number): void {
     this.productService.getProductById(productId).subscribe({
-      next: (foundProduct) => {
+      next: (foundProduct: ProductApiResponse) => {
+        // Usamos la interfaz de API
         if (foundProduct) {
-          let processedSizes: string[] = [];
-          if (foundProduct.size && foundProduct.size.trim() !== "") {
-            processedSizes = foundProduct.size.split(",").map((s) => s.trim());
-          }
-          this.availableSizes.set(processedSizes);
+          // --- ¡LÓGICA DE TALLAS CORREGIDA! ---
+          // Leemos el array 'variants' (tallas/stock)
+          const variants = foundProduct.variants || []; // <-- Aseguramos que sea un array
 
+          // Extraemos las tallas únicas y con stock
+          const processedSizes = variants
+            .filter((v) => v.stock > 0) // Solo mostrar tallas con stock
+            .map((v) => v.size)
+            .filter((v, i, a) => a.indexOf(v) === i); // Quitar duplicados
+
+          this.availableSizes.set(processedSizes);
+          // ------------------------------------
+
+          // --- ¡LÓGICA DE HERMANOS AÑADIDA! ---
+          const siblings = foundProduct.siblings || []; // <-- Aseguramos que sea un array
+          this.siblings.set(siblings);
+          // ---------------------------------
+
+          // Creamos el objeto 'Product' completo para el frontend
           const productData: ProductDetail = {
-            ...foundProduct,
+            id: foundProduct.id,
+            name: foundProduct.name,
+            description: foundProduct.description,
             price: Number(foundProduct.price),
             rating: foundProduct.averageRating,
             ratingCount: foundProduct.ratingCount,
-            images: Array.isArray(foundProduct.images)
-              ? foundProduct.images
-              : [],
-            variants: Array.isArray(foundProduct.variants)
-              ? foundProduct.variants
-              : [],
+            images: foundProduct.images || [], // <-- Aseguramos que sea un array
+            variants: variants,
+            siblings: siblings,
             oldPrice:
               Number(foundProduct.price) < 150
                 ? Number(foundProduct.price) + 30
@@ -114,11 +129,15 @@ export class ProductDetailComponent implements OnInit {
             color: foundProduct.color,
             material: foundProduct.material,
             gender: foundProduct.gender,
+            category: foundProduct.category,
+            brand: foundProduct.brand,
+            // 'size' (el string) ya no existe
           };
           this.product.set(productData);
 
           // Si es un cambio de variante, actualizamos la imagen principal
-          if (productData.images.length > 0) {
+          if (productData.images && productData.images.length > 0) {
+            // <-- Arregla "posiblemente undefined"
             this.selectedImageUrl.set(productData.images[0].imageUrl);
           }
         } else {
@@ -140,7 +159,8 @@ export class ProductDetailComponent implements OnInit {
       return `${this.backendUrl}${this.selectedImageUrl()}`;
     }
     const product = this.product();
-    if (product && product.images.length > 0) {
+    if (product && product.images && product.images.length > 0) {
+      // <-- Arregla "posiblemente undefined"
       return `${this.backendUrl}${product.images[0].imageUrl}`;
     }
     return this.defaultImage;
@@ -171,17 +191,25 @@ export class ProductDetailComponent implements OnInit {
     const product = this.product();
     if (!product) return;
 
-    this.cartService.addToCart(product.id, this.quantity()).subscribe({
-      next: () => {
-        this.toastService.showSuccess("¡Producto añadido a la cesta!");
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error("Error al añadir al carrito:", err);
-        this.toastService.showError(
-          err.error?.message || "No se pudo añadir el producto."
-        );
-      },
-    });
+    // Comprobación de "posiblemente undefined"
+    const selectedVariant = (product.variants || []).find(
+      (v) => v.size === this.selectedSize()
+    );
+
+    // --- ¡LLAMADA CORREGIDA! (Arregla error "2 vs 3 argumentos") ---
+    this.cartService
+      .addToCart(product.id, this.quantity(), this.selectedSize())
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess("¡Producto añadido a la cesta!");
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error("Error al añadir al carrito:", err);
+          this.toastService.showError(
+            err.error?.message || "No se pudo añadir el producto."
+          );
+        },
+      });
   }
 
   buyNow(): void {
@@ -192,17 +220,20 @@ export class ProductDetailComponent implements OnInit {
     const product = this.product();
     if (!product) return;
 
-    this.cartService.addToCart(product.id, this.quantity()).subscribe({
-      next: () => {
-        this.router.navigate(["/cart"]);
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error("Error en Compra Directa:", err);
-        this.toastService.showError(
-          err.error?.message || "No se pudo añadir el producto."
-        );
-      },
-    });
+    // --- ¡LLAMADA CORREGIDA! (Arregla error "2 vs 3 argumentos") ---
+    this.cartService
+      .addToCart(product.id, this.quantity(), this.selectedSize())
+      .subscribe({
+        next: () => {
+          this.router.navigate(["/cart"]);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error("Error en Compra Directa:", err);
+          this.toastService.showError(
+            err.error?.message || "No se pudo añadir el producto."
+          );
+        },
+      });
   }
 
   // --- Métodos de Pestañas ---

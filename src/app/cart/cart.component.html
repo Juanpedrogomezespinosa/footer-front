@@ -1,13 +1,9 @@
-<!-- Comentario trivial para forzar la recarga -->
-
-<!-- Estado de Carga -->
 <div *ngIf="isLoading()" class="flex justify-center items-center py-40">
   <div
     class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
   ></div>
 </div>
 
-<!-- Estado de Error -->
 <div *ngIf="error()" class="max-w-6xl mx-auto px-4 py-16 text-center">
   <h2 class="text-2xl font-bold text-red-600">¡Oops! Hubo un error</h2>
   <p class="text-text-muted-light mt-2">{{ error() }}</p>
@@ -19,7 +15,6 @@
   </button>
 </div>
 
-<!-- Contenido Principal del Carrito -->
 <main
   *ngIf="!isLoading() && !error()"
   class="flex-grow container mx-auto px-4 py-8 md:py-16"
@@ -33,17 +28,13 @@
       </h1>
     </div>
 
-    <!-- Contenedor del Carrito (con estado vacío) -->
     <div *ngIf="cartItems().length > 0; else emptyCart">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-        <!-- Lista de Items -->
         <div class="lg:col-span-2 space-y-4">
-          <!-- Bucle de items del carrito -->
           <div
             *ngFor="let item of cartItems()"
             class="flex gap-4 bg-surface-light p-4 rounded-xl border border-border-light shadow-sm"
           >
-            <!-- Imagen -->
             <div class="flex-shrink-0">
               <div
                 class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-24 h-24 md:w-28 md:h-28"
@@ -54,7 +45,6 @@
               ></div>
             </div>
 
-            <!-- Detalles del Item -->
             <div class="flex flex-1 flex-col justify-between">
               <div>
                 <p
@@ -62,18 +52,14 @@
                 >
                   {{ item.Product.name }}
                 </p>
-                <p
-                  *ngIf="item.Product.size"
-                  class="text-text-muted-light text-sm mt-1"
-                >
-                  Talla: {{ item.Product.size }}
+
+                <p *ngIf="item.size" class="text-text-muted-light text-sm mt-1">
+                  Talla: {{ item.size }}
                 </p>
-                <!-- Precio en Móvil -->
                 <p class="text-text-muted-light text-sm mt-2 md:hidden">
                   {{ item.Product.price | currency : "EUR" }}
                 </p>
               </div>
-              <!-- Control de Cantidad -->
               <div class="flex items-center gap-3">
                 <button
                   (click)="updateQuantity(item, -1)"
@@ -97,7 +83,6 @@
               </div>
             </div>
 
-            <!-- Precio y Botón de Eliminar (Desktop) -->
             <div class="flex flex-col justify-between items-end">
               <p
                 class="text-lg font-semibold leading-normal hidden md:block text-text-dark"
@@ -109,7 +94,6 @@
                 class="text-text-muted-light hover:text-primary transition-colors"
                 aria-label="Eliminar producto"
               >
-                <!-- Icono SVG -->
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -129,7 +113,6 @@
           </div>
         </div>
 
-        <!-- Resumen del Pedido (MODIFICADO) -->
         <aside class="lg:col-span-1">
           <div
             class="sticky top-28 bg-surface-light p-6 rounded-xl border border-border-light shadow-sm"
@@ -140,22 +123,17 @@
               Resumen del Pedido
             </h2>
 
-            <!--
-              --- INICIO DE SECCIÓN DE DIRECCIÓN AÑADIDA ---
-            -->
             <div class="border-b border-border-light pb-6 mb-6">
               <h3 class="text-base font-semibold text-text-dark mb-4">
                 Dirección de Envío
               </h3>
 
-              <!-- Cargando Direcciones... -->
               <div *ngIf="isLoadingAddresses()">
                 <div
                   class="h-10 bg-gray-200 rounded animate-pulse w-full"
                 ></div>
               </div>
 
-              <!-- Lista de Direcciones -->
               <div
                 *ngIf="!isLoadingAddresses() && addresses().length > 0"
                 class="flex flex-col gap-3"
@@ -189,7 +167,6 @@
                 </div>
               </div>
 
-              <!-- Sin Direcciones -->
               <div
                 *ngIf="!isLoadingAddresses() && addresses().length === 0"
                 class="text-center p-4 bg-gray-50 rounded-lg"
@@ -205,10 +182,6 @@
                 </a>
               </div>
             </div>
-            <!--
-              --- FIN DE SECCIÓN DE DIRECCIÓN AÑADIDA ---
-            -->
-
             <div class="space-y-4">
               <div class="flex justify-between items-center text-base">
                 <span class="text-text-muted-light">Subtotal</span>
@@ -251,7 +224,6 @@
       </div>
     </div>
 
-    <!-- Estado de Carrito Vacío -->
     <ng-template #emptyCart>
       <div
         class="text-center py-20 border border-border-light rounded-xl bg-surface-light"

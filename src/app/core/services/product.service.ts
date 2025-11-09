@@ -3,41 +3,22 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 
-/**
- * Interfaz para las variantes de producto (los "hermanos")
- */
-export interface ProductVariant {
+// Interfaz para los "hermanos" (otros colores)
+export interface ProductSibling {
   id: number;
   color: string;
-  image: string | null; // La imagen principal de la variante
+  image: string | null;
 }
 
-/**
- * Interfaz para los productos recibidos desde la API.
- */
-export interface ProductApiResponse {
+// Interfaz para las variantes de TALLA y STOCK del producto actual
+export interface ProductVariantStock {
   id: number;
-  name: string;
-  description?: string;
-  price: number;
-  image?: string;
-  averageRating?: number;
-  ratingCount?: number;
-  size?: string;
-  brand?: string;
-  color?: string;
-  stock?: number;
-  category: "zapatillas" | "ropa" | "complementos";
-  sub_category?: string;
-  gender?: "hombre" | "mujer" | "unisex";
-  material?: string | null; // <-- ¡LÍNEA IMPORTANTE!
-  images?: ProductImage[];
-  variants?: ProductVariant[];
+  color: string;
+  size: string;
+  stock: number;
 }
 
-/**
- * Interfaz para las imágenes de la galería
- */
+// Interfaz para las imágenes de la galería
 export interface ProductImage {
   id: number;
   imageUrl: string;
@@ -45,7 +26,32 @@ export interface ProductImage {
 }
 
 /**
+ * Interfaz para los productos recibidos desde la API.
+ * Esta es la respuesta DIRECTA del backend.
+ */
+export interface ProductApiResponse {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  image?: string; // Imagen principal (de la lista)
+  averageRating?: number;
+  ratingCount?: number;
+  // 'size: string' ya no existe
+  brand?: string;
+  color?: string; // Color principal
+  category: "zapatillas" | "ropa" | "complementos";
+  sub_category?: string;
+  gender?: "hombre" | "mujer" | "unisex";
+  material?: string | null;
+  images?: ProductImage[]; // Galería de imágenes
+  variants?: ProductVariantStock[]; // Tallas y stock
+  siblings?: ProductSibling[]; // Hermanos (otros colores)
+}
+
+/**
  * Interfaz de producto para uso interno del frontend.
+ * (Completa y actualizada)
  */
 export interface Product {
   id: number;
@@ -55,15 +61,16 @@ export interface Product {
   image?: string;
   rating?: number;
   ratingCount?: number;
-  size?: string;
   category: "zapatillas" | "ropa" | "complementos";
   brand?: string;
   oldPrice?: number;
   color?: string;
-  material?: string | null; // <-- ¡LÍNEA IMPORTANTE!
+  material?: string | null;
   gender?: "hombre" | "mujer" | "unisex";
-  images: ProductImage[];
-  variants: ProductVariant[];
+  // --- ¡CAMBIOS AQUÍ! Hechos opcionales ---
+  images?: ProductImage[];
+  variants?: ProductVariantStock[];
+  siblings?: ProductSibling[]; // <-- Arregla el error "siblings"
 }
 
 /**
@@ -86,9 +93,6 @@ export class ProductService {
 
   constructor(private httpClient: HttpClient) {}
 
-  /**
-   * Obtiene productos desde la API...
-   */
   getProducts(
     page: number,
     limit: number,
@@ -132,20 +136,14 @@ export class ProductService {
     });
   }
 
-  /**
-   * Obtiene un producto específico por su ID.
-   */
   getProductById(productId: number): Observable<ProductApiResponse> {
     return this.httpClient.get<ProductApiResponse>(
       `${this.apiUrl}/${productId}`
     );
   }
 
-  /**
-   * Obtiene los productos relacionados para "Completa tu look"
-   */
-  getRelatedProducts(productId: number): Observable<Product[]> {
-    return this.httpClient.get<Product[]>(
+  getRelatedProducts(productId: number): Observable<ProductApiResponse[]> {
+    return this.httpClient.get<ProductApiResponse[]>(
       `${this.apiUrl}/${productId}/related`
     );
   }
