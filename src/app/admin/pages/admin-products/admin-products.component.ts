@@ -1,6 +1,7 @@
 // src/app/admin/pages/admin-products/admin-products.component.ts
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router"; // 1. Importar RouterModule
 import { ModalService } from "../../../core/services/modal.service";
 import { AdminService } from "../../../core/services/admin.service";
 import { AdminProductsResponse } from "../../../core/models/admin.types";
@@ -10,7 +11,7 @@ import { ToastService } from "../../../core/services/toast.service";
 @Component({
   selector: "app-admin-products",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule], // 2. Añadir RouterModule aquí
   templateUrl: "./admin-products.component.html",
 })
 export class AdminProductsComponent implements OnInit {
@@ -45,7 +46,6 @@ export class AdminProductsComponent implements OnInit {
         this.loadProducts(this.productsResponse?.currentPage || 1);
       });
 
-    // --- ¡CAMBIO AÑADIDO! ---
     // Escuchar el cierre del modal de ELIMINAR para refrescar
     this.modalService.isDeleteModalOpen$
       .pipe(
@@ -97,13 +97,11 @@ export class AdminProductsComponent implements OnInit {
     this.modalService.openProductModal();
   }
 
-  // --- ¡MÉTODO MODIFICADO! ---
   /**
-   * Abre el modal de confirmación para eliminar un producto.
+   * Pide confirmación y elimina un producto.
    */
   onDelete(id: number, name: string): void {
-    // Ya no usamos window.confirm ni llamamos al adminService aquí
-    // Solo le pasamos la info al servicio del modal
+    // Llama al modal de confirmación en lugar de window.confirm
     this.modalService.openDeleteModal({ id, name });
   }
 

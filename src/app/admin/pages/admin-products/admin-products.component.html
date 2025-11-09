@@ -1,4 +1,6 @@
+<!-- src/app/admin/pages/admin-products/admin-products.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
+  <!-- Cabecera de la página -->
   <div class="flex flex-wrap justify-between items-center gap-4">
     <div class="flex flex-col gap-1">
       <p
@@ -15,11 +17,14 @@
     </button>
   </div>
 
+  <!-- Contenedor de la tabla y paginación -->
   <div *ngIf="productsResponse; else loading" class="flex flex-col gap-4">
+    <!-- Tabla de productos -->
     <div
       class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
     >
-      <table class="w-full text-left">
+      <table class="w-full text-left min-w-[1000px]">
+        <!-- Encabezados de la tabla -->
         <thead class="border-b border-border-light dark:border-border-dark">
           <tr>
             <th
@@ -54,7 +59,9 @@
             </th>
           </tr>
         </thead>
+        <!-- Cuerpo de la tabla -->
         <tbody>
+          <!-- Estado: No hay productos -->
           <tr *ngIf="productsResponse.products.length === 0">
             <td
               colspan="6"
@@ -63,35 +70,57 @@
               No se encontraron productos. ¡Intenta crear uno!
             </td>
           </tr>
+          <!-- Fila por cada producto -->
           <tr
             *ngFor="let product of productsResponse.products"
             class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
           >
+            <!-- Imagen (con enlace corregido) -->
             <td class="p-4">
-              <img
-                [src]="
-                  product.image ||
-                  'https://placehold.co/64x64/eee/ccc?text=Sin+Img'
-                "
-                alt="Imagen de {{ product.name }}"
-                class="w-12 h-12 object-cover rounded-lg border border-border-light"
-              />
+              <a
+                [routerLink]="['/products', 'product', product.id]"
+                target="_blank"
+                class="block w-12 h-12 rounded-lg border border-border-light overflow-hidden group"
+              >
+                <img
+                  [src]="
+                    product.image ||
+                    'https://placehold.co/64x64/eee/ccc?text=Sin+Img'
+                  "
+                  alt="Imagen de {{ product.name }}"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </a>
             </td>
+
+            <!-- Nombre (con enlace corregido) -->
             <td
               class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
             >
-              {{ product.name }}
+              <a
+                [routerLink]="['/products', 'product', product.id]"
+                target="_blank"
+                class="hover:text-primary hover:underline transition-colors"
+              >
+                {{ product.name }}
+              </a>
             </td>
+
+            <!-- Categoría -->
             <td
               class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary capitalize"
             >
               {{ product.category }}
             </td>
+
+            <!-- Precio -->
             <td
               class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
             >
               {{ product.price | number : "1.2-2" }}€
             </td>
+
+            <!-- Stock -->
             <td class="p-4 text-sm">
               <span
                 *ngIf="product.stock > 0; else noStock"
@@ -107,6 +136,8 @@
                 </span>
               </ng-template>
             </td>
+
+            <!-- Acciones -->
             <td class="p-4">
               <div class="flex gap-2">
                 <button
@@ -128,6 +159,7 @@
       </table>
     </div>
 
+    <!-- Paginación -->
     <div
       *ngIf="productsResponse.totalPages > 1"
       class="flex items-center justify-between p-4"
@@ -142,14 +174,14 @@
         <button
           (click)="onPrevPage()"
           [disabled]="!productsResponse.prevPage"
-          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-secondary-light hover:bg-secondary disabled:bg-gray-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Anterior
         </button>
         <button
           (click)="onNextPage()"
           [disabled]="!productsResponse.nextPage"
-          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-secondary-light hover:bg-secondary disabled:bg-gray-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Siguiente
         </button>
@@ -158,6 +190,7 @@
   </div>
 </div>
 
+<!-- Estado de Carga -->
 <ng-template #loading>
   <div class="w-full text-center p-10">
     <p class="text-text-light-secondary dark:text-text-dark-secondary">
