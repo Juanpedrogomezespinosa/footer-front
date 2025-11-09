@@ -12,6 +12,13 @@ import {
   FullAdminOrder,
 } from "../models/admin.types";
 
+// Interfaz para los filtros de producto
+export interface ProductFilters {
+  name?: string;
+  category?: string;
+  stock?: string;
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -42,17 +49,38 @@ export class AdminService {
       params,
     });
   }
+
+  // --- ¡MÉTODO MODIFICADO! ---
+  /**
+   * Obtiene la lista de productos con paginación y filtros.
+   * GET /api/products
+   */
   getProducts(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    filters: ProductFilters = {} // 1. Aceptar objeto de filtros
   ): Observable<AdminProductsResponse> {
-    const params = new HttpParams()
+    // 2. Empezar con la paginación
+    let params = new HttpParams()
       .set("page", page.toString())
       .set("limit", limit.toString());
+
+    // 3. Añadir filtros dinámicamente solo si existen
+    if (filters.name) {
+      params = params.set("name", filters.name);
+    }
+    if (filters.category) {
+      params = params.set("category", filters.category);
+    }
+    if (filters.stock) {
+      params = params.set("stock", filters.stock);
+    }
+
     return this.http.get<AdminProductsResponse>(this.productsApiUrl, {
-      params,
+      params, // 4. Enviar todos los parámetros
     });
   }
+
   createProduct(productData: FormData): Observable<any> {
     return this.http.post<any>(this.productsApiUrl, productData);
   }
@@ -74,11 +102,6 @@ export class AdminService {
     return this.http.put<any>(`${this.apiUrl}/orders/${id}/status`, { status });
   }
 
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
-  /**
-   * Elimina un usuario por su ID.
-   * DELETE /api/admin/users/:id
-   */
   deleteUser(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/users/${id}`);
   }

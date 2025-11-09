@@ -17,6 +17,76 @@
     </button>
   </div>
 
+  <!-- --- ¡NUEVA SECCIÓN DE FILTROS AÑADIDA! --- -->
+  <form
+    [formGroup]="filterForm"
+    class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm"
+  >
+    <!-- 1. Búsqueda por Nombre -->
+    <div>
+      <label
+        for="filter-name"
+        class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+      >
+        Buscar por nombre
+      </label>
+      <div class="relative">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        >
+          >
+        </div>
+        <input
+          type="search"
+          id="filter-name"
+          formControlName="name"
+          placeholder="Ej: Adidas Samba..."
+          class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg bg-background-light focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+    </div>
+
+    <!-- 2. Filtro por Categoría -->
+    <div>
+      <label
+        for="filter-category"
+        class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+      >
+        Categoría
+      </label>
+      <select
+        id="filter-category"
+        formControlName="category"
+        class="w-full p-2 border border-border-light rounded-lg bg-background-light focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <option value="">Todas</option>
+        <option value="zapatillas">Zapatillas</option>
+        <option value="ropa">Ropa</option>
+        <option value="complementos">Complementos</option>
+      </select>
+    </div>
+
+    <!-- 3. Filtro por Stock -->
+    <div>
+      <label
+        for="filter-stock"
+        class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+      >
+        Stock
+      </label>
+      <select
+        id="filter-stock"
+        formControlName="stock"
+        class="w-full p-2 border border-border-light rounded-lg bg-background-light focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <option value="">Todos</option>
+        <option value="true">Con Stock</option>
+        <option value="false">Sin Stock</option>
+      </select>
+    </div>
+  </form>
+  <!-- --- FIN DE LA SECCIÓN DE FILTROS --- -->
+
   <!-- Contenedor de la tabla y paginación -->
   <div *ngIf="productsResponse; else loading" class="flex flex-col gap-4">
     <!-- Tabla de productos -->
@@ -67,7 +137,7 @@
               colspan="6"
               class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
             >
-              No se encontraron productos. ¡Intenta crear uno!
+              No se encontraron productos con los filtros actuales.
             </td>
           </tr>
           <!-- Fila por cada producto -->
