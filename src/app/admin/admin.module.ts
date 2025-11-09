@@ -15,7 +15,8 @@ import { ProductModalComponent } from "./components/product-modal/product-modal.
 import { EditProductModalComponent } from "./components/edit-product-modal/edit-product-modal.component";
 import { DeleteProductModalComponent } from "./components/delete-product-modal/delete-product-modal.component";
 import { OrderDetailsModalComponent } from "./components/order-details-modal/order-details-modal.component";
-import { StatusUpdateModalComponent } from "./components/status-update-modal/status-update-modal.component"; // 1. Importar
+import { StatusUpdateModalComponent } from "./components/status-update-modal/status-update-modal.component";
+import { DeleteUserModalComponent } from "./components/delete-user-modal/delete-user-modal.component"; // 1. Importar
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { StatusUpdateModalComponent } from "./components/status-update-modal/sta
     EditProductModalComponent,
     DeleteProductModalComponent,
     OrderDetailsModalComponent,
-    StatusUpdateModalComponent, // 2. Añadir a imports
+    StatusUpdateModalComponent,
+    DeleteUserModalComponent, // 2. Añadir a imports
   ],
 })
 export class AdminModule {}

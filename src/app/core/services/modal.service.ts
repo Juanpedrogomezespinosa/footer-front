@@ -3,17 +3,23 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { FullAdminProduct } from "../models/admin.types";
 
-// Interface para los datos del modal de borrado
+// Interface para los datos del modal de borrado de producto
 export interface ProductDeleteInfo {
   id: number;
   name: string;
 }
 
-// --- ¡NUEVA INTERFAZ! ---
-// Interface para los datos del modal de estado
+// Interface para los datos del modal de estado de pedido
 export interface OrderStatusInfo {
   id: number;
   status: string;
+}
+
+// --- ¡NUEVA INTERFAZ AÑADIDA! ---
+// Interface para los datos del modal de borrado de usuario
+export interface UserDeleteInfo {
+  id: number;
+  username: string;
 }
 
 @Injectable({
@@ -45,13 +51,21 @@ export class ModalService {
   private orderToViewIdSubject = new BehaviorSubject<number | null>(null);
   orderToViewId$ = this.orderToViewIdSubject.asObservable();
 
-  // --- ¡NUEVO! Modal de ACTUALIZAR ESTADO ---
+  // --- Modal de ACTUALIZAR ESTADO ---
   private statusUpdateModalSubject = new BehaviorSubject<boolean>(false);
   isStatusUpdateModalOpen$ = this.statusUpdateModalSubject.asObservable();
   private orderToUpdateSubject = new BehaviorSubject<OrderStatusInfo | null>(
     null
   );
   orderToUpdate$ = this.orderToUpdateSubject.asObservable();
+
+  // --- ¡NUEVO! Modal de ELIMINAR USUARIO ---
+  private deleteUserModalSubject = new BehaviorSubject<boolean>(false);
+  isDeleteUserModalOpen$ = this.deleteUserModalSubject.asObservable();
+  private userToDeleteSubject = new BehaviorSubject<UserDeleteInfo | null>(
+    null
+  );
+  userToDelete$ = this.userToDeleteSubject.asObservable();
 
   constructor() {}
 
@@ -73,7 +87,7 @@ export class ModalService {
     this.productToEditSubject.next(null);
   }
 
-  // --- Métodos ELIMINAR ---
+  // --- Métodos ELIMINAR PRODUCTO ---
   openDeleteModal(productInfo: ProductDeleteInfo) {
     this.productToDeleteSubject.next(productInfo);
     this.deleteModalSubject.next(true);
@@ -93,7 +107,7 @@ export class ModalService {
     this.orderToViewIdSubject.next(null);
   }
 
-  // --- ¡NUEVO! Métodos ACTUALIZAR ESTADO ---
+  // --- Métodos ACTUALIZAR ESTADO ---
   openStatusUpdateModal(orderInfo: OrderStatusInfo) {
     this.orderToUpdateSubject.next(orderInfo);
     this.statusUpdateModalSubject.next(true);
@@ -101,5 +115,15 @@ export class ModalService {
   closeStatusUpdateModal() {
     this.statusUpdateModalSubject.next(false);
     this.orderToUpdateSubject.next(null);
+  }
+
+  // --- ¡NUEVO! Métodos ELIMINAR USUARIO ---
+  openDeleteUserModal(userInfo: UserDeleteInfo) {
+    this.userToDeleteSubject.next(userInfo);
+    this.deleteUserModalSubject.next(true);
+  }
+  closeDeleteUserModal() {
+    this.deleteUserModalSubject.next(false);
+    this.userToDeleteSubject.next(null);
   }
 }

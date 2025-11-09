@@ -1,12 +1,13 @@
 // src/app/admin/pages/admin-users/admin-users.component.ts
-import { Component, OnInit } from "@angular/core"; // 1. Importar OnInit
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { AdminService } from "../../../core/services/admin.service"; // 2. Importar servicios
+import { AdminService } from "../../../core/services/admin.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { AuthService } from "../../../core/services/auth.service";
-import { AdminUser } from "../../../core/models/admin.types"; // 3. Importar el tipo de dato
+import { AdminUser } from "../../../core/models/admin.types";
 import { Observable, of } from "rxjs";
-import { catchError, take } from "rxjs/operators";
+import { catchError, take, skip, filter } from "rxjs/operators";
+import { ModalService } from "../../../core/services/modal.service"; // 1. Importar ModalService
 
 @Component({
   selector: "app-admin-users",
@@ -22,7 +23,8 @@ export class AdminUsersComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private toast: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService: ModalService // 2. Inyectar ModalService
   ) {
     // Obtenemos el ID del admin actual para deshabilitar su propio botón de borrado
     this.authService.user$.pipe(take(1)).subscribe((user) => {
@@ -32,6 +34,16 @@ export class AdminUsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+
+    // 3. Escuchar el cierre del modal de ELIMINAR USUARIO para refrescar
+    this.modalService.isDeleteUserModalOpen$
+      .pipe(
+        skip(1), // Ignorar el valor inicial
+        filter((isOpen) => !isOpen) // Filtrar solo cuando se cierra
+      )
+      .subscribe(() => {
+        this.loadUsers(); // Recargar la lista de usuarios
+      });
   }
 
   /**
@@ -48,8 +60,6 @@ export class AdminUsersComponent implements OnInit {
       })
     );
 
-    // Solo para fines de 'isLoading', nos suscribimos.
-    // El pipe 'async' en el HTML manejará la data.
     this.users$.subscribe(() => {
       this.isLoading = false;
     });
@@ -64,25 +74,13 @@ export class AdminUsersComponent implements OnInit {
       return;
     }
 
-    // Usamos el confirm de navegador por ahora.
-    // (Podemos cambiarlo a un modal personalizado si lo prefieres)
-    const confirmation = window.confirm(
-      `¿Estás seguro de que quieres eliminar al usuario "${username}" (ID: ${userId})? Esta acción no se puede deshacer.`
-    );
+    // 4. --- ¡LÓGICA ACTUALIZADA! ---
+    // Ya no usamos window.confirm
+    this.modalService.openDeleteUserModal({ id: userId, username: username });
 
-    if (confirmation) {
-      this.adminService.deleteUser(userId).subscribe({
-        next: () => {
-          this.toast.showSuccess("Usuario eliminado correctamente.");
-          this.loadUsers(); // Recargamos la lista
-        },
-        error: (err) => {
-          console.error("Error al eliminar usuario:", err);
-          this.toast.showError(
-            err.error?.message || "Error al eliminar el usuario."
-          );
-        },
-      });
-    }
+    // El resto de la lógica (llamar al servicio, mostrar toast,
+    // y refrescar la lista) se maneja ahora desde:
+    // 1. El 'delete-user-modal.component.ts' (la llamada)
+    // 2. El 'ngOnInit' de este componente (el refresco)
   }
 }

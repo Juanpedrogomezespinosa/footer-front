@@ -120,8 +120,11 @@
 <app-order-details-modal
   *ngIf="isOrderDetailsModalOpen$ | async"
 ></app-order-details-modal>
-
-<!-- ¡NUEVO MODAL AÑADIDO! -->
 <app-status-update-modal
   *ngIf="isStatusUpdateModalOpen$ | async"
 ></app-status-update-modal>
+
+<!-- ¡NUEVO MODAL AÑADIDO! -->
+<app-delete-user-modal
+  *ngIf="isDeleteUserModalOpen$ | async"
+></app-delete-user-modal>
