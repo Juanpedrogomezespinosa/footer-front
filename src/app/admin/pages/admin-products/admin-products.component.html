@@ -1,6 +1,4 @@
-<!-- src/app/admin/pages/admin-products/admin-products.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
-  <!-- Cabecera de la página -->
   <div class="flex flex-wrap justify-between items-center gap-4">
     <div class="flex flex-col gap-1">
       <p
@@ -17,12 +15,10 @@
     </button>
   </div>
 
-  <!-- --- ¡NUEVA SECCIÓN DE FILTROS AÑADIDA! --- -->
   <form
     [formGroup]="filterForm"
     class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm"
   >
-    <!-- 1. Búsqueda por Nombre -->
     <div>
       <label
         for="filter-name"
@@ -46,7 +42,6 @@
       </div>
     </div>
 
-    <!-- 2. Filtro por Categoría -->
     <div>
       <label
         for="filter-category"
@@ -66,7 +61,6 @@
       </select>
     </div>
 
-    <!-- 3. Filtro por Stock -->
     <div>
       <label
         for="filter-stock"
@@ -85,16 +79,11 @@
       </select>
     </div>
   </form>
-  <!-- --- FIN DE LA SECCIÓN DE FILTROS --- -->
-
-  <!-- Contenedor de la tabla y paginación -->
   <div *ngIf="productsResponse; else loading" class="flex flex-col gap-4">
-    <!-- Tabla de productos -->
     <div
       class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
     >
       <table class="w-full text-left min-w-[1000px]">
-        <!-- Encabezados de la tabla -->
         <thead class="border-b border-border-light dark:border-border-dark">
           <tr>
             <th
@@ -129,9 +118,7 @@
             </th>
           </tr>
         </thead>
-        <!-- Cuerpo de la tabla -->
         <tbody>
-          <!-- Estado: No hay productos -->
           <tr *ngIf="productsResponse.products.length === 0">
             <td
               colspan="6"
@@ -140,12 +127,10 @@
               No se encontraron productos con los filtros actuales.
             </td>
           </tr>
-          <!-- Fila por cada producto -->
           <tr
             *ngFor="let product of productsResponse.products"
             class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
           >
-            <!-- Imagen (con enlace corregido) -->
             <td class="p-4">
               <a
                 [routerLink]="['/products', 'product', product.id]"
@@ -163,7 +148,6 @@
               </a>
             </td>
 
-            <!-- Nombre (con enlace corregido) -->
             <td
               class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
             >
@@ -176,27 +160,24 @@
               </a>
             </td>
 
-            <!-- Categoría -->
             <td
               class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary capitalize"
             >
               {{ product.category }}
             </td>
 
-            <!-- Precio -->
             <td
               class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary font-medium"
             >
               {{ product.price | number : "1.2-2" }}€
             </td>
 
-            <!-- Stock -->
             <td class="p-4 text-sm">
               <span
-                *ngIf="product.stock > 0; else noStock"
+                *ngIf="product.totalStock > 0; else noStock"
                 class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
               >
-                En Stock ({{ product.stock }})
+                {{ product.totalStock }} unidades
               </span>
               <ng-template #noStock>
                 <span
@@ -207,7 +188,6 @@
               </ng-template>
             </td>
 
-            <!-- Acciones -->
             <td class="p-4">
               <div class="flex gap-2">
                 <button
@@ -229,7 +209,6 @@
       </table>
     </div>
 
-    <!-- Paginación -->
     <div
       *ngIf="productsResponse.totalPages > 1"
       class="flex items-center justify-between p-4"
@@ -260,7 +239,6 @@
   </div>
 </div>
 
-<!-- Estado de Carga -->
 <ng-template #loading>
   <div class="w-full text-center p-10">
     <p class="text-text-light-secondary dark:text-text-dark-secondary">

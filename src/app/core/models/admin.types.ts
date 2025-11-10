@@ -94,6 +94,7 @@ export interface AdminProduct {
   image: string | null; // La imagen principal
   averageRating: number;
   ratingCount: number;
+  totalStock: number; // <-- ¡¡¡CORRECCIÓN AÑADIDA AQUÍ!!!
   // Añade más campos si los necesitas en la tabla
 }
 
