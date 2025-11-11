@@ -1,7 +1,6 @@
 <div class="p-4 bg-white rounded-2xl shadow-md w-full max-w-md">
   <h3 class="text-xl font-semibold text-gray-800 mb-4">Filtrar productos</h3>
 
-  <!-- Botón para Limpiar Filtros (Añadido para evitar el bloqueo) -->
   <div class="mb-4">
     <button
       (click)="resetFilters()"
@@ -11,7 +10,6 @@
     </button>
   </div>
 
-  <!-- Filtros -->
   <div class="mb-6" *ngFor="let filter of filters">
     <p class="text-gray-700 font-medium mb-2">{{ filter.label }}</p>
     <div class="flex flex-col gap-2">
@@ -23,16 +21,11 @@
           type="checkbox"
           [value]="option"
           (change)="onFilterChange(filter.key, $event)"
-          [checked]="selectedFilters[filter.key]?.includes(option) || false"
+          [checked]="selectedFilters[filter.key].includes(option) || false"
           class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-secondary focus:ring-offset-1"
         />
         <span class="text-gray-700">{{ option }}</span>
       </label>
     </div>
   </div>
-
-  <!--
-    --- SECCIÓN "ORDENAR POR" ELIMINADA ---
-    La hemos movido a 'products-list.component.html'
-  -->
 </div>

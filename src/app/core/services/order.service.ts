@@ -1,16 +1,13 @@
+// src/app/core/services/order.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ProductApiResponse } from "./product.service";
-import { UserAddress } from "./user.service"; // <-- 1. IMPORTAR UserAddress
+import { UserAddress } from "./user.service";
 
-// Interfaz para los items que enviamos al crear la orden
-export interface OrderItemInput {
-  productId: number;
-  productName: string;
-  quantity: number;
-  price: number;
-}
+// --- ¡INTERFAZ ELIMINADA! ---
+// Ya no enviamos esta información desde el frontend.
+// export interface OrderItemInput { ... }
 
 // Interfaz para la respuesta de /checkout de tu backend
 export interface CreateOrderResponse {
@@ -28,9 +25,12 @@ export interface OrderDetails {
   OrderItems: {
     quantity: number;
     price: number;
+    // Esta interfaz probablemente necesite un refactor
+    // para usar la nueva 'CartItem' (product + variant),
+    // pero de momento lo dejamos para que compile.
     Product: ProductApiResponse;
   }[];
-  Address: UserAddress; // <-- 2. AÑADIR LA DIRECCIÓN A LOS DETALLES
+  Address: UserAddress;
 }
 
 @Injectable({
@@ -43,17 +43,15 @@ export class OrderService {
   constructor(private http: HttpClient) {}
 
   /**
+   * --- ¡¡¡MÉTODO CORREGIDO!!! ---
    * Llama al backend para crear una orden y obtener la sesión de Stripe
    * Backend: POST /api/orders/checkout
-   * --- ¡MODIFICADO! ---
    */
   createOrder(
-    items: OrderItemInput[],
-    addressId: number // <-- 3. AÑADIR addressId
+    addressId: number // <-- 1. Solo pedimos el addressId
   ): Observable<CreateOrderResponse> {
-    // 4. ENVIAR 'items' Y 'addressId'
+    // 2. ENVIAMOS SOLO el 'addressId'
     return this.http.post<CreateOrderResponse>(`${this.apiUrl}/checkout`, {
-      items,
       addressId,
     });
   }

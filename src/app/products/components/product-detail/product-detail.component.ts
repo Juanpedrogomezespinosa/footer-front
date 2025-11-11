@@ -183,57 +183,95 @@ export class ProductDetailComponent implements OnInit {
     this.quantity.update((q) => (q > 1 ? q - 1 : 1));
   }
 
+  // --- ¡¡¡FUNCIÓN 'addToCart' CORREGIDA!!! ---
   addToCart(): void {
-    if (this.availableSizes().length > 0 && !this.selectedSize()) {
-      this.toastService.showError("Por favor, selecciona una talla.");
-      return;
-    }
     const product = this.product();
     if (!product) return;
 
-    // Comprobación de "posiblemente undefined"
-    const selectedVariant = (product.variants || []).find(
-      (v) => v.size === this.selectedSize()
-    );
+    let variantId: number;
 
-    // --- ¡LLAMADA CORREGIDA! (Arregla error "2 vs 3 argumentos") ---
-    this.cartService
-      .addToCart(product.id, this.quantity(), this.selectedSize())
-      .subscribe({
-        next: () => {
-          this.toastService.showSuccess("¡Producto añadido a la cesta!");
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error("Error al añadir al carrito:", err);
-          this.toastService.showError(
-            err.error?.message || "No se pudo añadir el producto."
-          );
-        },
-      });
+    // Comprobar si el producto tiene tallas (ej: Zapatillas)
+    if (this.availableSizes().length > 0) {
+      if (!this.selectedSize()) {
+        this.toastService.showError("Por favor, selecciona una talla.");
+        return;
+      }
+      // Encontrar la variante específica (id, color, size, stock)
+      const selectedVariant = (product.variants || []).find(
+        (v) => v.size === this.selectedSize()
+      );
+      if (!selectedVariant) {
+        this.toastService.showError("Error al encontrar la variante de talla.");
+        return;
+      }
+      variantId = selectedVariant.id;
+    } else {
+      // Producto SIN tallas (ej: Gorra "Talla Única")
+      if (!product.variants || product.variants.length === 0) {
+        this.toastService.showError("Este producto no tiene stock definido.");
+        return;
+      }
+      // Asumimos que es la primera (y única) variante
+      variantId = product.variants[0].id;
+    }
+
+    // --- ¡Nueva llamada al servicio! ---
+    // Asumimos que cartService.addToCart ahora espera (variantId, quantity)
+    this.cartService.addToCart(variantId, this.quantity()).subscribe({
+      next: () => {
+        this.toastService.showSuccess("¡Producto añadido a la cesta!");
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error("Error al añadir al carrito:", err);
+        this.toastService.showError(
+          err.error?.message || "No se pudo añadir el producto."
+        );
+      },
+    });
   }
 
+  // --- ¡¡¡FUNCIÓN 'buyNow' CORREGIDA!!! ---
   buyNow(): void {
-    if (this.availableSizes().length > 0 && !this.selectedSize()) {
-      this.toastService.showError("Por favor, selecciona una talla.");
-      return;
-    }
     const product = this.product();
     if (!product) return;
 
-    // --- ¡LLAMADA CORREGIDA! (Arregla error "2 vs 3 argumentos") ---
-    this.cartService
-      .addToCart(product.id, this.quantity(), this.selectedSize())
-      .subscribe({
-        next: () => {
-          this.router.navigate(["/cart"]);
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error("Error en Compra Directa:", err);
-          this.toastService.showError(
-            err.error?.message || "No se pudo añadir el producto."
-          );
-        },
-      });
+    let variantId: number;
+
+    // (Misma lógica de 'addToCart' para encontrar el variantId)
+    if (this.availableSizes().length > 0) {
+      if (!this.selectedSize()) {
+        this.toastService.showError("Por favor, selecciona una talla.");
+        return;
+      }
+      const selectedVariant = (product.variants || []).find(
+        (v) => v.size === this.selectedSize()
+      );
+      if (!selectedVariant) {
+        this.toastService.showError("Error al encontrar la variante de talla.");
+        return;
+      }
+      variantId = selectedVariant.id;
+    } else {
+      if (!product.variants || product.variants.length === 0) {
+        this.toastService.showError("Este producto no tiene stock definido.");
+        return;
+      }
+      variantId = product.variants[0].id;
+    }
+
+    // --- ¡Nueva llamada al servicio! ---
+    this.cartService.addToCart(variantId, this.quantity()).subscribe({
+      next: () => {
+        // Redirigir al carrito después de añadir
+        this.router.navigate(["/cart"]);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error("Error en Compra Directa:", err);
+        this.toastService.showError(
+          err.error?.message || "No se pudo añadir el producto."
+        );
+      },
+    });
   }
 
   // --- Métodos de Pestañas ---

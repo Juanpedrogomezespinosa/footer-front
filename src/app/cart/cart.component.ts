@@ -1,3 +1,4 @@
+// src/app/cart/cart.component.ts
 import {
   Component,
   OnInit,
@@ -9,7 +10,10 @@ import {
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { CartService, CartItem } from "../core/services/cart.service";
-import { OrderService, OrderItemInput } from "../core/services/order.service";
+// --- ¡CAMBIO AQUÍ! ---
+// Ya no necesitamos OrderItemInput
+import { OrderService } from "../core/services/order.service";
+// --------------------
 import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
 import { ProductApiResponse } from "../core/services/product.service";
@@ -33,7 +37,7 @@ export class CartComponent implements OnInit {
 
   public subtotal: Signal<number> = computed(() => {
     return this.cartItems().reduce((sum, item) => {
-      return sum + Number(item.Product.price) * item.quantity;
+      return sum + Number(item.product.price) * item.quantity;
     }, 0);
   });
 
@@ -119,6 +123,9 @@ export class CartComponent implements OnInit {
     this.selectedAddressId.set(addressId);
   }
 
+  /**
+   * --- ¡¡¡FUNCIÓN 'onCheckout' CORREGIDA!!! ---
+   */
   onCheckout(): void {
     if (!this.selectedAddressId()) {
       this.toastService.showError(
@@ -129,32 +136,27 @@ export class CartComponent implements OnInit {
 
     this.isLoading.set(true);
 
-    const itemsToOrder: OrderItemInput[] = this.cartItems().map((item) => ({
-      productId: item.productId,
-      productName: item.Product.name,
-      quantity: item.quantity,
-      price: Number(item.Product.price),
-    }));
+    // --- ¡BLOQUE ELIMINADO! ---
+    // Ya no creamos el array 'itemsToOrder' en el frontend.
+    // const itemsToOrder: OrderItemInput[] = ...
 
-    this.orderService
-      .createOrder(itemsToOrder, this.selectedAddressId()!)
-      .subscribe({
-        next: (response) => {
-          window.location.href = response.checkoutUrl;
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error("Error en el checkout:", err);
-          this.error.set(err.error?.message || "Error al procesar el pago.");
-          this.isLoading.set(false);
-        },
-      });
+    // --- ¡LLAMADA CORREGIDA! ---
+    // Simplemente llamamos al servicio con el ID de la dirección.
+    this.orderService.createOrder(this.selectedAddressId()!).subscribe({
+      next: (response) => {
+        // Redirigimos a Stripe
+        window.location.href = response.checkoutUrl;
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error("Error en el checkout:", err);
+        this.error.set(err.error?.message || "Error al procesar el pago.");
+        this.isLoading.set(false);
+      },
+    });
   }
 
   getProductImage(imageName: string | undefined | null): string {
     if (imageName) {
-      // --- ¡ESTA ES LA CORRECCIÓN! ---
-      // La 'imageName' ya es la ruta completa (ej: /uploads/imagen.png)
-      // Solo necesitamos añadir el host.
       return `http://localhost:3000${imageName}`;
     }
     return `https://placehold.co/400x400/eeeeee/aaaaaa?text=Producto`;

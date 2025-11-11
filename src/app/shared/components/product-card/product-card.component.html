@@ -45,56 +45,27 @@
         </p>
       </div>
 
-      <ng-container *ngIf="isComplexProduct(); else simpleProductButton">
-        <a
-          [routerLink]="['/products', 'product', product.id]"
-          (click)="$event.stopPropagation()"
-          aria-label="Ver opciones del producto"
-          title="Ver opciones"
-          class="text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
+      <a
+        [routerLink]="['/products', 'product', product.id]"
+        (click)="$event.stopPropagation()"
+        aria-label="Ver opciones del producto"
+        title="Ver opciones"
+        class="text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="currentColor"
+          class="bi bi-arrow-right"
+          viewBox="0 0 16 16"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            class="bi bi-arrow-right"
-            viewBox="0 0 16 16"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
-            />
-          </svg>
-        </a>
-      </ng-container>
-
-      <ng-template #simpleProductButton>
-        <button
-          type="button"
-          (click)="addToCart($event)"
-          aria-label="Añadir al carrito"
-          title="Añadir al carrito"
-          class="text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            class="bi bi-bag-plus"
-            viewBox="0 0 16 16"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8 7.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0v-1.5H6a.5.5 0 0 1 0-1h1.5V8a.5.5 0 0 1 .5-.5z"
-            />
-            <path
-              d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"
-            />
-          </svg>
-        </button>
-      </ng-template>
+          <path
+            fill-rule="evenodd"
+            d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+          />
+        </svg>
+      </a>
     </div>
   </div>
 </div>

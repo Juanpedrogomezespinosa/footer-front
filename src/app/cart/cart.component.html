@@ -39,9 +39,9 @@
               <div
                 class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-24 h-24 md:w-28 md:h-28"
                 [style.background-image]="
-                  'url(' + getProductImage(item.Product.image) + ')'
+                  'url(' + getProductImage(item.product.image) + ')'
                 "
-                [attr.aria-label]="item.Product.name"
+                [attr.aria-label]="item.product.name"
               ></div>
             </div>
 
@@ -50,14 +50,17 @@
                 <p
                   class="text-base md:text-lg font-semibold leading-tight text-text-dark"
                 >
-                  {{ item.Product.name }}
+                  {{ item.product.name }}
                 </p>
 
-                <p *ngIf="item.size" class="text-text-muted-light text-sm mt-1">
-                  Talla: {{ item.size }}
+                <p
+                  *ngIf="item.variant.size"
+                  class="text-text-muted-light text-sm mt-1"
+                >
+                  Talla: {{ item.variant.size }}
                 </p>
                 <p class="text-text-muted-light text-sm mt-2 md:hidden">
-                  {{ item.Product.price | currency : "EUR" }}
+                  {{ item.product.price | currency : "EUR" }}
                 </p>
               </div>
               <div class="flex items-center gap-3">
@@ -87,7 +90,7 @@
               <p
                 class="text-lg font-semibold leading-normal hidden md:block text-text-dark"
               >
-                {{ item.Product.price | currency : "EUR" }}
+                {{ item.product.price | currency : "EUR" }}
               </p>
               <button
                 (click)="removeItem(item.id)"

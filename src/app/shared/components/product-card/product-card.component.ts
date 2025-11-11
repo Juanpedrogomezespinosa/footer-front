@@ -61,22 +61,17 @@ export class ProductCardComponent {
     this.router.navigate(["/products", "product", this.product.id]);
   }
 
+  // --- ¡¡¡FUNCIÓN CORREGIDA!!! ---
   addToCart(event: MouseEvent): void {
     // Detiene el clic para que no se propague al div padre
     event.stopPropagation();
 
-    // Esta función ahora solo es llamada por productos "simples" (complementos)
-    // Enviamos 'undefined' para la talla, y el backend lo manejará
-    this.cartService.addToCart(this.product.id, 1, undefined).subscribe({
-      next: () => {
-        this.toastService.showSuccess("Producto añadido al carrito");
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error("Error al añadir al carrito:", err);
-        this.toastService.showError(
-          err.error?.message || "No se pudo añadir el producto."
-        );
-      },
-    });
+    // Con la nueva lógica de variantes, el botón de "añadir"
+    // en la tarjeta ya no es fiable.
+    // Lo mejor es redirigir al usuario a la página de detalles
+    // para que seleccione la variante (color/talla) correcta.
+    this.goToProductDetail();
+
+    // --- El código antiguo (que ahora falla) ha sido eliminado ---
   }
 }
