@@ -1,5 +1,5 @@
 // src/app/admin/components/edit-product-modal/edit-product-modal.component.ts
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -7,7 +7,7 @@ import {
   FormArray,
   ReactiveFormsModule,
   Validators,
-  AbstractControl, // <-- 1. Importar AbstractControl
+  AbstractControl,
 } from "@angular/forms";
 import { ModalService } from "../../../core/services/modal.service";
 import { AdminService } from "../../../core/services/admin.service";
@@ -25,9 +25,10 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
   product: FullAdminProduct | null = null;
   private productSubscription: Subscription | null = null;
+  private categorySubscription: Subscription | null = null; // <-- Para cambios de categoría
 
-  // --- 2. Añadir variables de estado para las tallas ---
-  currentCategory: string = ""; // Rastreador de categoría
+  // --- Variables de estado para las tallas ---
+  currentCategory = signal<string>(""); // Rastrea la categoría
   clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
@@ -40,6 +41,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private toast: ToastService
   ) {
+    // --- Formulario actualizado a la estructura anidada ---
     this.productForm = this.fb.group({
       name: ["", Validators.required],
       description: ["", Validators.required],
@@ -50,7 +52,8 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       material: [""],
       season: [""],
       is_new: [false],
-      variants: this.fb.array([], Validators.required),
+      // 'variants' se reemplaza por 'colorGroups'
+      colorGroups: this.fb.array([], Validators.required), // Empezar vacío
     });
   }
 
@@ -60,7 +63,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       (product) => {
         if (product) {
           this.product = product;
-          this.currentCategory = product.category; // <-- 3. Establecer categoría actual
+          this.currentCategory.set(product.category); // Establecer categoría actual
 
           // Rellenamos los campos principales
           this.productForm.patchValue({
@@ -75,23 +78,47 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             is_new: product.is_new,
           });
 
-          // Rellenamos el FormArray 'variants'
-          this.variants.clear();
-          if (product.variants && product.variants.length > 0) {
-            product.variants.forEach((variant) => {
-              // --- 4. Pasar la categoría para aplicar la lógica de talla correcta ---
-              this.variants.push(
-                this.createVariantGroup(this.currentCategory, variant)
-              );
+          // --- ¡¡¡NUEVA LÓGICA DE CARGA DE VARIANTES!!! ---
+          // 1. Agrupar las variantes planas por color
+          const groupedVariants = this.groupVariantsByColor(product.variants);
+          this.colorGroups.clear(); // Limpiar el array
+
+          // 2. Crear los FormGroups anidados a partir de los datos agrupados
+          groupedVariants.forEach((group) => {
+            const sizeStockFormGroups = group.sizeStocks.map((ss) => {
+              // Creamos el grupo de talla/stock...
+              const sizeStockGroup = this.createSizeStockGroup();
+              // ...le aplicamos la lógica de talla...
+              this.applySizeLogic(sizeStockGroup.get("size"), product.category);
+              // ...y le ponemos los valores
+              sizeStockGroup.patchValue(ss);
+              return sizeStockGroup;
             });
+
+            this.colorGroups.push(
+              this.fb.group({
+                color: [group.color, Validators.required],
+                sizeStocks: this.fb.array(
+                  sizeStockFormGroups,
+                  Validators.required
+                ),
+              })
+            );
+          });
+
+          // Si por alguna razón no hay variantes, añadir un grupo vacío
+          if (groupedVariants.length === 0) {
+            this.colorGroups.push(this.createColorGroup());
+            this.updateAllSizeControls(this.currentCategory());
           }
 
-          // --- 5. Escuchar cambios en la categoría (si el admin la cambia) ---
-          this.productForm
-            .get("category")
-            ?.valueChanges.subscribe((newCategory) => {
-              this.currentCategory = newCategory;
-              this.updateVariantSizeControls(newCategory);
+          // 3. Escuchar cambios en la categoría (si el admin la cambia)
+          this.categorySubscription?.unsubscribe(); // Limpiar listener anterior
+          this.categorySubscription = this.productForm
+            .get("category")!
+            .valueChanges.subscribe((newCategory) => {
+              this.currentCategory.set(newCategory);
+              this.updateAllSizeControls(newCategory);
             });
         }
       }
@@ -99,24 +126,117 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpiamos la suscripción
+    // Limpiamos las suscripciones
     this.productSubscription?.unsubscribe();
-  }
-
-  // --- 6. HELPERS PARA EL FORMULARIO DE VARIANTES (Mejorados) ---
-  get variants(): FormArray {
-    return this.productForm.get("variants") as FormArray;
+    this.categorySubscription?.unsubscribe();
   }
 
   /**
-   * Aplica la lógica de validación/valor al control de TALLA
+   * Helper para agrupar el array plano de variantes de la API
+   * en la estructura anidada que necesita nuestro formulario.
    */
+  groupVariantsByColor(
+    variants: FullAdminProduct["variants"]
+  ): { color: string; sizeStocks: { size: string; stock: number }[] }[] {
+    if (!variants) return [];
+
+    const grouped = new Map<string, { size: string; stock: number }[]>();
+
+    // Agrupar
+    variants.forEach((v) => {
+      if (!grouped.has(v.color)) {
+        grouped.set(v.color, []);
+      }
+      grouped.get(v.color)!.push({ size: v.size, stock: v.stock });
+    });
+
+    // Convertir de Map a Array
+    return Array.from(grouped.entries()).map(([color, sizeStocks]) => ({
+      color,
+      sizeStocks,
+    }));
+  }
+
+  // --- HELPERS PARA FORMULARIOS ANIDADOS ---
+
+  get colorGroups(): FormArray {
+    return this.productForm.get("colorGroups") as FormArray;
+  }
+
+  createColorGroup(): FormGroup {
+    return this.fb.group({
+      color: ["", Validators.required],
+      sizeStocks: this.fb.array(
+        [this.createSizeStockGroup()],
+        Validators.required
+      ),
+    });
+  }
+
+  addColorGroup(): void {
+    this.colorGroups.push(this.createColorGroup());
+    const newGroupIndex = this.colorGroups.length - 1;
+    const sizeStockArray = this.getSizeStocks(newGroupIndex);
+    const sizeControl = sizeStockArray.at(0).get("size");
+    this.applySizeLogic(sizeControl, this.currentCategory());
+  }
+
+  removeColorGroup(index: number): void {
+    if (this.colorGroups.length > 0) {
+      // Permitir borrar hasta el último
+      this.colorGroups.removeAt(index);
+    }
+  }
+
+  getSizeStocks(colorIndex: number): FormArray {
+    return this.colorGroups.at(colorIndex).get("sizeStocks") as FormArray;
+  }
+
+  createSizeStockGroup(): FormGroup {
+    const sizeControl = this.fb.control("");
+    this.applySizeLogic(sizeControl, this.currentCategory());
+    return this.fb.group({
+      size: sizeControl,
+      stock: [0, [Validators.required, Validators.min(0)]],
+    });
+  }
+
+  addSizeStock(colorIndex: number): void {
+    this.getSizeStocks(colorIndex).push(this.createSizeStockGroup());
+  }
+
+  removeSizeStock(colorIndex: number, sizeIndex: number): void {
+    const sizeStocks = this.getSizeStocks(colorIndex);
+    if (sizeStocks.length > 1) {
+      // Permitir borrar hasta la última
+      sizeStocks.removeAt(sizeIndex);
+    } else {
+      this.toast.showError("Debe haber al menos una talla por color.");
+    }
+  }
+
+  updateAllSizeControls(category: string): void {
+    this.colorGroups.controls.forEach((colorGroup) => {
+      const sizeStocks = (colorGroup as FormGroup).get(
+        "sizeStocks"
+      ) as FormArray;
+      sizeStocks.controls.forEach((sizeStockControl) => {
+        const sizeControl = (sizeStockControl as FormGroup).get("size");
+        this.applySizeLogic(sizeControl, category);
+        if (category !== "complementos") {
+          sizeControl?.setValue("");
+        }
+      });
+    });
+  }
+
   applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
     if (!sizeControl) return;
-
     sizeControl.clearValidators();
     sizeControl.enable();
-    // No reseteamos el valor aquí, porque estamos cargando datos existentes
+
+    // Guardar el valor actual ANTES de resetear
+    const currentValue = sizeControl.value;
 
     if (category === "zapatillas") {
       sizeControl.setValidators([
@@ -127,83 +247,70 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     } else if (category === "ropa") {
       sizeControl.setValidators([Validators.required]);
     } else if (category === "complementos") {
-      sizeControl.setValue(this.uniqueSize); // Establece el valor
-      sizeControl.disable(); // Lo deshabilita
+      sizeControl.setValue(this.uniqueSize);
+      sizeControl.disable();
     } else {
       sizeControl.setValidators([Validators.required]);
-      sizeControl.disable(); // Deshabilitar si no hay categoría
+      sizeControl.disable();
     }
+
+    // Si la categoría no es complementos, re-aplicar el valor (si es válido)
+    if (category !== "complementos") {
+      sizeControl.setValue(currentValue);
+    }
+
     sizeControl.updateValueAndValidity();
   }
 
-  /**
-   * Actualiza TODAS las filas de variantes cuando la categoría principal cambia
-   */
-  updateVariantSizeControls(category: string): void {
-    this.variants.controls.forEach((control) => {
-      const variantGroup = control as FormGroup;
-      const sizeControl = variantGroup.get("size");
-      this.applySizeLogic(sizeControl, category);
-      // Solo reseteamos el valor si NO es para complementos
-      if (category !== "complementos") {
-        sizeControl?.setValue("");
-      }
-    });
-  }
-
-  /**
-   * Crea un grupo de variante, aplicando la lógica de talla
-   */
-  createVariantGroup(
-    category: string, // Categoría actual
-    variant?: { color: string; size: string; stock: number }
-  ): FormGroup {
-    const group = this.fb.group({
-      color: [variant?.color || "", Validators.required],
-      size: [variant?.size || "", Validators.required], // Se aplica lógica abajo
-      stock: [variant?.stock || 0, [Validators.required, Validators.min(0)]],
-    });
-
-    // Aplicar la lógica de talla al control 'size' recién creado
-    this.applySizeLogic(group.get("size"), category);
-    return group;
-  }
-
-  addVariant(): void {
-    const category = this.productForm.get("category")?.value;
-    if (!category) {
-      this.toast.showError("Por favor, selecciona una categoría primero.");
-      return;
-    }
-    this.variants.push(this.createVariantGroup(category));
-  }
-
-  removeVariant(index: number): void {
-    this.variants.removeAt(index);
-    // Opcional: si es la última, no dejar borrar
-    // if (this.variants.length > 0) {
-    //   this.variants.removeAt(index);
-    // } else {
-    //   this.toast.showError("Debe haber al menos una variante.");
-    // }
-  }
-  // -------------------------------------------
+  // --- FIN DE HELPERS ---
 
   onSubmit(): void {
     if (this.productForm.invalid || !this.product) {
       this.toast.showError("Formulario inválido. Revisa las variantes.");
-      this.productForm.markAllAsTouched(); // Marcar para ver errores
+      this.productForm.markAllAsTouched();
+      // Debugging
+      this.colorGroups.controls.forEach((colorGroup, i) => {
+        if (colorGroup.invalid) {
+          console.log(`Grupo de Color ${i} inválido:`, colorGroup.value);
+          (
+            (colorGroup as FormGroup).get("sizeStocks") as FormArray
+          ).controls.forEach((sizeStock, j) => {
+            if (sizeStock.invalid) {
+              console.log(`  Talla/Stock ${j} inválida:`, sizeStock.value);
+            }
+          });
+        }
+      });
       return;
     }
 
-    // --- 7. Usar 'getRawValue()' para incluir campos deshabilitados ---
     const formValue = this.productForm.getRawValue();
 
-    // El backend (productController.js) espera 'variants' como un string JSON
+    // 1. Aplanar la estructura de 'colorGroups' a 'variants'
+    const variantsForApi: { color: string; size: string; stock: number }[] = [];
+    formValue.colorGroups.forEach(
+      (group: {
+        color: string;
+        sizeStocks: { size: string; stock: number }[];
+      }) => {
+        const color = group.color;
+        group.sizeStocks.forEach((sizeStock) => {
+          variantsForApi.push({
+            color: color,
+            size: sizeStock.size,
+            stock: sizeStock.stock,
+          });
+        });
+      }
+    );
+
+    // 2. Preparar los datos para enviar
     const updatedData = {
       ...formValue,
-      variants: JSON.stringify(formValue.variants), // 'variants' ahora tiene los valores correctos
+      colorGroups: undefined, // No enviar la estructura anidada
+      variants: JSON.stringify(variantsForApi), // Enviar la estructura plana
     };
+    delete updatedData.colorGroups; // Asegurarse de que se elimina
 
     this.adminService.updateProduct(this.product.id, updatedData).subscribe({
       next: () => {

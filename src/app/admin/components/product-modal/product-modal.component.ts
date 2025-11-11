@@ -1,5 +1,5 @@
 // src/app/admin/components/product-modal/product-modal.component.ts
-import { Component, OnInit, signal } from "@angular/core"; // <-- 1. Importar signal
+import { Component, OnInit, signal, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -7,10 +7,12 @@ import {
   ReactiveFormsModule,
   Validators,
   FormArray,
+  AbstractControl,
 } from "@angular/forms";
 import { ModalService } from "../../../core/services/modal.service";
 import { AdminService } from "../../../core/services/admin.service";
 import { ToastService } from "../../../core/services/toast.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-product-modal",
@@ -18,18 +20,17 @@ import { ToastService } from "../../../core/services/toast.service";
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: "./product-modal.component.html",
 })
-export class ProductModalComponent implements OnInit {
+export class ProductModalComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
   selectedFiles: File[] = [];
   fileNames: string[] = [];
+  private categorySubscription: Subscription | null = null;
 
-  // --- 2. Añadir variables de estado para las tallas ---
-  currentCategory = signal<string>(""); // Rastrea la categoría
+  currentCategory = signal<string>("");
   clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
   uniqueSize = "Talla Única";
-  // --------------------------------------------------
 
   constructor(
     private fb: FormBuilder,
@@ -42,105 +43,138 @@ export class ProductModalComponent implements OnInit {
       description: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
       brand: ["", Validators.required],
-      category: ["", Validators.required], // zapatillas, ropa, complementos
-      gender: ["", Validators.required], // unisex, hombre, mujer
+      category: ["", Validators.required],
+      gender: ["", Validators.required],
       material: [""],
       season: [""],
       is_new: [true],
       images: [null, Validators.required],
-      variants: this.fb.array([this.createVariantGroup()], Validators.required),
+      colorGroups: this.fb.array(
+        [this.createColorGroup()],
+        Validators.required
+      ),
     });
   }
 
   ngOnInit(): void {
-    // --- 3. Escuchar cambios en la categoría ---
-    this.productForm.get("category")?.valueChanges.subscribe((category) => {
-      this.currentCategory.set(category);
-      this.updateVariantSizeControls(category);
-    });
-    // ------------------------------------------
+    this.categorySubscription = this.productForm
+      .get("category")!
+      .valueChanges.subscribe((category) => {
+        this.currentCategory.set(category);
+        this.updateAllSizeControls(category);
+      });
   }
 
-  // --- 4. Actualizar dinámicamente los validadores y valores de TALLA ---
-  updateVariantSizeControls(category: string): void {
-    this.variantsArray.controls.forEach((control) => {
-      const variantGroup = control as FormGroup;
-      const sizeControl = variantGroup.get("size");
-      if (!sizeControl) return;
-
-      // Resetear
-      sizeControl.clearValidators();
-      sizeControl.enable();
-      sizeControl.setValue(""); // <-- Importante: resetear valor
-
-      if (category === "zapatillas") {
-        sizeControl.setValidators([
-          Validators.required,
-          Validators.min(this.sneakerMin),
-          Validators.max(this.sneakerMax),
-        ]);
-      } else if (category === "ropa") {
-        sizeControl.setValidators([Validators.required]);
-      } else if (category === "complementos") {
-        sizeControl.setValue(this.uniqueSize);
-        sizeControl.disable(); // Deshabilitado, el valor se tomará con getRawValue()
-      } else {
-        // Categoría por defecto (o vacía)
-        sizeControl.setValidators([Validators.required]);
-        sizeControl.disable(); // Deshabilitar si no hay categoría
-      }
-      sizeControl.updateValueAndValidity();
-    });
+  ngOnDestroy(): void {
+    this.categorySubscription?.unsubscribe();
   }
-  // -------------------------------------------------------------
 
-  createVariantGroup(): FormGroup {
+  // --- GRUPO DE COLOR ---
+  get colorGroups(): FormArray {
+    return this.productForm.get("colorGroups") as FormArray;
+  }
+
+  createColorGroup(): FormGroup {
     return this.fb.group({
       color: ["", Validators.required],
-      size: ["", Validators.required], // Ej: "36", "S", "Única"
+      sizeStocks: this.fb.array(
+        [this.createSizeStockGroup()], // Inicializar con una talla/stock
+        Validators.required
+      ),
+    });
+  }
+
+  addColorGroup(): void {
+    this.colorGroups.push(this.createColorGroup());
+    // Aplicar la lógica de tallas a la primera fila del nuevo grupo
+    const newGroupIndex = this.colorGroups.length - 1;
+    const sizeStockArray = this.getSizeStocks(newGroupIndex);
+    const sizeControl = sizeStockArray.at(0).get("size");
+    this.applySizeLogic(sizeControl, this.currentCategory());
+  }
+
+  removeColorGroup(index: number): void {
+    if (this.colorGroups.length > 1) {
+      this.colorGroups.removeAt(index);
+    } else {
+      this.toast.showError("Debe haber al menos un grupo de color.");
+    }
+  }
+
+  // --- PAREJA TALLA/STOCK ---
+  getSizeStocks(colorIndex: number): FormArray {
+    return this.colorGroups.at(colorIndex).get("sizeStocks") as FormArray;
+  }
+
+  createSizeStockGroup(): FormGroup {
+    const sizeControl = this.fb.control(""); // Valor inicial vacío
+    this.applySizeLogic(sizeControl, this.currentCategory()); // Aplicar lógica inicial
+    return this.fb.group({
+      size: sizeControl,
       stock: [0, [Validators.required, Validators.min(0)]],
     });
   }
 
-  get variantsArray(): FormArray {
-    return this.productForm.get("variants") as FormArray;
+  addSizeStock(colorIndex: number): void {
+    this.getSizeStocks(colorIndex).push(this.createSizeStockGroup());
+    // No hace falta aplicar applySizeLogic aquí porque ya se hace en createSizeStockGroup
   }
 
-  // --- 5. Modificar 'addVariant' para que use la categoría actual ---
-  addVariant(): void {
-    const currentCategory = this.productForm.get("category")?.value;
-    const newVariantGroup = this.createVariantGroup();
-
-    // Aplicar la lógica de talla/validadores a la nueva fila
-    const sizeControl = newVariantGroup.get("size");
-    if (sizeControl) {
-      if (currentCategory === "zapatillas") {
-        sizeControl.setValidators([
-          Validators.required,
-          Validators.min(this.sneakerMin),
-          Validators.max(this.sneakerMax),
-        ]);
-      } else if (currentCategory === "ropa") {
-        sizeControl.setValidators([Validators.required]);
-      } else if (currentCategory === "complementos") {
-        sizeControl.setValue(this.uniqueSize);
-        sizeControl.disable();
-      } else {
-        // No permitir añadir si no hay categoría
-        this.toast.showError("Por favor, selecciona una categoría primero.");
-        return;
-      }
-    }
-    this.variantsArray.push(newVariantGroup);
-  }
-  // -------------------------------------------------------------
-
-  removeVariant(index: number): void {
-    if (this.variantsArray.length > 1) {
-      this.variantsArray.removeAt(index);
+  removeSizeStock(colorIndex: number, sizeIndex: number): void {
+    const sizeStocks = this.getSizeStocks(colorIndex);
+    if (sizeStocks.length > 1) {
+      sizeStocks.removeAt(sizeIndex);
     } else {
-      this.toast.showError("Debe haber al menos una variante.");
+      this.toast.showError("Debe haber al menos una talla por color.");
     }
+  }
+
+  /**
+   * Itera por TODOS los grupos y TODAS las tallas y aplica la lógica de validación y estado.
+   * Utiliza `AbstractControl.enable()`/`disable()` y `setValue()` para evitar la advertencia de Angular.
+   */
+  updateAllSizeControls(category: string): void {
+    this.colorGroups.controls.forEach((colorGroup) => {
+      const sizeStocks = (colorGroup as FormGroup).get(
+        "sizeStocks"
+      ) as FormArray;
+      sizeStocks.controls.forEach((sizeStockControl) => {
+        const sizeControl = (sizeStockControl as FormGroup).get("size");
+        this.applySizeLogic(sizeControl, category);
+      });
+    });
+  }
+
+  /**
+   * Aplica validadores/valor/estado a UN solo control de talla.
+   * La clave para la advertencia de `disabled` es usar `control.disable()`/`enable()`
+   * en lugar de `[disabled]` en el HTML.
+   */
+  applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
+    if (!sizeControl) return;
+
+    sizeControl.clearValidators();
+    sizeControl.enable(); // Primero habilitar para limpiar estados anteriores
+    sizeControl.setValue(""); // Siempre resetear el valor
+
+    if (category === "zapatillas") {
+      sizeControl.setValidators([
+        Validators.required,
+        Validators.min(this.sneakerMin),
+        Validators.max(this.sneakerMax),
+      ]);
+    } else if (category === "ropa") {
+      sizeControl.setValidators([Validators.required]);
+    } else if (category === "complementos") {
+      sizeControl.setValue(this.uniqueSize);
+      sizeControl.disable(); // Deshabilitar el control en TS
+    } else {
+      // Categoría no seleccionada o inválida
+      sizeControl.setValidators([Validators.required]);
+      sizeControl.disable(); // Deshabilitar el control en TS
+      sizeControl.setValue(""); // Asegurarse de que esté vacío
+    }
+    sizeControl.updateValueAndValidity(); // Actualizar validación
   }
 
   onFileChange(event: Event): void {
@@ -162,25 +196,16 @@ export class ProductModalComponent implements OnInit {
     if (this.productForm.invalid) {
       this.toast.showError("Por favor, completa todos los campos requeridos.");
       this.productForm.markAllAsTouched();
-
+      // Debugging más profundo para formularios anidados
       console.log("Formulario inválido:", this.productForm.value);
-      Object.keys(this.productForm.controls).forEach((key) => {
-        const controlErrors = this.productForm.get(key)?.errors;
-        if (controlErrors) {
-          console.log("Control con error:", key, controlErrors);
-        }
-      });
-      // Revisar errores en el FormArray
-      this.variantsArray.controls.forEach((group, index) => {
-        if (group.invalid) {
-          console.log(`Variante ${index} inválida:`, group.errors, group.value);
-          Object.keys((group as FormGroup).controls).forEach((key) => {
-            const controlErrors = (group as FormGroup).get(key)?.errors;
-            if (controlErrors) {
-              console.log(
-                `Control [${index}].${key} con error:`,
-                controlErrors
-              );
+      this.colorGroups.controls.forEach((colorGroup, i) => {
+        if (colorGroup.invalid) {
+          console.log(`Grupo de Color ${i} inválido:`, colorGroup.value);
+          (
+            (colorGroup as FormGroup).get("sizeStocks") as FormArray
+          ).controls.forEach((sizeStock, j) => {
+            if (sizeStock.invalid) {
+              console.log(`  Talla/Stock ${j} inválida:`, sizeStock.value);
             }
           });
         }
@@ -196,30 +221,43 @@ export class ProductModalComponent implements OnInit {
     }
 
     const formData = new FormData();
+    const formValue = this.productForm.getRawValue(); // Incluir campos disabled
 
-    // --- 6. Usar 'getRawValue()' para incluir campos deshabilitados ---
-    const formValue = this.productForm.getRawValue();
-    // ---------------------------------------------------------------
+    // 1. Aplanar la estructura de 'colorGroups' a 'variants'
+    const variantsForApi: { color: string; size: string; stock: number }[] = [];
+    formValue.colorGroups.forEach(
+      (group: {
+        color: string;
+        sizeStocks: { size: string; stock: number }[];
+      }) => {
+        const color = group.color;
+        group.sizeStocks.forEach((sizeStock) => {
+          variantsForApi.push({
+            color: color,
+            size: sizeStock.size,
+            stock: sizeStock.stock,
+          });
+        });
+      }
+    );
 
-    // Añadimos los campos del producto padre
+    // 2. Añadir los campos del producto padre
     Object.keys(formValue).forEach((key) => {
-      if (key !== "images" && key !== "variants") {
+      // Omitimos 'images' y la estructura anidada 'colorGroups'
+      if (key !== "images" && key !== "colorGroups") {
         formData.append(key, formValue[key]);
       }
     });
 
-    // Añadimos el array de variantes como un string JSON
-    formData.append(
-      "variants",
-      JSON.stringify(formValue.variants) // 'variants' contendrá "Talla Única"
-    );
-    // ----------------------------
+    // 3. Añadir el array "aplastado" como string JSON
+    formData.append("variants", JSON.stringify(variantsForApi));
 
-    // Añadimos todas las imágenes seleccionadas
+    // 4. Añadir todas las imágenes seleccionadas
     this.selectedFiles.forEach((file) => {
       formData.append("images", file, file.name);
     });
 
+    // 5. Enviar a la API
     this.adminService.createProduct(formData).subscribe({
       next: (response) => {
         this.toast.showSuccess("¡Producto creado con éxito!");
@@ -239,15 +277,19 @@ export class ProductModalComponent implements OnInit {
     this.productForm.reset({
       is_new: true,
       price: 0,
-      category: "", // Resetear categoría
+      category: "",
     });
     // Reseteamos el FormArray
-    this.variantsArray.clear();
-    this.variantsArray.push(this.createVariantGroup());
-
-    // Resetear estado de tallas
-    this.currentCategory.set("");
-    this.updateVariantSizeControls(""); // Poner los inputs de talla en disabled
+    this.colorGroups.clear();
+    // Añadimos un grupo de color inicial y aplicamos la lógica de talla
+    const initialColorGroup = this.createColorGroup();
+    this.colorGroups.push(initialColorGroup);
+    const initialSizeControl = (
+      initialColorGroup.get("sizeStocks") as FormArray
+    )
+      .at(0)
+      .get("size");
+    this.applySizeLogic(initialSizeControl, ""); // Aplicar estado inicial (categoría vacía)
 
     this.selectedFiles = [];
     this.fileNames = [];
