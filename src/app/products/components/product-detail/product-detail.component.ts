@@ -1,5 +1,5 @@
 // src/app/products/components/product-detail/product-detail.component.ts
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, signal, computed } from "@angular/core";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -9,16 +9,14 @@ import {
   Product,
   ProductImage,
   ProductApiResponse,
-  ProductVariantStock, // <-- Importamos la interfaz correcta
-  ProductSibling, // <-- Importamos la interfaz correcta
+  ProductVariantStock,
+  ProductSibling,
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
 
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
 
-// Definir la interfaz completa para la señal
-// El tipo 'Product' del servicio ya es la interfaz completa
 type ProductDetail = Product;
 
 @Component({
@@ -35,14 +33,31 @@ export class ProductDetailComponent implements OnInit {
   error = signal<string | null>(null);
 
   // Señales para interacción
+  selectedColor = signal<string>("");
   selectedSize = signal<string>("");
   selectedImageUrl = signal<string>("");
   quantity = signal(1);
   activeTab = signal("description");
 
-  // Esta señal ahora se rellenará dinámicamente
+  // Señales dinámicas para la UI
+  availableColors = signal<string[]>([]);
   availableSizes = signal<string[]>([]);
-  // ¡NUEVA SEÑAL PARA HERMANOS!
+
+  // Señal computada para obtener la variante
+  selectedVariantId = computed<number | null>(() => {
+    const p = this.product();
+    const color = this.selectedColor();
+    const size = this.selectedSize();
+
+    // Comprobación de seguridad (corregida en el prompt anterior)
+    if (!p || !p.variants || !color || !size) return null;
+
+    const variant = p.variants.find(
+      (v) => v.color === color && v.size === size
+    );
+    return variant ? variant.id : null;
+  });
+
   siblings = signal<ProductSibling[]>([]);
 
   backendUrl = "http://localhost:3000";
@@ -57,23 +72,17 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // --- ¡LÓGICA DE CARGA MODIFICADA! ---
     this.route.paramMap.subscribe((params) => {
       const productIdParam = params.get("id");
       const productId = Number(productIdParam);
 
-      // 1. Comprobar si ya tenemos un producto cargado (es un cambio de variante)
-      const isVariantSwitch = this.product() !== null;
+      this.isLoading.set(true);
+      this.product.set(null);
+      window.scrollTo(0, 0);
 
-      if (!isVariantSwitch) {
-        // --- Carga COMPLETA (primera vez que entras) ---
-        this.isLoading.set(true);
-        this.product.set(null);
-        window.scrollTo(0, 0); // Solo hacemos scroll al inicio aquí
-      }
-
-      // En ambos casos, reseteamos la selección
+      this.selectedColor.set("");
       this.selectedSize.set("");
+      this.availableColors.set([]);
       this.availableSizes.set([]);
       this.siblings.set([]);
 
@@ -83,7 +92,6 @@ export class ProductDetailComponent implements OnInit {
         return;
       }
 
-      // 2. Llamar a loadProduct en ambos casos.
       this.loadProduct(productId);
     });
   }
@@ -91,27 +99,18 @@ export class ProductDetailComponent implements OnInit {
   loadProduct(productId: number): void {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: ProductApiResponse) => {
-        // Usamos la interfaz de API
         if (foundProduct) {
-          // --- ¡LÓGICA DE TALLAS CORREGIDA! ---
-          // Leemos el array 'variants' (tallas/stock)
-          const variants = foundProduct.variants || []; // <-- Aseguramos que sea un array
+          const variants = foundProduct.variants || [];
+          const siblings = foundProduct.siblings || [];
 
-          // Extraemos las tallas únicas y con stock
-          const processedSizes = variants
-            .filter((v) => v.stock > 0) // Solo mostrar tallas con stock
-            .map((v) => v.size)
-            .filter((v, i, a) => a.indexOf(v) === i); // Quitar duplicados
+          const colorsWithStock = variants
+            .filter((v) => v.stock > 0)
+            .map((v) => v.color)
+            .filter((v, i, a) => a.indexOf(v) === i); // Unique
+          this.availableColors.set(colorsWithStock);
 
-          this.availableSizes.set(processedSizes);
-          // ------------------------------------
-
-          // --- ¡LÓGICA DE HERMANOS AÑADIDA! ---
-          const siblings = foundProduct.siblings || []; // <-- Aseguramos que sea un array
           this.siblings.set(siblings);
-          // ---------------------------------
 
-          // Creamos el objeto 'Product' completo para el frontend
           const productData: ProductDetail = {
             id: foundProduct.id,
             name: foundProduct.name,
@@ -119,7 +118,7 @@ export class ProductDetailComponent implements OnInit {
             price: Number(foundProduct.price),
             rating: foundProduct.averageRating,
             ratingCount: foundProduct.ratingCount,
-            images: foundProduct.images || [], // <-- Aseguramos que sea un array
+            images: foundProduct.images || [],
             variants: variants,
             siblings: siblings,
             oldPrice:
@@ -131,19 +130,31 @@ export class ProductDetailComponent implements OnInit {
             gender: foundProduct.gender,
             category: foundProduct.category,
             brand: foundProduct.brand,
-            // 'size' (el string) ya no existe
           };
           this.product.set(productData);
 
-          // Si es un cambio de variante, actualizamos la imagen principal
           if (productData.images && productData.images.length > 0) {
-            // <-- Arregla "posiblemente undefined"
-            this.selectedImageUrl.set(productData.images[0].imageUrl);
+            this.selectedImageUrl.set(productData.images[0]?.imageUrl || "");
           }
+
+          // --- ¡¡¡BLOQUE CORREGIDO!!! ---
+          // Esta es la corrección para los errores TS2345
+          const mainColor = foundProduct.color; // Puede ser string | null | undefined
+
+          if (mainColor && colorsWithStock.includes(mainColor)) {
+            // Si el color principal existe Y está en la lista de stock
+            this.selectColor(mainColor);
+          } else if (colorsWithStock.length > 0) {
+            // Si no, seleccionar el primer color que sí tenga stock
+            // (colorsWithStock[0] está garantizado a ser un string)
+            this.selectColor(colorsWithStock[0]);
+          }
+          // Si no hay stock de nada, ambas señales (color/talla) quedarán vacías
+          // ------------------------------------
         } else {
           this.error.set("Producto no encontrado.");
         }
-        this.isLoading.set(false); // Ponemos isLoading(false) en ambos casos
+        this.isLoading.set(false);
       },
       error: (err: HttpErrorResponse) => {
         console.error("Error al cargar el producto:", err);
@@ -160,17 +171,38 @@ export class ProductDetailComponent implements OnInit {
     }
     const product = this.product();
     if (product && product.images && product.images.length > 0) {
-      // <-- Arregla "posiblemente undefined"
-      return `${this.backendUrl}${product.images[0].imageUrl}`;
+      return `${this.backendUrl}${product.images[0]?.imageUrl || ""}`;
     }
     return this.defaultImage;
   }
 
-  selectImage(imageUrl: string): void {
-    this.selectedImageUrl.set(imageUrl);
+  // Aceptamos 'string | undefined'
+  selectImage(imageUrl: string | undefined): void {
+    this.selectedImageUrl.set(imageUrl || ""); // <-- y ponemos un fallback
   }
 
   // --- Métodos de Acciones de Producto ---
+  selectColor(color: string): void {
+    this.selectedColor.set(color);
+    this.selectedSize.set("");
+
+    const product = this.product();
+    if (!product) {
+      this.availableSizes.set([]);
+      return;
+    }
+
+    // Nos aseguramos de que 'variants' existe
+    const variants = product.variants || [];
+
+    const sizesForColor = variants
+      .filter((v) => v.color === color && v.stock > 0)
+      .map((v) => v.size)
+      .filter((v, i, a) => a.indexOf(v) === i); // Unique
+
+    this.availableSizes.set(sizesForColor);
+  }
+
   selectSize(size: string): void {
     this.selectedSize.set(size);
   }
@@ -183,40 +215,16 @@ export class ProductDetailComponent implements OnInit {
     this.quantity.update((q) => (q > 1 ? q - 1 : 1));
   }
 
-  // --- ¡¡¡FUNCIÓN 'addToCart' CORREGIDA!!! ---
   addToCart(): void {
-    const product = this.product();
-    if (!product) return;
+    const variantId = this.selectedVariantId();
 
-    let variantId: number;
-
-    // Comprobar si el producto tiene tallas (ej: Zapatillas)
-    if (this.availableSizes().length > 0) {
-      if (!this.selectedSize()) {
-        this.toastService.showError("Por favor, selecciona una talla.");
-        return;
-      }
-      // Encontrar la variante específica (id, color, size, stock)
-      const selectedVariant = (product.variants || []).find(
-        (v) => v.size === this.selectedSize()
+    if (!variantId) {
+      this.toastService.showError(
+        "Por favor, selecciona un color y una talla."
       );
-      if (!selectedVariant) {
-        this.toastService.showError("Error al encontrar la variante de talla.");
-        return;
-      }
-      variantId = selectedVariant.id;
-    } else {
-      // Producto SIN tallas (ej: Gorra "Talla Única")
-      if (!product.variants || product.variants.length === 0) {
-        this.toastService.showError("Este producto no tiene stock definido.");
-        return;
-      }
-      // Asumimos que es la primera (y única) variante
-      variantId = product.variants[0].id;
+      return;
     }
 
-    // --- ¡Nueva llamada al servicio! ---
-    // Asumimos que cartService.addToCart ahora espera (variantId, quantity)
     this.cartService.addToCart(variantId, this.quantity()).subscribe({
       next: () => {
         this.toastService.showSuccess("¡Producto añadido a la cesta!");
@@ -230,39 +238,18 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- ¡¡¡FUNCIÓN 'buyNow' CORREGIDA!!! ---
   buyNow(): void {
-    const product = this.product();
-    if (!product) return;
+    const variantId = this.selectedVariantId();
 
-    let variantId: number;
-
-    // (Misma lógica de 'addToCart' para encontrar el variantId)
-    if (this.availableSizes().length > 0) {
-      if (!this.selectedSize()) {
-        this.toastService.showError("Por favor, selecciona una talla.");
-        return;
-      }
-      const selectedVariant = (product.variants || []).find(
-        (v) => v.size === this.selectedSize()
+    if (!variantId) {
+      this.toastService.showError(
+        "Por favor, selecciona un color y una talla."
       );
-      if (!selectedVariant) {
-        this.toastService.showError("Error al encontrar la variante de talla.");
-        return;
-      }
-      variantId = selectedVariant.id;
-    } else {
-      if (!product.variants || product.variants.length === 0) {
-        this.toastService.showError("Este producto no tiene stock definido.");
-        return;
-      }
-      variantId = product.variants[0].id;
+      return;
     }
 
-    // --- ¡Nueva llamada al servicio! ---
     this.cartService.addToCart(variantId, this.quantity()).subscribe({
       next: () => {
-        // Redirigir al carrito después de añadir
         this.router.navigate(["/cart"]);
       },
       error: (err: HttpErrorResponse) => {
