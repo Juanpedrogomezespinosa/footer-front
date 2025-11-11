@@ -182,17 +182,66 @@
               />
             </div>
 
-            <div class="col-span-3 md:col-span-1">
-              <label [for]="'size-' + i" class="sr-only">Talla</label>
-              <input
-                type="text"
-                [id]="'size-' + i"
-                formControlName="size"
-                placeholder="Talla (Ej: 42, M, Única)"
-                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
-              />
-            </div>
+            <div
+              class="col-span-3 md:col-span-1"
+              [ngSwitch]="currentCategory()"
+            >
+              <div *ngSwitchCase="'zapatillas'">
+                <label [for]="'size-' + i" class="sr-only"
+                  >Talla (Zapatillas)</label
+                >
+                <input
+                  type="number"
+                  [id]="'size-' + i"
+                  formControlName="size"
+                  [min]="sneakerMin"
+                  [max]="sneakerMax"
+                  placeholder="Talla ({{ sneakerMin }}-{{ sneakerMax }})"
+                  class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+                />
+              </div>
 
+              <div *ngSwitchCase="'ropa'">
+                <label [for]="'size-' + i" class="sr-only">Talla (Ropa)</label>
+                <select
+                  [id]="'size-' + i"
+                  formControlName="size"
+                  class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+                >
+                  <option value="" disabled>Talla...</option>
+                  <option *ngFor="let s of clothingSizes" [value]="s">
+                    {{ s }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngSwitchCase="'complementos'">
+                <label [for]="'size-' + i" class="sr-only"
+                  >Talla (Complementos)</label
+                >
+                <input
+                  type="text"
+                  [id]="'size-' + i"
+                  formControlName="size"
+                  placeholder="Talla Única"
+                  class="w-full p-2 border border-border-light rounded-lg bg-gray-200 text-gray-500 text-sm"
+                  [readOnly]="true"
+                  [disabled]="true"
+                />
+              </div>
+
+              <div *ngSwitchDefault>
+                <label [for]="'size-' + i" class="sr-only">Talla</label>
+                <input
+                  type="text"
+                  [id]="'size-' + i"
+                  formControlName="size"
+                  placeholder="Selecciona categoría"
+                  class="w-full p-2 border border-border-light rounded-lg bg-gray-200 text-gray-500 text-sm"
+                  [disabled]="true"
+                />
+              </div>
+            </div>
             <div class="col-span-2 md:col-span-1">
               <label [for]="'stock-' + i" class="sr-only">Stock</label>
               <input
@@ -225,6 +274,7 @@
           Añadir otra variante (Talla/Color)
         </button>
       </div>
+
       <div class="flex items-center gap-2">
         <input
           type="checkbox"

@@ -1,3 +1,4 @@
+<!-- src/app/admin/components/edit-product-modal/edit-product-modal.component.html -->
 <div
   (click)="close()"
   class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in"
@@ -155,6 +156,7 @@
           </div>
         </div>
 
+        <!-- --- ¡¡¡SECCIÓN DE VARIANTES ACTUALIZADA!!! --- -->
         <div>
           <label
             class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
@@ -170,24 +172,74 @@
               [formGroupName]="i"
               class="grid grid-cols-1 md:grid-cols-4 gap-3"
             >
+              <!-- Color -->
               <input
                 type="text"
                 formControlName="color"
                 placeholder="Color (Ej: Rojo)"
-                class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
               />
-              <input
-                type="text"
-                formControlName="size"
-                placeholder="Talla (Ej: 42, M, Uni)"
-                class="w-full p-2 border border-border-light rounded-lg bg-background-light"
-              />
+
+              <!-- Talla (DINÁMICA) -->
+              <div [ngSwitch]="currentCategory">
+                <!-- Caso 1: Zapatillas -->
+                <div *ngSwitchCase="'zapatillas'">
+                  <input
+                    type="number"
+                    formControlName="size"
+                    [min]="sneakerMin"
+                    [max]="sneakerMax"
+                    placeholder="Talla ({{ sneakerMin }}-{{ sneakerMax }})"
+                    class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+                  />
+                </div>
+
+                <!-- Caso 2: Ropa -->
+                <div *ngSwitchCase="'ropa'">
+                  <select
+                    formControlName="size"
+                    class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
+                  >
+                    <option value="" disabled>Talla...</option>
+                    <option *ngFor="let s of clothingSizes" [value]="s">
+                      {{ s }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Caso 3: Complementos -->
+                <div *ngSwitchCase="'complementos'">
+                  <input
+                    type="text"
+                    formControlName="size"
+                    placeholder="Talla Única"
+                    class="w-full p-2 border border-border-light rounded-lg bg-gray-200 text-gray-500 text-sm"
+                    [readOnly]="true"
+                    [disabled]="true"
+                  />
+                </div>
+
+                <!-- Caso 4: Default (Categoría no seleccionada) -->
+                <div *ngSwitchDefault>
+                  <input
+                    type="text"
+                    formControlName="size"
+                    placeholder="Selecciona categoría"
+                    class="w-full p-2 border border-border-light rounded-lg bg-gray-200 text-gray-500 text-sm"
+                    [disabled]="true"
+                  />
+                </div>
+              </div>
+
+              <!-- Stock -->
               <input
                 type="number"
                 formControlName="stock"
                 placeholder="Stock"
-                class="w-full p-2 border border-border-light rounded-lg bg-background-light"
+                class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm"
               />
+
+              <!-- Botón Eliminar -->
               <button
                 type="button"
                 (click)="removeVariant(i)"
@@ -197,6 +249,7 @@
               </button>
             </div>
           </div>
+          <!-- Botón Añadir Variante -->
           <button
             type="button"
             (click)="addVariant()"
@@ -205,6 +258,8 @@
             + Añadir otra variante
           </button>
         </div>
+        <!-- --- FIN DE LA SECCIÓN DE VARIANTES --- -->
+
         <div class="flex items-center gap-2">
           <input
             type="checkbox"
