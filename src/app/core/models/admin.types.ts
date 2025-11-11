@@ -88,25 +88,27 @@ export interface AdminProduct {
   id: number;
   name: string;
   price: string; // La API lo devuelve como string
-  stock: number;
+  stock: number; // Este 'stock' es el que tu HTML usaba antes
   category: string;
   brand: string;
   image: string | null; // La imagen principal
   averageRating: number;
   ratingCount: number;
-  totalStock: number; // <-- ¡¡¡CORRECCIÓN AÑADIDA AQUÍ!!!
-  // Añade más campos si los necesitas en la tabla
+  totalStock: number; // Este es el nuevo campo correcto para la lista
 }
 
+// --- ¡¡¡INTERFAZ CORREGIDA!!! ---
 // --- Para: GET /api/products/:id (Detalle de producto para editar) ---
 export interface FullAdminProduct {
   id: number;
   name: string;
   description: string;
   price: string;
-  stock: number;
-  size: string;
-  color: string;
+  // --- Campos antiguos eliminados ---
+  // stock: number;
+  // size: string;
+  // ----------------------------------
+  color: string; // Color principal del producto padre
   brand: string;
   category: string;
   sub_category?: string | null;
@@ -116,6 +118,23 @@ export interface FullAdminProduct {
   is_new: boolean;
   images: { id: number; imageUrl: string; displayOrder: number }[];
   averageRating: number;
+
+  // --- ¡¡¡NUEVOS CAMPOS AÑADIDOS!!! ---
+  // El array de variantes que ahora envía el backend
+  variants: {
+    id: number;
+    color: string;
+    size: string;
+    stock: number;
+  }[];
+
+  // El array de "hermanos" (otros colores)
+  siblings: {
+    id: number;
+    color: string;
+    image: string | null;
+  }[];
+  // ------------------------------------
 }
 
 // --- ¡NUEVAS INTERFACES AÑADIDAS! ---
