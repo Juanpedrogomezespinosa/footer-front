@@ -1,6 +1,4 @@
-<!-- src/app/admin/pages/admin-users/admin-users.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
-  <!-- Cabecera -->
   <div class="flex flex-col gap-1">
     <p
       class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight"
@@ -9,13 +7,38 @@
     </p>
   </div>
 
-  <!-- Contenedor de la tabla -->
+  <form
+    [formGroup]="filterForm"
+    class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm"
+  >
+    <div class="md:col-span-2">
+      <label
+        for="filter-name"
+        class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+      >
+        Buscar por nombre, apellidos o email
+      </label>
+      <div class="relative">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        >
+          >
+        </div>
+        <input
+          type="search"
+          id="filter-name"
+          formControlName="search"
+          placeholder="Ej: Juanpe..."
+          class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg bg-background-light focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+    </div>
+  </form>
   <div *ngIf="!isLoading; else loading" class="flex flex-col gap-4">
     <div
       class="w-full overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm"
     >
       <table class="w-full text-left min-w-[800px]">
-        <!-- Encabezados -->
         <thead class="border-b border-border-light dark:border-border-dark">
           <tr>
             <th
@@ -41,27 +64,28 @@
             <th
               class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
             >
+              Detalles
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
               Acciones
             </th>
           </tr>
         </thead>
-        <!-- Cuerpo de la Tabla -->
         <tbody *ngIf="users$ | async as users">
-          <!-- Estado vacío -->
           <tr *ngIf="users.length === 0">
             <td
-              colspan="5"
+              colspan="6"
               class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
             >
               No se encontraron usuarios.
             </td>
           </tr>
-          <!-- Fila por cada usuario -->
           <tr
             *ngFor="let user of users"
             class="border-b border-border-light dark:border-border-dark last:border-b-0 hover:bg-background-light dark:hover:bg-background-dark transition-colors"
           >
-            <!-- Avatar -->
             <td class="p-4">
               <img
                 [src]="
@@ -74,7 +98,6 @@
               />
             </td>
 
-            <!-- Usuario (Nombre y Email) -->
             <td
               class="p-4 text-sm text-text-light-primary dark:text-text-dark-primary"
             >
@@ -84,7 +107,6 @@
               </p>
             </td>
 
-            <!-- Rol -->
             <td class="p-4 text-sm">
               <span
                 class="px-2 py-1 text-xs font-semibold rounded-full capitalize"
@@ -99,14 +121,21 @@
               </span>
             </td>
 
-            <!-- Fecha de Creación -->
             <td
               class="p-4 text-sm text-text-light-secondary dark:text-text-dark-secondary"
             >
               {{ user.created_at | date : "dd/MM/yyyy" }}
             </td>
 
-            <!-- Acciones -->
+            <td class="p-4">
+              <button
+                (click)="onDetails(user.id)"
+                class="text-sm font-medium text-blue-600 hover:underline"
+              >
+                Ver Detalles
+              </button>
+            </td>
+
             <td class="p-4">
               <button
                 (click)="onDeleteUser(user.id, user.username)"
@@ -123,7 +152,6 @@
   </div>
 </div>
 
-<!-- Estado de Carga -->
 <ng-template #loading>
   <div class="w-full text-center p-10">
     <p class="text-text-light-secondary dark:text-text-dark-secondary">

@@ -6,7 +6,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 
 import { ADMIN_ROUTES } from "./admin.routes";
 import { DashboardComponent } from "./dashboard/dashboard.component";
-import { AdminLayoutComponent } from "./admin-layout/admin-layout.component";
+import { AdminLayoutComponent } from "./pages/admin-layout/admin-layout.component";
 
 import { AdminProductsComponent } from "./pages/admin-products/admin-products.component";
 import { AdminOrdersComponent } from "./pages/admin-orders/admin-orders.component";

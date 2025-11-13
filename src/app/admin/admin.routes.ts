@@ -1,7 +1,7 @@
 // src/app/admin/admin.routes.ts
 import { Routes } from "@angular/router";
 import { DashboardComponent } from "./dashboard/dashboard.component";
-import { AdminLayoutComponent } from "./admin-layout/admin-layout.component";
+import { AdminLayoutComponent } from "./pages/admin-layout/admin-layout.component";
 // 1. Importar los nuevos componentes de página
 import { AdminProductsComponent } from "./pages/admin-products/admin-products.component";
 import { AdminOrdersComponent } from "./pages/admin-orders/admin-orders.component";

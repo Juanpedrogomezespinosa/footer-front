@@ -24,6 +24,23 @@ export interface SalesGraph {
   };
 }
 
+// --- ¡¡¡NUEVA INTERFAZ REUTILIZABLE!!! ---
+// Una única fuente de verdad para las Direcciones
+export interface AdminAddress {
+  id: number;
+  userId: number;
+  alias: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone: string | null;
+  isDefault: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- Para: /api/admin/orders ---
 export interface AdminOrdersResponse {
   currentPage: number;
@@ -46,20 +63,9 @@ export interface AdminOrder {
     username: string;
     email: string;
   };
-  Address: {
-    id: number;
-    userId: number;
-    alias: string;
-    street: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-    phone: string | null;
-    isDefault: boolean;
-    created_at: string;
-    updated_at: string;
-  } | null; // El address puede ser null
+  // --- ¡REFACTORIZADO! ---
+  // Ahora usa la interfaz reutilizable
+  Address: AdminAddress | null;
 }
 
 // --- Para: /api/admin/users ---
@@ -72,6 +78,12 @@ export interface AdminUser {
   avatarUrl: string | null;
   role: "admin" | "client";
   created_at: string;
+}
+
+// --- ¡NUEVA INTERFAZ! ---
+// Para: GET /api/admin/users/:id
+export interface FullAdminUser extends AdminUser {
+  Addresses: AdminAddress[]; // <-- Reutiliza la interfaz
 }
 
 // --- Para: GET /api/products (Listado de productos) ---
@@ -97,17 +109,12 @@ export interface AdminProduct {
   totalStock: number; // Este es el nuevo campo correcto para la lista
 }
 
-// --- ¡¡¡INTERFAZ CORREGIDA!!! ---
 // --- Para: GET /api/products/:id (Detalle de producto para editar) ---
 export interface FullAdminProduct {
   id: number;
   name: string;
   description: string;
   price: string;
-  // --- Campos antiguos eliminados ---
-  // stock: number;
-  // size: string;
-  // ----------------------------------
   color: string; // Color principal del producto padre
   brand: string;
   category: string;
@@ -118,32 +125,24 @@ export interface FullAdminProduct {
   is_new: boolean;
   images: { id: number; imageUrl: string; displayOrder: number }[];
   averageRating: number;
-
-  // --- ¡¡¡NUEVOS CAMPOS AÑADIDOS!!! ---
-  // El array de variantes que ahora envía el backend
   variants: {
     id: number;
     color: string;
     size: string;
     stock: number;
   }[];
-
-  // El array de "hermanos" (otros colores)
   siblings: {
     id: number;
     color: string;
     image: string | null;
   }[];
-  // ------------------------------------
 }
-
-// --- ¡NUEVAS INTERFACES AÑADIDAS! ---
 
 // --- Para: GET /api/orders/:id (Detalle de un pedido) ---
 
-/**
- * Información de la dirección tal como se devuelve en un pedido
- */
+// --- ¡INTERFAZ ELIMINADA! ---
+// 'AdminOrderUserAddress' ya no es necesaria, usamos 'AdminAddress'
+/*
 export interface AdminOrderUserAddress {
   id: number;
   alias: string;
@@ -154,28 +153,20 @@ export interface AdminOrderUserAddress {
   country: string;
   phone?: string | null;
 }
+*/
 
-/**
- * Información simplificada del producto dentro de un OrderItem
- */
 export interface AdminOrderItemProduct {
   id: number;
   name: string;
   image: string | null; // Asumimos que el backend devuelve la imagen principal
 }
 
-/**
- * Un item (producto) dentro de un pedido
- */
 export interface AdminOrderItem {
   quantity: number;
   price: string; // La API devuelve 'price' como string
   Product: AdminOrderItemProduct;
 }
 
-/**
- * El objeto completo de detalles de un pedido para el modal de admin
- */
 export interface FullAdminOrder {
   id: number;
   status: string;
@@ -186,6 +177,8 @@ export interface FullAdminOrder {
     username: string;
     email: string;
   };
-  Address: AdminOrderUserAddress;
+  // --- ¡REFACTORIZADO! ---
+  // Ahora usa la interfaz reutilizable
+  Address: AdminAddress;
   OrderItems: AdminOrderItem[];
 }

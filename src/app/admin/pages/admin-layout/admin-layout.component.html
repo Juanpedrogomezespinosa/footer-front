@@ -285,6 +285,10 @@
   *ngIf="isDeleteUserModalOpen$ | async"
 ></app-delete-user-modal>
 
+<app-user-details-modal
+  *ngIf="isUserDetailsModalOpen$ | async"
+></app-user-details-modal>
+
 <style>
   @keyframes fade-in {
     0% {

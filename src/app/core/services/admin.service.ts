@@ -10,6 +10,7 @@ import {
   AdminProductsResponse,
   FullAdminProduct,
   FullAdminOrder,
+  FullAdminUser, // <-- ¡Importado!
 } from "../models/admin.types";
 
 // Interfaz para los filtros de producto
@@ -35,9 +36,22 @@ export class AdminService {
   getSalesGraph(): Observable<SalesGraph> {
     return this.http.get<SalesGraph>(`${this.apiUrl}/stats/sales-graph`);
   }
-  getUsers(): Observable<AdminUser[]> {
-    return this.http.get<AdminUser[]>(`${this.apiUrl}/users`);
+
+  // --- ¡MODIFICADO! ---
+  getUsers(searchQuery?: string | null): Observable<AdminUser[]> {
+    let params = new HttpParams();
+    if (searchQuery) {
+      params = params.set("search", searchQuery);
+    }
+    return this.http.get<AdminUser[]>(`${this.apiUrl}/users`, { params });
   }
+
+  // --- ¡NUEVO! ---
+  getAdminUserById(id: number): Observable<FullAdminUser> {
+    return this.http.get<FullAdminUser>(`${this.apiUrl}/users/${id}`);
+  }
+  // -------------
+
   getOrders(
     page: number = 1,
     limit: number = 10
@@ -50,7 +64,6 @@ export class AdminService {
     });
   }
 
-  // --- ¡MÉTODO MODIFICADO! ---
   /**
    * Obtiene la lista de productos con paginación y filtros.
    * GET /api/products
@@ -58,14 +71,12 @@ export class AdminService {
   getProducts(
     page: number = 1,
     limit: number = 10,
-    filters: ProductFilters = {} // 1. Aceptar objeto de filtros
+    filters: ProductFilters = {}
   ): Observable<AdminProductsResponse> {
-    // 2. Empezar con la paginación
     let params = new HttpParams()
       .set("page", page.toString())
       .set("limit", limit.toString());
 
-    // 3. Añadir filtros dinámicamente solo si existen
     if (filters.name) {
       params = params.set("name", filters.name);
     }
@@ -77,7 +88,7 @@ export class AdminService {
     }
 
     return this.http.get<AdminProductsResponse>(this.productsApiUrl, {
-      params, // 4. Enviar todos los parámetros
+      params,
     });
   }
 

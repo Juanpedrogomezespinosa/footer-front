@@ -1,7 +1,7 @@
 // src/app/core/services/modal.service.ts
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { FullAdminProduct } from "../models/admin.types";
+import { FullAdminProduct, FullAdminUser } from "../models/admin.types"; // <-- ¡Importado FullAdminUser!
 
 // Interface para los datos del modal de borrado de producto
 export interface ProductDeleteInfo {
@@ -37,14 +37,13 @@ export class ModalService {
   );
   productToEdit$ = this.productToEditSubject.asObservable();
 
-  // --- ¡NUEVO! Modal de DETALLES de producto ---
+  // --- Modal de DETALLES de producto ---
   private detailsModalSubject = new BehaviorSubject<boolean>(false);
   isDetailsModalOpen$ = this.detailsModalSubject.asObservable();
   private productToViewSubject = new BehaviorSubject<FullAdminProduct | null>(
     null
   );
   productToView$ = this.productToViewSubject.asObservable();
-  // ---------------------------------------------
 
   // --- Modal de ELIMINAR producto ---
   private deleteModalSubject = new BehaviorSubject<boolean>(false);
@@ -75,6 +74,13 @@ export class ModalService {
   );
   userToDelete$ = this.userToDeleteSubject.asObservable();
 
+  // --- ¡¡¡NUEVO!!! Modal de DETALLES DE USUARIO ---
+  private userDetailsModalSubject = new BehaviorSubject<boolean>(false);
+  isUserDetailsModalOpen$ = this.userDetailsModalSubject.asObservable();
+  private userToViewSubject = new BehaviorSubject<FullAdminUser | null>(null);
+  userToView$ = this.userToViewSubject.asObservable();
+  // ---------------------------------------------
+
   constructor() {}
 
   // --- Métodos CREAR ---
@@ -95,7 +101,7 @@ export class ModalService {
     this.productToEditSubject.next(null);
   }
 
-  // --- ¡NUEVO! Métodos DETALLES PRODUCTO ---
+  // --- Métodos DETALLES PRODUCTO ---
   openProductDetailsModal(product: FullAdminProduct) {
     this.productToViewSubject.next(product);
     this.detailsModalSubject.next(true);
@@ -104,7 +110,6 @@ export class ModalService {
     this.detailsModalSubject.next(false);
     this.productToViewSubject.next(null);
   }
-  // ------------------------------------
 
   // --- Métodos ELIMINAR PRODUCTO ---
   openDeleteModal(productInfo: ProductDeleteInfo) {
@@ -145,4 +150,15 @@ export class ModalService {
     this.deleteUserModalSubject.next(false);
     this.userToDeleteSubject.next(null);
   }
+
+  // --- ¡¡¡NUEVOS!!! Métodos DETALLES DE USUARIO ---
+  openUserDetailsModal(user: FullAdminUser) {
+    this.userToViewSubject.next(user);
+    this.userDetailsModalSubject.next(true);
+  }
+  closeUserDetailsModal() {
+    this.userDetailsModalSubject.next(false);
+    this.userToViewSubject.next(null);
+  }
+  // -----------------------------------------
 }

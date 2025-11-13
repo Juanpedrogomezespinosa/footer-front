@@ -1,62 +1,101 @@
 // src/app/admin/pages/admin-users/admin-users.component.ts
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AdminService } from "../../../core/services/admin.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { AuthService } from "../../../core/services/auth.service";
-import { AdminUser } from "../../../core/models/admin.types";
-import { Observable, of } from "rxjs";
-import { catchError, take, skip, filter } from "rxjs/operators";
-import { ModalService } from "../../../core/services/modal.service"; // 1. Importar ModalService
+import { AdminUser, FullAdminUser } from "../../../core/models/admin.types"; // <-- Importar FullAdminUser
+import { Observable, of, Subscription } from "rxjs"; // <-- Importar Subscription
+import {
+  catchError,
+  take,
+  skip,
+  filter,
+  debounceTime,
+  distinctUntilChanged,
+} from "rxjs/operators";
+import { ModalService } from "../../../core/services/modal.service";
+import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms"; // <-- Importar Reactive Forms
 
 @Component({
   selector: "app-admin-users",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule], // <-- Añadir ReactiveFormsModule
   templateUrl: "./admin-users.component.html",
 })
-export class AdminUsersComponent implements OnInit {
-  users$: Observable<AdminUser[]> = of([]); // Observable para la lista
+export class AdminUsersComponent implements OnInit, OnDestroy {
+  users$: Observable<AdminUser[]> = of([]);
   isLoading: boolean = true;
-  currentAdminId: number | null = null; // Para evitar la auto-eliminación
+  currentAdminId: number | null = null;
+  filterForm: FormGroup; // <-- Para la búsqueda
+  private filterSubscription: Subscription | null = null;
+  private modalSubscription: Subscription | null = null;
 
   constructor(
     private adminService: AdminService,
     private toast: ToastService,
     private authService: AuthService,
-    private modalService: ModalService // 2. Inyectar ModalService
+    private modalService: ModalService,
+    private fb: FormBuilder // <-- Inyectar FormBuilder
   ) {
-    // Obtenemos el ID del admin actual para deshabilitar su propio botón de borrado
     this.authService.user$.pipe(take(1)).subscribe((user) => {
       this.currentAdminId = user?.id || null;
+    });
+
+    // Inicializar el formulario de búsqueda
+    this.filterForm = this.fb.group({
+      search: [""],
     });
   }
 
   ngOnInit(): void {
     this.loadUsers();
 
-    // 3. Escuchar el cierre del modal de ELIMINAR USUARIO para refrescar
-    this.modalService.isDeleteUserModalOpen$
+    // Escuchar el cierre del modal de ELIMINAR USUARIO para refrescar
+    this.modalSubscription = this.modalService.isDeleteUserModalOpen$
       .pipe(
-        skip(1), // Ignorar el valor inicial
-        filter((isOpen) => !isOpen) // Filtrar solo cuando se cierra
+        skip(1),
+        filter((isOpen) => !isOpen)
       )
       .subscribe(() => {
-        this.loadUsers(); // Recargar la lista de usuarios
+        this.loadUsers(this.filterForm.value.search); // Recargar con el filtro
       });
+
+    // --- ¡NUEVO! Escuchar el cierre del modal de DETALLES ---
+    // (No es estrictamente necesario ya que no edita, pero es buena práctica)
+    this.modalService.isUserDetailsModalOpen$
+      .pipe(
+        skip(1),
+        filter((isOpen) => !isOpen)
+      )
+      .subscribe(); // No hacemos nada, pero mantenemos el patrón
+
+    // --- ¡NUEVO! Escuchar los cambios en la búsqueda ---
+    this.filterSubscription = this.filterForm
+      .get("search")!
+      .valueChanges.pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((searchValue) => {
+        this.loadUsers(searchValue);
+      });
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar suscripciones
+    this.filterSubscription?.unsubscribe();
+    this.modalSubscription?.unsubscribe();
   }
 
   /**
    * Carga (o recarga) la lista de usuarios desde el servicio.
    */
-  loadUsers(): void {
+  loadUsers(searchQuery: string | null = null): void {
     this.isLoading = true;
-    this.users$ = this.adminService.getUsers().pipe(
+    this.users$ = this.adminService.getUsers(searchQuery).pipe(
       catchError((err) => {
         console.error("Error al cargar usuarios:", err);
         this.toast.showError("Error al cargar la lista de usuarios.");
         this.isLoading = false;
-        return of([]); // Devolver un array vacío en caso de error
+        return of([]);
       })
     );
 
@@ -73,14 +112,22 @@ export class AdminUsersComponent implements OnInit {
       this.toast.showError("No puedes eliminarte a ti mismo.");
       return;
     }
-
-    // 4. --- ¡LÓGICA ACTUALIZADA! ---
-    // Ya no usamos window.confirm
     this.modalService.openDeleteUserModal({ id: userId, username: username });
+  }
 
-    // El resto de la lógica (llamar al servicio, mostrar toast,
-    // y refrescar la lista) se maneja ahora desde:
-    // 1. El 'delete-user-modal.component.ts' (la llamada)
-    // 2. El 'ngOnInit' de este componente (el refresco)
+  // --- ¡¡¡NUEVA FUNCIÓN!!! ---
+  /**
+   * Obtiene los datos completos de un usuario y abre el modal de detalles.
+   */
+  onDetails(id: number): void {
+    this.adminService.getAdminUserById(id).subscribe({
+      next: (user) => {
+        this.modalService.openUserDetailsModal(user);
+      },
+      error: (err) => {
+        console.error("Error al obtener detalles del usuario:", err);
+        this.toast.showError("No se pudieron cargar los datos del usuario.");
+      },
+    });
   }
 }
