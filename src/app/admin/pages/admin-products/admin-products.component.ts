@@ -9,15 +9,13 @@ import {
   ProductFilters,
 } from "../../../core/services/admin.service";
 import { AdminProductsResponse } from "../../../core/models/admin.types";
-// --- ¡CAMBIO AQUÍ! ---
 import {
   filter,
   skip,
   debounceTime,
   distinctUntilChanged,
-} from "rxjs/operators"; // Operadores de RxJS
-import { Subscription } from "rxjs"; // 1. Subscription se importa de 'rxjs'
-// --------------------
+} from "rxjs/operators";
+import { Subscription } from "rxjs";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
@@ -39,9 +37,9 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder
   ) {
     this.filterForm = this.fb.group({
-      name: [""], // Para la barra de búsqueda
-      category: [""], // Para el <select> de categoría
-      stock: [""], // Para el <select> de stock
+      name: [""],
+      category: [""],
+      stock: [""],
     });
   }
 
@@ -51,13 +49,12 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     // Escuchar los cambios en los filtros
     this.filterSubscription = this.filterForm.valueChanges
       .pipe(
-        debounceTime(400), // Esperar 400ms después de la última pulsación
+        debounceTime(400),
         distinctUntilChanged(
           (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
-        ) // Solo si el valor es diferente
+        )
       )
       .subscribe((filters) => {
-        // Cuando un filtro cambia, siempre volvemos a la página 1
         this.loadProducts(1, filters);
       });
 
@@ -90,10 +87,20 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.loadProducts(this.productsResponse?.currentPage || 1);
       });
+
+    // --- ¡NUEVO LISTENER! ---
+    // Escuchar el cierre del modal de DETALLES para refrescar
+    this.modalService.isDetailsModalOpen$
+      .pipe(
+        skip(1),
+        filter((isOpen) => !isOpen)
+      )
+      .subscribe(() => {
+        this.loadProducts(this.productsResponse?.currentPage || 1);
+      });
   }
 
   ngOnDestroy(): void {
-    // Limpiar la suscripción a los filtros
     this.filterSubscription?.unsubscribe();
   }
 
@@ -102,8 +109,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
    */
   loadProducts(page: number, filters: ProductFilters | null = null): void {
     this.isLoading = true;
-
-    // Si no se pasan filtros, usa los valores actuales del formulario
     const activeFilters = filters || this.filterForm.value;
 
     this.adminService.getProducts(page, 10, activeFilters).subscribe({
@@ -124,7 +129,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
    */
   onNextPage(): void {
     if (this.productsResponse && this.productsResponse.nextPage) {
-      // Pasa la página siguiente, los filtros se cogen del formulario
       this.loadProducts(this.productsResponse.nextPage);
     }
   }
@@ -134,7 +138,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
    */
   onPrevPage(): void {
     if (this.productsResponse && this.productsResponse.prevPage) {
-      // Pasa la página anterior, los filtros se cogen del formulario
       this.loadProducts(this.productsResponse.prevPage);
     }
   }
@@ -164,6 +167,22 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error("Error al obtener detalles del producto:", err);
         this.toast.showError("No se pudieron cargar los datos para editar.");
+      },
+    });
+  }
+
+  // --- ¡NUEVA FUNCIÓN! ---
+  /**
+   * Obtiene los datos completos de un producto y abre el modal de DETALLES.
+   */
+  onDetails(id: number): void {
+    this.adminService.getProductById(id).subscribe({
+      next: (product) => {
+        this.modalService.openProductDetailsModal(product);
+      },
+      error: (err) => {
+        console.error("Error al obtener detalles del producto:", err);
+        this.toast.showError("No se pudieron cargar los datos del producto.");
       },
     });
   }

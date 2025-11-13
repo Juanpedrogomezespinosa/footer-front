@@ -114,6 +114,11 @@
             <th
               class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
             >
+              Detalles
+            </th>
+            <th
+              class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
+            >
               Acciones
             </th>
           </tr>
@@ -121,7 +126,7 @@
         <tbody>
           <tr *ngIf="productsResponse.products.length === 0">
             <td
-              colspan="6"
+              colspan="7"
               class="p-6 text-center text-text-light-secondary dark:text-text-dark-secondary"
             >
               No se encontraron productos con los filtros actuales.
@@ -186,6 +191,15 @@
                   Sin Stock
                 </span>
               </ng-template>
+            </td>
+
+            <td class="p-4">
+              <button
+                (click)="onDetails(product.id)"
+                class="text-blue-600 hover:underline text-sm font-medium"
+              >
+                Ver Detalles
+              </button>
             </td>
 
             <td class="p-4">

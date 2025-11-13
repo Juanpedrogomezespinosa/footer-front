@@ -1,17 +1,9 @@
-<!-- src/app/admin/admin-layout/admin-layout.component.html -->
-<!-- Contenedor principal del layout -->
 <div
   class="flex min-h-screen w-full bg-background-light dark:bg-background-dark"
 >
-  <!-- 
-    1. SIDEBAR DE ESCRITORIO
-    - Oculto por defecto (hidden)
-    - Se muestra en pantallas 'lg' y mayores (lg:flex)
-  -->
   <aside
     class="hidden lg:flex h-screen min-h-screen flex-col justify-between bg-white p-4 border-r border-border-light dark:border-border-dark w-64 sticky top-0"
   >
-    <!-- Contenido del Sidebar (Logo, Links, Perfil) -->
     <div class="flex flex-col gap-8">
       <a
         routerLink="/admin/dashboard"
@@ -108,15 +100,10 @@
     </div>
   </aside>
 
-  <!-- 
-    2. ÁREA DE CONTENIDO PRINCIPAL
-  -->
   <div class="flex-1 flex flex-col w-full min-w-0">
-    <!-- HEADER MÓVIL (CORREGIDO) -->
     <header
       class="lg:hidden sticky top-0 z-30 flex items-center justify-between gap-4 px-4 h-16 bg-white dark:bg-card-dark border-b border-border-light dark:border-border-dark"
     >
-      <!-- Logo -->
       <a
         routerLink="/admin/dashboard"
         class="flex items-center gap-3 group focus:outline-none"
@@ -141,7 +128,6 @@
           Footer
         </h2>
       </a>
-      <!-- Botón Hamburguesa (CORREGIDO) -->
       <button
         (click)="toggleSidebar()"
         class="text-text-light-primary dark:text-text-dark-primary p-2"
@@ -163,27 +149,20 @@
       </button>
     </header>
 
-    <!-- Contenido de la Página (Dashboard, Productos, etc.) -->
     <main class="flex-1 p-4 md:p-8 overflow-y-auto">
       <router-outlet></router-outlet>
     </main>
   </div>
 
-  <!-- 
-    3. SIDEBAR MÓVIL (FLOTANTE)
-  -->
   <div *ngIf="isSidebarOpen" class="lg:hidden fixed inset-0 z-50">
-    <!-- Overlay oscuro -->
     <div
       (click)="toggleSidebar()"
       class="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
     ></div>
 
-    <!-- Contenido del Sidebar (CORREGIDO) -->
     <aside
       class="relative z-10 flex h-full w-64 flex-col justify-between bg-white dark:bg-card-dark p-4 border-r border-border-light dark:border-border-dark animate-slide-in"
     >
-      <!-- El contenido interno es el mismo -->
       <div class="flex flex-col gap-8">
         <a
           routerLink="/admin/dashboard"
@@ -286,13 +265,13 @@
   </div>
 </div>
 
-<!-- 
-  4. MODALES
--->
 <app-product-modal *ngIf="isProductModalOpen$ | async"></app-product-modal>
 <app-edit-product-modal
   *ngIf="isEditModalOpen$ | async"
 ></app-edit-product-modal>
+<app-product-details-modal
+  *ngIf="isDetailsModalOpen$ | async"
+></app-product-details-modal>
 <app-delete-product-modal
   *ngIf="isDeleteModalOpen$ | async"
 ></app-delete-product-modal>
@@ -306,9 +285,6 @@
   *ngIf="isDeleteUserModalOpen$ | async"
 ></app-delete-user-modal>
 
-<!-- 
-  5. ESTILOS GLOBALES (para las animaciones)
--->
 <style>
   @keyframes fade-in {
     0% {

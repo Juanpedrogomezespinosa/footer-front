@@ -1,0 +1,244 @@
+<div
+  (click)="close()"
+  class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in"
+></div>
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    class="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-card-dark rounded-xl shadow-lg flex flex-col animate-scale-in"
+    (click)="$event.stopPropagation()"
+  >
+    <div
+      class="flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark"
+    >
+      <h2
+        class="text-xl font-bold text-text-light-primary dark:text-text-dark-primary"
+      >
+        Detalles del Producto (ID: {{ product()?.id }})
+      </h2>
+      <button
+        (click)="close()"
+        class="text-text-light-secondary hover:text-primary dark:hover:text-primary transition-colors rounded-full p-1"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div
+      *ngIf="product() as product"
+      class="flex-1 overflow-y-auto p-6 space-y-6"
+    >
+      <div
+        class="border border-border-light dark:border-border-dark rounded-lg overflow-hidden"
+      >
+        <table
+          class="w-full divide-y divide-border-light dark:divide-border-dark"
+        >
+          <tbody class="divide-y divide-border-light dark:divide-border-dark">
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary w-1/3"
+              >
+                Nombre
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary"
+              >
+                {{ product.name }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Descripción
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary whitespace-pre-wrap"
+              >
+                {{ product.description }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Precio
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary"
+              >
+                {{ product.price | number : "1.2-2" }}€
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Marca
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary"
+              >
+                {{ product.brand }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Categoría
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary capitalize"
+              >
+                {{ product.category }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Género
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary capitalize"
+              >
+                {{ product.gender }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Material
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary"
+              >
+                {{ product.material || "N/A" }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Temporada
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary capitalize"
+              >
+                {{ product.season || "N/A" }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                scope="row"
+                class="px-4 py-3 text-left text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+              >
+                Es Nuevo
+              </th>
+              <td
+                class="px-4 py-3 text-sm text-text-light-primary dark:text-text-dark-primary"
+              >
+                <span
+                  *ngIf="product.is_new"
+                  class="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
+                  >Sí</span
+                >
+                <span
+                  *ngIf="!product.is_new"
+                  class="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >No</span
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="space-y-4 pt-4">
+        <h3
+          class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary"
+        >
+          Variantes por Color
+        </h3>
+
+        <div
+          *ngIf="groupedVariants().length === 0"
+          class="p-4 bg-gray-100 border border-border-light dark:border-border-dark rounded-lg text-center text-sm text-text-light-secondary"
+        >
+          Este producto no tiene variantes de stock definidas.
+        </div>
+
+        <div
+          *ngFor="let group of groupedVariants(); let i = index"
+          class="p-4 bg-white border border-border-light dark:border-border-dark rounded-lg shadow-sm"
+        >
+          <h4
+            class="text-md font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 capitalize"
+          >
+            Color: {{ group.color }}
+          </h4>
+
+          <table
+            class="min-w-full divide-y divide-border-light dark:divide-border-dark"
+          >
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-4 py-2 text-left text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider"
+                >
+                  Talla
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-2 text-left text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider"
+                >
+                  Stock
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="bg-white dark:bg-card-dark divide-y divide-border-light dark:divide-border-dark"
+            >
+              <tr *ngFor="let item of group.sizeStocks">
+                <td
+                  class="px-4 py-2 whitespace-nowrap text-sm text-text-light-primary dark:text-text-dark-primary"
+                >
+                  {{ item.size }}
+                </td>
+                <td
+                  class="px-4 py-2 whitespace-nowrap text-sm text-text-light-primary dark:text-text-dark-primary"
+                >
+                  {{ item.stock }} unidades
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-2"
+    >
+      <button
+        (click)="close()"
+        type="button"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-secondary hover:opacity-90 transition-opacity"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

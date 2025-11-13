@@ -15,7 +15,6 @@ export interface OrderStatusInfo {
   status: string;
 }
 
-// --- ¡NUEVA INTERFAZ AÑADIDA! ---
 // Interface para los datos del modal de borrado de usuario
 export interface UserDeleteInfo {
   id: number;
@@ -38,6 +37,15 @@ export class ModalService {
   );
   productToEdit$ = this.productToEditSubject.asObservable();
 
+  // --- ¡NUEVO! Modal de DETALLES de producto ---
+  private detailsModalSubject = new BehaviorSubject<boolean>(false);
+  isDetailsModalOpen$ = this.detailsModalSubject.asObservable();
+  private productToViewSubject = new BehaviorSubject<FullAdminProduct | null>(
+    null
+  );
+  productToView$ = this.productToViewSubject.asObservable();
+  // ---------------------------------------------
+
   // --- Modal de ELIMINAR producto ---
   private deleteModalSubject = new BehaviorSubject<boolean>(false);
   isDeleteModalOpen$ = this.deleteModalSubject.asObservable();
@@ -59,7 +67,7 @@ export class ModalService {
   );
   orderToUpdate$ = this.orderToUpdateSubject.asObservable();
 
-  // --- ¡NUEVO! Modal de ELIMINAR USUARIO ---
+  // --- Modal de ELIMINAR USUARIO ---
   private deleteUserModalSubject = new BehaviorSubject<boolean>(false);
   isDeleteUserModalOpen$ = this.deleteUserModalSubject.asObservable();
   private userToDeleteSubject = new BehaviorSubject<UserDeleteInfo | null>(
@@ -86,6 +94,17 @@ export class ModalService {
     this.editModalSubject.next(false);
     this.productToEditSubject.next(null);
   }
+
+  // --- ¡NUEVO! Métodos DETALLES PRODUCTO ---
+  openProductDetailsModal(product: FullAdminProduct) {
+    this.productToViewSubject.next(product);
+    this.detailsModalSubject.next(true);
+  }
+  closeProductDetailsModal() {
+    this.detailsModalSubject.next(false);
+    this.productToViewSubject.next(null);
+  }
+  // ------------------------------------
 
   // --- Métodos ELIMINAR PRODUCTO ---
   openDeleteModal(productInfo: ProductDeleteInfo) {
@@ -117,7 +136,7 @@ export class ModalService {
     this.orderToUpdateSubject.next(null);
   }
 
-  // --- ¡NUEVO! Métodos ELIMINAR USUARIO ---
+  // --- Métodos ELIMINAR USUARIO ---
   openDeleteUserModal(userInfo: UserDeleteInfo) {
     this.userToDeleteSubject.next(userInfo);
     this.deleteUserModalSubject.next(true);

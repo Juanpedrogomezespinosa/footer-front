@@ -13,6 +13,9 @@ import { OrderDetailsModalComponent } from "../components/order-details-modal/or
 import { StatusUpdateModalComponent } from "../components/status-update-modal/status-update-modal.component";
 import { DeleteUserModalComponent } from "../components/delete-user-modal/delete-user-modal.component";
 
+// --- ¡¡¡1. IMPORTAR EL NUEVO MODAL!!! ---
+import { ProductDetailsModalComponent } from "../components/product-details-modal/product-details-modal.component";
+
 @Component({
   selector: "app-admin-layout",
   standalone: true,
@@ -25,6 +28,8 @@ import { DeleteUserModalComponent } from "../components/delete-user-modal/delete
     OrderDetailsModalComponent,
     StatusUpdateModalComponent,
     DeleteUserModalComponent,
+    // --- ¡¡¡2. AÑADIR EL NUEVO MODAL A LOS IMPORTS!!! ---
+    ProductDetailsModalComponent,
   ],
   templateUrl: "./admin-layout.component.html",
 })
@@ -36,6 +41,8 @@ export class AdminLayoutComponent {
   isOrderDetailsModalOpen$: Observable<boolean>;
   isStatusUpdateModalOpen$: Observable<boolean>;
   isDeleteUserModalOpen$: Observable<boolean>;
+  // --- ¡¡¡3. DECLARAR LA NUEVA VARIABLE DE OBSERVABLE!!! ---
+  isDetailsModalOpen$: Observable<boolean>;
 
   // Esta propiedad controla el menú móvil
   isSidebarOpen = false;
@@ -52,6 +59,8 @@ export class AdminLayoutComponent {
     this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$;
     this.isStatusUpdateModalOpen$ = this.modalService.isStatusUpdateModalOpen$;
     this.isDeleteUserModalOpen$ = this.modalService.isDeleteUserModalOpen$;
+    // --- ¡¡¡4. INICIALIZAR LA NUEVA VARIABLE!!! ---
+    this.isDetailsModalOpen$ = this.modalService.isDetailsModalOpen$;
   }
 
   logout(): void {
