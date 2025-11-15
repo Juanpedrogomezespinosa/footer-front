@@ -1,14 +1,138 @@
-<footer class="bg-primary text-white py-6 mt-auto shadow-inner">
-  <div
-    class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4"
-  >
-    <p class="text-sm opacity-90">
-      &copy; {{ currentYear }} Footer. Todos los derechos reservados.
-    </p>
-    <nav class="flex gap-6 text-sm">
-      <a href="#" class="hover:text-secondary transition-colors">Aviso Legal</a>
-      <a href="#" class="hover:text-secondary transition-colors">Privacidad</a>
-      <a href="#" class="hover:text-secondary transition-colors">Contacto</a>
-    </nav>
+<footer class="bg-primary text-white mt-auto shadow-inner">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-4">
+        <a
+          routerLink="/home"
+          class="flex items-center gap-3 group shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded"
+          aria-label="Ir al inicio"
+        >
+          <div
+            class="size-6 text-secondary transition-transform group-hover:rotate-90"
+          >
+            <svg
+              fill="none"
+              viewBox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+                fill="currentColor"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <h2
+            class="text-lg font-bold leading-tight tracking-[-0.015em] text-white"
+          >
+            Footer
+          </h2>
+        </a>
+        <p class="text-sm text-gray-300">
+          Tu tienda de ropa y complementos de confianza.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-200 tracking-wider uppercase">
+          Tienda
+        </h3>
+        <ul class="mt-4 space-y-2">
+          <li>
+            <a
+              [routerLink]="['/products/category/zapatillas']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Zapatillas
+            </a>
+          </li>
+          <li>
+            <a
+              [routerLink]="['/products/category/ropa']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Ropa
+            </a>
+          </li>
+          <li>
+            <a
+              [routerLink]="['/products/category/complementos']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Complementos
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-200 tracking-wider uppercase">
+          Empresa
+        </h3>
+        <ul class="mt-4 space-y-2">
+          <li>
+            <a
+              [routerLink]="['/about']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Sobre Nosotros
+            </a>
+          </li>
+          <li>
+            <a
+              [routerLink]="['/contact']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Contacto
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-200 tracking-wider uppercase">
+          Ayuda
+        </h3>
+        <ul class="mt-4 space-y-2">
+          <li>
+            <a
+              [routerLink]="['/shipping']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Envíos y Devoluciones
+            </a>
+          </li>
+          <li>
+            <a
+              [routerLink]="['/faq']"
+              class="text-sm text-gray-300 hover:text-secondary transition-colors"
+            >
+              Preguntas Frecuentes
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-700 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm text-gray-400">
+          &copy; {{ currentYear }} Footer. Todos los derechos reservados.
+        </p>
+        <nav class="flex gap-6 text-sm">
+          <a
+            [routerLink]="['/legal-notice']"
+            class="text-gray-400 hover:text-secondary transition-colors"
+            >Aviso Legal</a
+          >
+          <a
+            [routerLink]="['/privacy']"
+            class="text-gray-400 hover:text-secondary transition-colors"
+            >Privacidad</a
+          >
+        </nav>
+      </div>
+    </div>
   </div>
 </footer>
