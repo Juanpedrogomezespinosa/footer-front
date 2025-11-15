@@ -81,15 +81,22 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
+
+  // --- NUEVA RUTA DE CONTACTO ---
+  {
+    path: "contact",
+    loadComponent: () =>
+      import("./contact/contact.component").then((m) => m.ContactComponent),
+    title: "Contacto", // Buena práctica añadir un título
+  },
+  // --- FIN DE NUEVA RUTA ---
+
   {
     path: "",
     redirectTo: "home",
     pathMatch: "full",
   },
 
-  // --- ¡CAMBIO AQUÍ! ---
-  // La ruta comodín (**) ahora carga el componente NotFoundComponent
-  // en lugar de redirigir a 'home'.
   {
     path: "**",
     loadComponent: () =>

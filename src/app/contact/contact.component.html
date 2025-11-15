@@ -1,0 +1,185 @@
+<main class="w-full max-w-6xl mx-auto py-12 md:py-20 px-4">
+  <div class="flex flex-col gap-8 md:gap-16">
+    <div class="flex min-w-72 flex-col gap-2">
+      <h1
+        class="text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em] text-primary"
+      >
+        Ponte en contacto
+      </h1>
+      <p class="text-gray-600 text-base md:text-lg font-normal leading-normal">
+        ¿Tienes alguna pregunta? Estamos aquí para ayudarte.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      <div class="flex flex-col gap-8">
+        <div class="flex flex-col gap-6">
+          <div class="flex items-center gap-4 py-2">
+            <div
+              class="text-secondary flex items-center justify-center rounded-lg bg-secondary/20 shrink-0 size-12"
+            >
+              <span class="material-symbols-outlined">location_on</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-primary">
+                Nuestra Ubicación
+              </p>
+              <p class="text-gray-600 text-sm font-normal leading-normal">
+                Av. Virgen de la Palma, Centro comercial, Puerta Europa, 11203
+                Algeciras, Cádiz
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4 py-2">
+            <div
+              class="text-secondary flex items-center justify-center rounded-lg bg-secondary/20 shrink-0 size-12"
+            >
+              <span class="material-symbols-outlined">call</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-primary">
+                Llámanos
+              </p>
+              <p class="text-gray-600 text-sm font-normal leading-normal">
+                +34 666 666 666
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4 py-2">
+            <div
+              class="text-secondary flex items-center justify-center rounded-lg bg-secondary/20 shrink-0 size-12"
+            >
+              <span class="material-symbols-outlined">mail</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-primary">
+                Escríbenos
+              </p>
+              <p class="text-gray-600 text-sm font-normal leading-normal">
+                info.Footer&#64;gmail.com
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="aspect-[4/3] w-full bg-gray-200 rounded-xl overflow-hidden">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5355.302956670825!2d-5.467572210901545!3d36.134115310576966!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0c94b3f362c657%3A0x133f48b236b6493!2sCentro%20Comercial%20Puerta%20Europa!5e0!3m2!1ses!2ses!4v1763221956049!5m2!1ses!2ses"
+            width="600"
+            height="450"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <form
+          [formGroup]="contactForm"
+          (ngSubmit)="onSubmit()"
+          class="space-y-6"
+          novalidate
+        >
+          <div>
+            <label
+              class="block text-sm font-medium leading-6 text-primary"
+              for="name"
+              >Nombre</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="name"
+                class="block w-full rounded-lg border-0 bg-gray-50 py-2.5 px-4 text-primary shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-secondary placeholder:text-gray-400"
+                id="name"
+                type="text"
+              />
+            </div>
+            <p *ngIf="isFieldInvalid('name')" class="mt-1 text-sm text-red-600">
+              {{ getErrorMessage("name") }}
+            </p>
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium leading-6 text-primary"
+              for="email"
+              >Email</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="email"
+                class="block w-full rounded-lg border-0 bg-gray-50 py-2.5 px-4 text-primary shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-secondary placeholder:text-gray-400"
+                id="email"
+                type="email"
+              />
+            </div>
+            <p
+              *ngIf="isFieldInvalid('email')"
+              class="mt-1 text-sm text-red-600"
+            >
+              {{ getErrorMessage("email") }}
+            </p>
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium leading-6 text-primary"
+              for="subject"
+              >Asunto</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="subject"
+                class="block w-full rounded-lg border-0 bg-gray-50 py-2.5 px-4 text-primary shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-secondary placeholder:text-gray-400"
+                id="subject"
+                type="text"
+              />
+            </div>
+            <p
+              *ngIf="isFieldInvalid('subject')"
+              class="mt-1 text-sm text-red-600"
+            >
+              {{ getErrorMessage("subject") }}
+            </p>
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium leading-6 text-primary"
+              for="message"
+              >Mensaje</label
+            >
+            <div class="mt-2">
+              <textarea
+                formControlName="message"
+                class="block w-full rounded-lg border-0 bg-gray-50 py-2.5 px-4 text-primary shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-secondary placeholder:text-gray-400"
+                id="message"
+                rows="6"
+              ></textarea>
+            </div>
+            <p
+              *ngIf="isFieldInvalid('message')"
+              class="mt-1 text-sm text-red-600"
+            >
+              {{ getErrorMessage("message") }}
+            </p>
+          </div>
+
+          <div>
+            <button
+              [disabled]="isLoading || contactForm.invalid"
+              class="flex w-full justify-center rounded-lg bg-secondary px-3 py-3 text-sm font-bold leading-6 text-white shadow-sm hover:bg-secondary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              type="submit"
+            >
+              {{ isLoading ? "Enviando..." : "Enviar Mensaje" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
