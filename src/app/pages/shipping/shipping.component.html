@@ -1,1 +1,139 @@
-<p>shipping works!</p>
+<!-- 
+  Notas de adaptación:
+  - Breadcrumb 'Inicio' enlazado a [routerLink]="['/home']".
+  - Colores adaptados a tu paleta (primary, secondary, text-gray-600).
+  - Botón 'Contactar con soporte' enlazado a [routerLink]="['/contact']".
+  - Input conectado a [(ngModel)] y botón 'Rastrear' a (click).
+-->
+<main class="flex-grow">
+  <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-16 lg:py-20">
+    <div class="flex flex-wrap gap-2 mb-8">
+      <a
+        [routerLink]="['/home']"
+        class="text-gray-600 hover:text-secondary text-sm font-medium transition-colors"
+        >Inicio</a
+      >
+      <span class="text-gray-600 text-sm font-medium">/</span>
+      <span class="text-primary text-sm font-medium"
+        >Envíos y Devoluciones</span
+      >
+    </div>
+    <div class="mb-12">
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-primary">
+        Envíos y Devoluciones
+      </h1>
+    </div>
+    <div class="space-y-16">
+      <section>
+        <h2
+          class="text-2xl sm:text-3xl font-bold tracking-tight text-primary mb-6"
+        >
+          Política de Envíos
+        </h2>
+        <div class="space-y-4 text-gray-600">
+          <p>
+            Entendemos que quieres recibir tus productos lo antes posible. Aquí
+            detallamos toda la información sobre nuestros métodos, costos y
+            tiempos de entrega para que sepas exactamente cuándo esperar tu
+            nuevo equipamiento.
+          </p>
+          <div
+            class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
+          >
+            <span class="material-symbols-outlined text-secondary text-2xl"
+              >local_shipping</span
+            >
+            <p class="font-semibold text-primary">
+              Envío gratuito en pedidos superiores a 50€ para toda la península.
+            </p>
+          </div>
+          <p>
+            Costos de envío: Estándar (48/72h) - 4.95€; Express (24h) - 7.95€.
+            Realizamos envíos a toda la Unión Europea. Los tiempos de entrega
+            estimados se calculan desde el momento en que el pedido sale de
+            nuestro almacén.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2
+          class="text-2xl sm:text-3xl font-bold tracking-tight text-primary mb-6"
+        >
+          Política de Devoluciones
+        </h2>
+        <div class="space-y-6 text-gray-600">
+          <p>
+            Si no estás completamente satisfecho con tu compra, no hay problema.
+            Te lo ponemos fácil para que puedas realizar una devolución o
+            cambio.
+          </p>
+          <div
+            class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
+          >
+            <span class="material-symbols-outlined text-secondary text-2xl"
+              >event_available</span
+            >
+            <p class="font-semibold text-primary">
+              Dispones de 30 días naturales desde la recepción del pedido para
+              solicitar una devolución.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-2 text-primary">
+              Condiciones para la devolución:
+            </h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li>
+                El producto debe estar en perfectas condiciones, sin usar y con
+                sus etiquetas originales.
+              </li>
+              <li>
+                Debe devolverse en su embalaje original o uno similar que
+                garantice su protección.
+              </li>
+              <li>
+                No se aceptan devoluciones de ropa interior o artículos
+                personalizados.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-2 text-primary">
+              Proceso de devolución:
+            </h3>
+            <div class="border-l-2 border-secondary pl-4 space-y-4">
+              <p>
+                <strong class="text-primary">1. Solicitud:</strong> Haz clic en
+                el botón "Iniciar una devolución" y completa el formulario con
+                los detalles de tu pedido.
+              </p>
+              <p>
+                <strong class="text-primary">2. Preparación:</strong> Empaqueta
+                el artículo de forma segura. Recibirás una etiqueta de envío por
+                correo electrónico.
+              </p>
+              <p>
+                <strong class="text-primary">3. Envío:</strong> Pega la etiqueta
+                en el paquete y llévalo a la oficina de correos más cercana.
+              </p>
+              <p>
+                <strong class="text-primary">4. Reembolso:</strong> Una vez que
+                recibamos y verifiquemos el artículo, procesaremos tu reembolso
+                en un plazo de 5-7 días hábiles.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-4 pt-4">
+            <button
+              [routerLink]="['/contact']"
+              class="flex items-center justify-center rounded-md border border-gray-300 h-12 px-8 text-base font-bold text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-colors"
+            >
+              Contactar con soporte
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>

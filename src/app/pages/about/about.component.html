@@ -1,34 +1,258 @@
-<div class="max-w-4xl mx-auto py-12 md:py-20 px-4">
-  <div class="prose prose-lg max-w-none text-primary">
-    <h1 class="text-4xl font-black text-primary">Sobre Nosotros</h1>
+<main class="flex-grow">
+  <!-- 
+    SECCIÓN 1: NUEVO BANNER (estilo Homepage)
+    - URL de imagen actualizada a una estable de Pexels.
+  -->
+  <section class="w-full px-4 sm:px-6 lg:px-10 py-5">
+    <div
+      class="layout-content-container flex flex-col max-w-7xl flex-1 mx-auto"
+    >
+      <div
+        class="flex min-h-[60vh] max-h-[720px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-center justify-center text-center px-6 py-10 md:px-10"
+        style="
+          background-image: linear-gradient(
+              rgba(0, 0, 0, 0.2) 0%,
+              rgba(0, 0, 0, 0.6) 100%
+            ),
+            url('https://images.pexels.com/photos/428340/pexels-photo-428340.jpeg');
+        "
+      >
+        <div class="flex flex-col gap-4 text-center items-center max-w-3xl">
+          <h1
+            class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-6xl"
+          >
+            Tu Estilo, Nuestra Pasión
+          </h1>
+          <p
+            class="text-gray-200 text-base font-normal leading-normal md:text-lg"
+          >
+            Descubre la historia de Footer, el destino definitivo para las
+            mejores zapatillas, ropa y accesorios urbanos.
+          </p>
+          <a
+            [routerLink]="['/products']"
+            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-secondary hover:bg-secondary-dark text-white text-base font-bold leading-normal tracking-[0.015em] transition-all mt-4"
+          >
+            <span class="truncate">Explora la Colección</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <p>
-      Bienvenido a Footer, tu destino número uno para encontrar el calzado, la
-      ropa y los complementos que marcan tendencia. Nacimos en 2025 con una
-      misión clara: ofrecer productos de alta calidad con un diseño excepcional,
-      accesibles para todos los entusiastas de la moda.
-    </p>
+  <!-- 
+    SECCIÓN 2: NUESTRA HISTORIA
+    - URL de imagen actualizada a una estable de Pexels.
+  -->
+  <section class="py-16 md:py-24 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-2 items-center gap-12 md:gap-16">
+        <div class="flex flex-col gap-4 order-2 md:order-1 text-primary">
+          <h2 class="text-3xl font-bold leading-tight tracking-tight">
+            Nuestra Historia
+          </h2>
+          <p class="text-gray-600">
+            Footer nació de la visión de crear un espacio donde la cultura
+            urbana y la moda se encontraran. No somos una marca, sino un curador
+            apasionado de las mejores zapatillas, ropa y accesorios que definen
+            el *streetwear* global. Desde nuestros inicios, nos hemos dedicado a
+            buscar y seleccionar productos auténticos y de alta calidad.
+          </p>
+          <p class="text-gray-600">
+            Nuestro viaje comenzó en un pequeño local, impulsado por una
+            comunidad de entusiastas. Con el tiempo, hemos evolucionado hasta
+            convertirnos en un referente, ofreciendo una cuidada selección de
+            marcas reconocidas y emergentes. Nuestro compromiso es brindarte
+            acceso a las últimas tendencias y los clásicos atemporales que
+            moldean la identidad urbana.
+          </p>
+        </div>
+        <div class="order-1 md:order-2">
+          <img
+            class="w-full h-auto object-cover rounded-xl shadow-lg"
+            src="https://images.pexels.com/photos/5531541/pexels-photo-5531541.jpeg"
+            alt="Interior moderno de la tienda Footer con variedad de zapatillas y ropa urbana"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <h2>Nuestra Historia</h2>
-    <p>
-      Lo que comenzó como un pequeño sueño en un garaje se ha convertido en una
-      tienda online líder en el sector. Somos un equipo de apasionados por el
-      *streetwear* y el diseño, y cada artículo de nuestra colección es
-      seleccionado cuidadosamente para asegurar que cumple con nuestros
-      estándares de estilo y durabilidad.
-    </p>
+  <!-- 
+    SECCIÓN 3: NUESTRO COMPROMISO (Valores)
+    - (Sin cambios de imagen)
+  -->
+  <section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col gap-12">
+        <div class="max-w-xl mx-auto text-center flex flex-col gap-3">
+          <h2
+            class="text-3xl font-bold leading-tight tracking-tight text-primary"
+          >
+            Nuestro Compromiso
+          </h2>
+          <p class="text-gray-600">
+            Estos no son solo principios. Es nuestra promesa contigo y con la
+            cultura que amamos.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            class="flex flex-col items-center text-center gap-4 rounded-lg bg-gray-50 p-8 border border-gray-200"
+          >
+            <div
+              class="flex items-center justify-center h-14 w-14 rounded-full bg-secondary/10 text-secondary"
+            >
+              <span class="material-symbols-outlined !text-3xl">verified</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h3 class="text-lg font-bold text-primary">
+                Autenticidad Garantizada
+              </h3>
+              <p class="text-sm text-gray-600">
+                Solo vendemos productos 100% auténticos. Trabajamos directamente
+                con las marcas para asegurar que cada par de zapatillas sea
+                legítimo.
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col items-center text-center gap-4 rounded-lg bg-gray-50 p-8 border border-gray-200"
+          >
+            <div
+              class="flex items-center justify-center h-14 w-14 rounded-full bg-secondary/10 text-secondary"
+            >
+              <span class="material-symbols-outlined !text-3xl">style</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h3 class="text-lg font-bold text-primary">La Mejor Selección</h3>
+              <p class="text-sm text-gray-600">
+                No seguimos las modas, las entendemos. Nuestro equipo está
+                obsesionado con el *streetwear* y selecciona solo las piezas que
+                definen la tendencia.
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col items-center text-center gap-4 rounded-lg bg-gray-50 p-8 border border-gray-200"
+          >
+            <div
+              class="flex items-center justify-center h-14 w-14 rounded-full bg-secondary/10 text-secondary"
+            >
+              <span class="material-symbols-outlined !text-3xl">groups</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h3 class="text-lg font-bold text-primary">
+                Pasión por la Comunidad
+              </h3>
+              <p class="text-sm text-gray-600">
+                Footer es más que una tienda. Somos un espacio para la cultura
+                urbana. Apoyamos a artistas locales y conectamos a la gente con
+                la misma pasión.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <h2>Nuestro Compromiso</h2>
-    <p>
-      Creemos en la moda sostenible y en las prácticas comerciales éticas. Nos
-      esforzamos por trabajar con proveedores que comparten nuestros valores y
-      por reducir nuestro impacto ambiental en cada paso del camino.
-    </p>
-    <ul>
-      <li>Calidad garantizada en cada producto.</li>
-      <li>Atención al cliente excepcional.</li>
-      <li>Envíos rápidos y devoluciones sencillas.</li>
-    </ul>
-    <p>Gracias por confiar en nosotros.</p>
-  </div>
-</div>
+  <!-- 
+    SECCIÓN 4: CONOCE AL EQUIPO
+    - URLs de imágenes actualizadas a unas estables de Pexels.
+  -->
+  <section class="py-16 md:py-24 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col gap-12">
+        <div class="max-w-xl mx-auto text-center flex flex-col gap-3">
+          <h2
+            class="text-3xl font-bold leading-tight tracking-tight text-primary"
+          >
+            Conoce a Nuestro Equipo
+          </h2>
+          <p class="text-gray-600">
+            Somos el motor detrás de Footer, un grupo de profesionales con una
+            pasión compartida por la moda urbana y la excelencia.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="flex flex-col items-center text-center gap-4">
+            <img
+              class="w-40 h-40 object-cover rounded-full shadow-md"
+              src="https://images.pexels.com/photos/2102415/pexels-photo-2102415.jpeg"
+              alt="Retrato profesional de Alex Martinez"
+            />
+            <div class="flex flex-col">
+              <h3 class="font-bold text-primary">Alex Martinez</h3>
+              <p class="text-sm text-gray-600">Director General y Estrategia</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-center text-center gap-4">
+            <img
+              class="w-40 h-40 object-cover rounded-full shadow-md"
+              src="https://images.pexels.com/photos/1848565/pexels-photo-1848565.jpeg"
+              alt="Retrato profesional de Sofia Chen"
+            />
+            <div class="flex flex-col">
+              <h3 class="font-bold text-primary">Sofía Chen</h3>
+              <p class="text-sm text-gray-600">
+                Directora de Compras y Tendencias
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col items-center text-center gap-4">
+            <img
+              class="w-40 h-40 object-cover rounded-full shadow-md"
+              src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg"
+              alt="Retrato profesional de Leo García"
+            />
+            <div class="flex flex-col">
+              <h3 class="font-bold text-primary">Leo García</h3>
+              <p class="text-sm text-gray-600">
+                Jefe de Operaciones y Logística
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col items-center text-center gap-4">
+            <img
+              class="w-40 h-40 object-cover rounded-full shadow-md"
+              src="https://images.pexels.com/photos/3775131/pexels-photo-3775131.jpeg"
+              alt="Retrato profesional de María Rodríguez"
+            />
+            <div class="flex flex-col">
+              <h3 class="font-bold text-primary">María Rodríguez</h3>
+              <p class="text-sm text-gray-600">Marketing y Engagement</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 
+    SECCIÓN 5: CTA (Sin cambios)
+  -->
+  <section class="py-16 md:py-24">
+    <div class="container mx-auto px-4">
+      <div
+        class="rounded-xl bg-gray-100 p-10 md:p-16 flex flex-col items-center text-center gap-6"
+      >
+        <h2
+          class="text-3xl font-bold leading-tight tracking-tight max-w-lg text-primary"
+        >
+          Únete a nuestro movimiento. Sé parte de la historia.
+        </h2>
+        <p class_="text-gray-600 max-w-md">
+          Descubre las piezas que te acompañarán en tu próxima aventura urbana.
+          Explora nuestras colecciones y encuentra tu estilo.
+        </p>
+        <a
+          [routerLink]="['/products']"
+          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-secondary text-white text-base font-bold transition-transform hover:scale-105"
+        >
+          <span class="truncate">Explora la Colección</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,1 +1,140 @@
-<p>faq works!</p>
+<!-- 
+  Notas de adaptación:
+  - Botón 'Ir a Contacto' enlazado a [routerLink]="['/contact']".
+  - Input conectado a [(ngModel)].
+  - Lógica de 'chips' conectada a (click) y [ngClass].
+  - Colores adaptados a tu paleta (primary, secondary, text-gray-600).
+-->
+<main class="flex flex-1 justify-center py-5 sm:py-10 px-4">
+  <div
+    class="layout-content-container flex flex-col w-full max-w-4xl flex-1 gap-8"
+  >
+    <!-- Título -->
+    <div class="flex flex-wrap justify-between gap-4 text-center">
+      <div class="flex w-full flex-col items-center gap-3">
+        <p
+          class="text-primary text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]"
+        >
+          ¿Necesitas Ayuda?
+        </p>
+        <p class="text-gray-600 text-base font-normal leading-normal">
+          Encuentra respuestas a las dudas más comunes.
+        </p>
+      </div>
+    </div>
+    <!-- Búsqueda -->
+
+    <!-- Categorías (Chips) -->
+
+    <!-- Acordeón -->
+    <div
+      class="flex flex-col p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
+    >
+      <details
+        class="flex flex-col border-t border-t-gray-200 py-2 group"
+        open=""
+      >
+        <summary
+          class="flex cursor-pointer items-center justify-between gap-6 py-4 hover:text-secondary"
+        >
+          <p
+            class="text-primary text-base font-medium leading-normal group-hover:text-secondary"
+          >
+            ¿Cuáles son los métodos de pago aceptados?
+          </p>
+          <span
+            class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300"
+            >expand_more</span
+          >
+        </summary>
+        <p class="text-gray-600 text-sm font-normal leading-relaxed pb-2">
+          Aceptamos tarjetas de crédito y débito (Visa, MasterCard), PayPal y
+          transferencias bancarias. Todos los pagos son procesados de forma
+          segura.
+        </p>
+      </details>
+      <details class="flex flex-col border-t border-t-gray-200 py-2 group">
+        <summary
+          class="flex cursor-pointer items-center justify-between gap-6 py-4 hover:text-secondary"
+        >
+          <p
+            class="text-primary text-base font-medium leading-normal group-hover:text-secondary"
+          >
+            ¿Cómo puedo seguir mi pedido?
+          </p>
+          <span
+            class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300"
+            >expand_more</span
+          >
+        </summary>
+        <p class="text-gray-600 text-sm font-normal leading-relaxed pb-2">
+          Una vez que tu pedido haya sido enviado, recibirás un correo
+          electrónico de confirmación con un número de seguimiento. Puedes usar
+          este número en el sitio web del transportista para ver el estado
+          actual de tu envío.
+        </p>
+      </details>
+      <details class="flex flex-col border-t border-t-gray-200 py-2 group">
+        <summary
+          class="flex cursor-pointer items-center justify-between gap-6 py-4 hover:text-secondary"
+        >
+          <p
+            class="text-primary text-base font-medium leading-normal group-hover:text-secondary"
+          >
+            ¿Cuál es la política de devoluciones?
+          </p>
+          <span
+            class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300"
+            >expand_more</span
+          >
+        </summary>
+        <p class="text-gray-600 text-sm font-normal leading-relaxed pb-2">
+          Ofrecemos una política de devolución de 30 días. Si no estás
+          satisfecho con tu compra, puedes devolverla dentro de los 30 días
+          posteriores a la recepción para obtener un reembolso completo o un
+          cambio, siempre que el producto esté en su estado original.
+        </p>
+      </details>
+      <details class="flex flex-col border-t border-t-gray-200 py-2 group">
+        <summary
+          class="flex cursor-pointer items-center justify-between gap-6 py-4 hover:text-secondary"
+        >
+          <p
+            class="text-primary text-base font-medium leading-normal group-hover:text-secondary"
+          >
+            ¿Cómo puedo cambiar mi contraseña?
+          </p>
+          <span
+            class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300"
+            >expand_more</span
+          >
+        </summary>
+        <p class="text-gray-600 text-sm font-normal leading-relaxed pb-2">
+          Puedes cambiar tu contraseña yendo a la sección "Mi Cuenta",
+          seleccionando "Detalles de la cuenta" y siguiendo las instrucciones
+          para actualizar tu contraseña. Si la has olvidado, puedes usar el
+          enlace "¿Olvidaste tu contraseña?" en la página de inicio de sesión.
+        </p>
+      </details>
+    </div>
+    <!-- Bloque de Contacto -->
+    <div
+      class="flex flex-col items-center justify-center gap-4 rounded-lg bg-white p-8 mt-8 border border-gray-200 shadow-sm"
+    >
+      <h3 class="text-xl font-bold text-primary">
+        ¿No encuentras tu respuesta?
+      </h3>
+      <p class="text-gray-600 text-center">
+        Si todavía tienes dudas, nuestro equipo de soporte está aquí para
+        ayudarte.
+      </p>
+      <button
+        [routerLink]="['/contact']"
+        class="flex items-center justify-center gap-2 rounded-lg bg-secondary px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-secondary-dark"
+      >
+        <span>Ir a Contacto</span>
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</main>
