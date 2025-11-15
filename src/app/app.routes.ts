@@ -36,7 +36,7 @@ export const routes: Routes = [
     title: "Mi Perfil",
     children: [
       {
-        path: "", // Ruta por defecto: /profile
+        path: "",
         loadComponent: () =>
           import(
             "./profile/components/profile-details/profile-details.component"
@@ -44,7 +44,7 @@ export const routes: Routes = [
         title: "Mis Datos",
       },
       {
-        path: "orders", // Ruta de historial: /profile/orders
+        path: "orders",
         loadComponent: () =>
           import(
             "./profile/components/order-history/order-history.component"
@@ -52,7 +52,7 @@ export const routes: Routes = [
         title: "Historial de Pedidos",
       },
       {
-        path: "addresses", // Ruta de direcciones: /profile/addresses
+        path: "addresses",
         loadComponent: () =>
           import(
             "./profile/components/profile-addresses/profile-addresses.component"
@@ -81,15 +81,51 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
-
-  // --- NUEVA RUTA DE CONTACTO ---
   {
     path: "contact",
     loadComponent: () =>
       import("./contact/contact.component").then((m) => m.ContactComponent),
-    title: "Contacto", // Buena práctica añadir un título
+    title: "Contacto",
   },
-  // --- FIN DE NUEVA RUTA ---
+
+  // --- 🚀 NUEVAS PÁGINAS ESTÁTICAS ---
+  {
+    path: "about",
+    loadComponent: () =>
+      import("./pages/about/about.component").then((m) => m.AboutComponent),
+    title: "Sobre Nosotros",
+  },
+  {
+    path: "shipping",
+    loadComponent: () =>
+      import("./pages/shipping/shipping.component").then(
+        (m) => m.ShippingComponent
+      ),
+    title: "Envíos y Devoluciones",
+  },
+  {
+    path: "faq",
+    loadComponent: () =>
+      import("./pages/faq/faq.component").then((m) => m.FaqComponent),
+    title: "Preguntas Frecuentes",
+  },
+  {
+    path: "legal-notice",
+    loadComponent: () =>
+      import("./pages/legal-notice/legal-notice.component").then(
+        (m) => m.LegalNoticeComponent
+      ),
+    title: "Aviso Legal",
+  },
+  {
+    path: "privacy",
+    loadComponent: () =>
+      import("./pages/privacy/privacy.component").then(
+        (m) => m.PrivacyComponent
+      ),
+    title: "Política de Privacidad",
+  },
+  // --- FIN DE NUEVAS PÁGINAS ---
 
   {
     path: "",
