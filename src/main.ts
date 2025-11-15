@@ -1,36 +1,40 @@
 // src/main.ts
 
 import { bootstrapApplication } from "@angular/platform-browser";
-// --- 👇 CAMBIO: Importaciones necesarias para el Interceptor ---
 import {
   provideHttpClient,
   withInterceptorsFromDi, // Necesario para interceptors basados en clases
   HTTP_INTERCEPTORS,
 } from "@angular/common/http";
-import { provideRouter } from "@angular/router";
+
+// --- 👇 CAMBIO: Importar 'withInMemoryScrolling' ---
+// Esta es la función correcta para tu versión de Angular
+import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
 
 import { AppComponent } from "./app/app.component";
 import { routes } from "./app/app.routes";
-// --- 👇 CAMBIO: Importar tu AuthInterceptor ---
 import { AuthInterceptor } from "./app/core/interceptors/auth.interceptor";
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes),
+    // --- 👇 CAMBIO: Usar 'withInMemoryScrolling' ---
+    provideRouter(
+      routes,
+      // 'enabled' te lleva arriba en nuevas navegaciones,
+      // y restaura el scroll al usar "atrás/adelante"
+      withInMemoryScrolling({ scrollPositionRestoration: "enabled" })
+    ),
+    // --- FIN DEL CAMBIO ---
+
     provideAnimations(), // Activa animaciones globales
 
-    // --- 👇 CAMBIO: Configuración del Interceptor ---
-
-    // 1. Habilita HttpClient y le dice que use interceptors
-    provideHttpClient(withInterceptorsFromDi()),
-
-    // 2. Registra tu AuthInterceptor (el que lee el token)
+    // Configuración del Interceptor
+    provideHttpClient(withInterceptorsFromDi()), // Habilita HttpClient y le dice que use interceptors
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
+      useClass: AuthInterceptor, // Registra tu AuthInterceptor (el que lee el token)
       multi: true,
     },
-    // --- FIN DEL CAMBIO ---
   ],
 }).catch((err) => console.error(err));
