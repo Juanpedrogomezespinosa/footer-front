@@ -2,6 +2,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
+import { jwtDecode } from "jwt-decode"; // <-- IMPORTAR jwt-decode
 
 // --- Interfaces de Autenticación ---
 export interface RegisterData {
@@ -15,9 +16,6 @@ export interface LoginCredentials {
   password: string;
 }
 
-/**
- * Interfaz de Usuario completa
- */
 export interface User {
   id: number;
   email: string;
@@ -34,7 +32,6 @@ export interface LoginResponse {
   token: string;
 }
 
-// --- 👇 NUEVAS INTERFACES AÑADIDAS ---
 export interface ForgotPasswordResponse {
   message: string;
 }
@@ -43,7 +40,6 @@ export interface ResetPasswordData {
   token: string;
   newPassword: string;
 }
-// --- FIN DE NUEVAS INTERFACES ---
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
@@ -56,7 +52,6 @@ export class AuthService {
     const userString = localStorage.getItem("user");
     if (token && userString) {
       const user = JSON.parse(userString);
-
       this.userSubject.next(user);
     }
   }
@@ -95,18 +90,13 @@ export class AuthService {
     return localStorage.getItem("token");
   }
 
-  /**
-   * Actualiza el avatar del usuario en el estado global.
-   */
   public updateUserAvatar(avatarUrl: string): void {
     const currentUser = this.userSubject.getValue();
-
     if (currentUser) {
       const updatedUser = {
         ...currentUser,
         avatarUrl: avatarUrl,
       };
-
       this.userSubject.next(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
     } else {
@@ -116,18 +106,14 @@ export class AuthService {
     }
   }
 
-  private handleLoginResponse(res: LoginResponse): void {
+  // --- 👇 CAMBIO: Hecho 'public' para ser usado por el callback ---
+  public handleLoginResponse(res: LoginResponse): void {
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user));
     this.userSubject.next(res.user);
   }
+  // --- FIN DEL CAMBIO ---
 
-  // --- 👇 NUEVOS MÉTODOS AÑADIDOS ---
-
-  /**
-   * Pide al backend que envíe un correo de reseteo.
-   * @param email El email del usuario
-   */
   forgotPassword(email: string): Observable<ForgotPasswordResponse> {
     return this.http.post<ForgotPasswordResponse>(
       `${this.backendUrl}/forgot-password`,
@@ -135,15 +121,38 @@ export class AuthService {
     );
   }
 
-  /**
-   * Envía el token (del enlace del email) y la nueva contraseña.
-   * @param data Objeto con el token y la newPassword
-   */
   resetPassword(data: ResetPasswordData): Observable<ForgotPasswordResponse> {
     return this.http.post<ForgotPasswordResponse>(
       `${this.backendUrl}/reset-password`,
       data
     );
   }
-  // --- FIN DE NUEVOS MÉTODOS ---
+
+  // --- 👇 NUEVO MÉTODO AÑADIDO ---
+  /**
+   * Maneja el token recibido de Google en la URL.
+   * Decodifica el token (que ahora contiene al usuario) y lo guarda.
+   * @param token El JWT recibido del backend
+   */
+  public handleGoogleToken(token: string): User | null {
+    try {
+      // 1. Guardar el token
+      localStorage.setItem("token", token);
+
+      // 2. Decodificar el token para obtener el payload del usuario
+      // (El payload es el objeto User gracias a nuestro 'generateToken' del backend)
+      const userPayload = jwtDecode<User>(token);
+
+      // 3. Guardar el usuario en localStorage y en el BehaviorSubject
+      localStorage.setItem("user", JSON.stringify(userPayload));
+      this.userSubject.next(userPayload);
+
+      return userPayload;
+    } catch (error) {
+      console.error("Error al decodificar el token de Google:", error);
+      this.logout();
+      return null;
+    }
+  }
+  // --- FIN DE NUEVO MÉTODO ---
 }

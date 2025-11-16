@@ -22,14 +22,11 @@ export const routes: Routes = [
       ),
   },
   {
-    // --- 👇 CAMBIO AQUÍ ---
-    // La ruta de registro ahora carga el MISMO componente que login
     path: "register",
     loadComponent: () =>
       import("./auth/components/login/login.component").then(
         (m) => m.LoginComponent
       ),
-    // (Opcional: podrías pasar un `data: { mode: 'register' }` si quisieras)
   },
   {
     path: "forgot-password",
@@ -47,6 +44,17 @@ export const routes: Routes = [
       ),
     title: "Restablecer Contraseña",
   },
+  // --- 👇 NUEVA RUTA DE CALLBACK DE GOOGLE ---
+  {
+    path: "auth/callback",
+    // Esta será la ruta para el nuevo componente que crearemos
+    loadComponent: () =>
+      import("./auth/auth-callback/auth-callback.component").then(
+        (m) => m.AuthCallbackComponent
+      ),
+    title: "Autenticando...",
+  },
+  // --- FIN DE NUEVA RUTA ---
   {
     path: "profile",
     loadComponent: () =>
@@ -106,8 +114,6 @@ export const routes: Routes = [
       import("./contact/contact.component").then((m) => m.ContactComponent),
     title: "Contacto",
   },
-
-  // --- 🚀 PÁGINAS ESTÁTICAS ---
   {
     path: "about",
     loadComponent: () =>
@@ -144,14 +150,11 @@ export const routes: Routes = [
       ),
     title: "Política de Privacidad",
   },
-  // --- FIN DE PÁGINAS ESTÁTICAS ---
-
   {
     path: "",
     redirectTo: "home",
     pathMatch: "full",
   },
-
   {
     path: "**",
     loadComponent: () =>
