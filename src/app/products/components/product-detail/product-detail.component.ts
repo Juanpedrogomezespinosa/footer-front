@@ -38,6 +38,7 @@ export class ProductDetailComponent implements OnInit {
   selectedImageUrl = signal<string>("");
   quantity = signal(1);
   activeTab = signal("description");
+  isSizeGuideOpen = signal(false);
 
   // Señales dinámicas para la UI
   availableColors = signal<string[]>([]);
@@ -49,7 +50,6 @@ export class ProductDetailComponent implements OnInit {
     const color = this.selectedColor();
     const size = this.selectedSize();
 
-    // Comprobación de seguridad (corregida en el prompt anterior)
     if (!p || !p.variants || !color || !size) return null;
 
     const variant = p.variants.find(
@@ -85,6 +85,7 @@ export class ProductDetailComponent implements OnInit {
       this.availableColors.set([]);
       this.availableSizes.set([]);
       this.siblings.set([]);
+      this.isSizeGuideOpen.set(false); // Asegurarse de que el modal esté cerrado al navegar
 
       if (isNaN(productId)) {
         this.error.set("ID de producto inválido.");
@@ -137,20 +138,12 @@ export class ProductDetailComponent implements OnInit {
             this.selectedImageUrl.set(productData.images[0]?.imageUrl || "");
           }
 
-          // --- ¡¡¡BLOQUE CORREGIDO!!! ---
-          // Esta es la corrección para los errores TS2345
-          const mainColor = foundProduct.color; // Puede ser string | null | undefined
-
+          const mainColor = foundProduct.color;
           if (mainColor && colorsWithStock.includes(mainColor)) {
-            // Si el color principal existe Y está en la lista de stock
             this.selectColor(mainColor);
           } else if (colorsWithStock.length > 0) {
-            // Si no, seleccionar el primer color que sí tenga stock
-            // (colorsWithStock[0] está garantizado a ser un string)
             this.selectColor(colorsWithStock[0]);
           }
-          // Si no hay stock de nada, ambas señales (color/talla) quedarán vacías
-          // ------------------------------------
         } else {
           this.error.set("Producto no encontrado.");
         }
@@ -176,9 +169,8 @@ export class ProductDetailComponent implements OnInit {
     return this.defaultImage;
   }
 
-  // Aceptamos 'string | undefined'
   selectImage(imageUrl: string | undefined): void {
-    this.selectedImageUrl.set(imageUrl || ""); // <-- y ponemos un fallback
+    this.selectedImageUrl.set(imageUrl || "");
   }
 
   // --- Métodos de Acciones de Producto ---
@@ -192,7 +184,6 @@ export class ProductDetailComponent implements OnInit {
       return;
     }
 
-    // Nos aseguramos de que 'variants' existe
     const variants = product.variants || [];
 
     const sizesForColor = variants
@@ -217,14 +208,12 @@ export class ProductDetailComponent implements OnInit {
 
   addToCart(): void {
     const variantId = this.selectedVariantId();
-
     if (!variantId) {
       this.toastService.showError(
         "Por favor, selecciona un color y una talla."
       );
       return;
     }
-
     this.cartService.addToCart(variantId, this.quantity()).subscribe({
       next: () => {
         this.toastService.showSuccess("¡Producto añadido a la cesta!");
@@ -240,14 +229,12 @@ export class ProductDetailComponent implements OnInit {
 
   buyNow(): void {
     const variantId = this.selectedVariantId();
-
     if (!variantId) {
       this.toastService.showError(
         "Por favor, selecciona un color y una talla."
       );
       return;
     }
-
     this.cartService.addToCart(variantId, this.quantity()).subscribe({
       next: () => {
         this.router.navigate(["/cart"]);
@@ -270,7 +257,6 @@ export class ProductDetailComponent implements OnInit {
   getStars(): ("full" | "half" | "empty")[] {
     const stars: ("full" | "half" | "empty")[] = [];
     let rating = this.product()?.rating ?? 0;
-
     for (let i = 1; i <= 5; i++) {
       if (rating >= 1) {
         stars.push("full");
@@ -282,5 +268,24 @@ export class ProductDetailComponent implements OnInit {
       rating -= 1;
     }
     return stars;
+  }
+
+  // --- 👇 FUNCIÓN AÑADIDA ---
+  /**
+   * Maneja el evento de error de carga de una imagen
+   * y lo reemplaza con un placeholder.
+   */
+  getPlaceholderImage(event: Event) {
+    // Usamos el 'defaultImage' que ya está definido en el componente
+    (event.target as HTMLImageElement).src = this.defaultImage;
+  }
+
+  // --- Métodos para el Modal ---
+  openSizeGuide(): void {
+    this.isSizeGuideOpen.set(true);
+  }
+
+  closeSizeGuide(): void {
+    this.isSizeGuideOpen.set(false);
   }
 }
