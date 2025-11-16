@@ -1,6 +1,15 @@
-import { Component } from "@angular/core";
+// src/app/home/home.component.ts
+
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
+
+import {
+  ProductService,
+  PaginatedProductResponse,
+  Product, // Asumo que tu servicio exporta 'Product' (con 'image: string' en lugar de 'images: any[]')
+} from "../core/services/product.service";
+import { ToastService } from "../core/services/toast.service";
 
 @Component({
   selector: "app-home",
@@ -9,12 +18,64 @@ import { RouterModule } from "@angular/router";
   templateUrl: "./home.component.html",
   styleUrls: [],
 })
-export class HomeComponent {
-  categories = ["Camisetas", "Pantalones", "Zapatillas", "Sudaderas"];
-  products = [
-    { name: "Camiseta deportiva", price: 29.99 },
-    { name: "Pantalón cargo", price: 49.99 },
-    { name: "Zapatillas urbanas", price: 79.99 },
-    { name: "Sudadera premium", price: 59.99 },
-  ];
+export class HomeComponent implements OnInit {
+  private backendUrl = "http://localhost:3000";
+
+  categories = ["Zapatillas", "Ropa", "Complementos"];
+  latestProducts: Product[] = [];
+  isLoading: boolean = true;
+
+  constructor(
+    private productService: ProductService,
+    private toastService: ToastService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadLatestProducts();
+  }
+
+  loadLatestProducts(): void {
+    this.isLoading = true;
+    this.productService.getProducts(1, 4).subscribe({
+      next: (response: PaginatedProductResponse) => {
+        this.latestProducts = response.products;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error("Error al cargar los últimos productos:", error);
+        this.toastService.showError(
+          "No se pudieron cargar las novedades. Inténtalo de nuevo."
+        );
+        this.isLoading = false;
+      },
+    });
+  }
+
+  /**
+   * Construye la URL completa para la imagen del backend
+   * (Esta lógica es la misma de tu profile.component.ts)
+   * @param imagePath La ruta relativa (ej: /uploads/img.png)
+   */
+  getFullImagePath(imagePath: string | undefined): string {
+    const placeholder =
+      "https://placehold.co/600x800/e2e8f0/94a3b8?text=Footer";
+
+    if (!imagePath) {
+      return placeholder;
+    }
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+
+    // Asume que imagePath ya viene con "/uploads/" (ej: /uploads/img.png)
+    return `${this.backendUrl}${imagePath}`;
+  }
+
+  /**
+   * Maneja el evento de error de carga de una imagen
+   */
+  getPlaceholderImage(event: Event) {
+    (event.target as HTMLImageElement).src =
+      "https://placehold.co/600x800/e2e8f0/94a3b8?text=Footer";
+  }
 }

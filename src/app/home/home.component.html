@@ -28,11 +28,12 @@
             >
               Descubre la nueva colección que fusiona rendimiento y moda urbana.
             </h2>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-secondary hover:bg-secondary-dark text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-secondar-dark transition-all mt-4"
+            <a
+              [routerLink]="['/products']"
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-secondary hover:bg-secondary-dark text-white text-base font-bold leading-normal tracking-[0.015em] transition-all mt-4"
             >
-              <a href="/products" class="truncate">Descubre la Colección</a>
-            </button>
+              <span class="truncate">Descubre la Colección</span>
+            </a>
           </div>
         </div>
       </section>
@@ -40,14 +41,16 @@
       <!-- Categorías Destacadas -->
       <section class="mt-16">
         <h2
-          class="text-text-light text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
+          class="text-primary text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
         >
           Categorías Destacadas
         </h2>
         <div
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 mt-4"
         >
-          <div
+          <!-- Categoría 1 -->
+          <a
+            [routerLink]="['/products/category/zapatillas']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
               background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDAHg5NeSib40O6SoEw1-V_f4kIH74TSd2jEvMpkLMY9w49rf4efvn-hMlhk52NKXVz0cR-VJVeW78ZokFEVKtaCUX2QHDbMv07XYaXp7fyTTxoenFrDWMqq6bS6fDbIwHw7vefoiU4i6BQqDMGMkBfaz62Rf4BKSL2RPmKo8_q_E2pzKt5CIowbTw5VLHQxpcbK3oxWzeOXl9t9eN8-upx7gTFKLcyulBIAUOm_kVtH2KPwkEdeCC6r3FXvMyimAQ1HOlaRzbnCs0n');
@@ -62,15 +65,16 @@
               <h3 class="text-white text-xl font-bold leading-tight">
                 Zapatillas
               </h3>
-              <a
+              <p
                 class="text-white font-semibold text-sm mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:underline"
-                href="/products/category/zapatillas"
-                >Ver más <span aria-hidden="true">→</span></a
               >
+                Ver más <span aria-hidden="true">→</span>
+              </p>
             </div>
-          </div>
-
-          <div
+          </a>
+          <!-- Categoría 2 -->
+          <a
+            [routerLink]="['/products/category/ropa']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
               background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBL-SW9mpiE40XDVuJ2jyy3n-DGEjUkdhKC0M9bIDA4E-vfCt6kAWfV-TAkDPQ0f4IuVF6a7pDJcv8INP_pd-YsNRuVKmxWdmxNrmuv-nmC9TcfqrgL9mzYuRKkCt8B1Djge8Qoldz7DHwczrjXwQEieCYxV9BjPC6CVwoLTAHJ7kx52KsN4x-3hNYyPPftkQc_pUaktzeyg6doCYoRxHHfkwB4pwOsNKudcPBD_jR8Uxat5p1emnfEXz-gVCx4cTqOAzchBx_1QXSL');
@@ -83,15 +87,16 @@
               class="relative p-6 z-10 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-in-out"
             >
               <h3 class="text-white text-xl font-bold leading-tight">Ropa</h3>
-              <a
+              <p
                 class="text-white font-semibold text-sm mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:underline"
-                href="/products/category/ropa"
-                >Ver más <span aria-hidden="true">→</span></a
               >
+                Ver más <span aria-hidden="true">→</span>
+              </p>
             </div>
-          </div>
-
-          <div
+          </a>
+          <!-- Categoría 3 -->
+          <a
+            [routerLink]="['/products/category/complementos']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
               background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHNC6ia8b39mW7sMkf39D3s4EQ70c3v8OuHrSdZnyKdYO0ueeUbwPu0kYFwPEs-PQz97T19XSxIIeo0wjtNBFKUZjNbZeDDS3ZlctqHrIL9RRPhykCmYFCknFvRou9ETqeGHTsoEBCkiiKx5clBErM3ssFSEo2qSN7OctGXeMWqxLdvV7GPP0LbgVWa4xAzso0aJjOQQWTPzjvKabWhak1rdhjTfjYkWMXHKR22sxyo84R4xFzG50Z04l8DB7OmxKnsu8mnVcBtEoj');
@@ -106,143 +111,74 @@
               <h3 class="text-white text-xl font-bold leading-tight">
                 Complementos
               </h3>
-              <a
+              <p
                 class="text-white font-semibold text-sm mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:underline"
-                href="/products/category/complementos"
-                >Ver más <span aria-hidden="true">→</span></a
               >
+                Ver más <span aria-hidden="true">→</span>
+              </p>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
       <!-- Novedades -->
       <section class="mt-16">
         <h2
-          class="text-text-light text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
+          class="text-primary text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
         >
           Novedades
         </h2>
+
+        <div *ngIf="isLoading" class="text-center py-10 text-gray-600">
+          Cargando productos...
+        </div>
+
         <div
+          *ngIf="!isLoading"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 mt-4"
         >
-          <!-- Producto 1 -->
           <div
-            class="group relative flex flex-col overflow-hidden rounded-lg border border-border-light bg-background-light transition-shadow hover:shadow-lg"
+            *ngFor="let product of latestProducts"
+            class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-lg"
           >
-            <div class="aspect-h-4 aspect-w-3 bg-gray-200">
+            <!-- Ruta corregida a /products/product/:id -->
+            <a
+              [routerLink]="['/products', 'product', product.id]"
+              class="aspect-h-4 aspect-w-3 bg-gray-200"
+            >
+              <!-- 
+                --- 👇 CORRECCIÓN DEFINITIVA DE LA IMAGEN ---
+                Cambiado de 'product.images?.[0]?.imageUrl' a 'product.image'
+              -->
               <img
+                [src]="getFullImagePath(product.image)"
+                (error)="getPlaceholderImage($event)"
+                [alt]="product.name"
                 class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuGva2DMJ_jv-vjeST1oC5WhMlcmour05KpBlK12uDqA-KlQgtxo5XtZL3Ab0Qft-KCav4o8bLaDITAWg3t3hFyvl3X3tT8drPrd5m9A_fCipRnEj5ABaD_vkn3rchjmNMLWW6cFcXTWFmKIymExtFs1LFLKvZXfr5CU7iqNsDjHUGXTfWKLgddhjXr0yLzHeU-cBswXwEFHXQqn0NAS5kv4oYrqTAl4LJCmQJS9-_fQ_bmuFAip3Ie67obnZ7EcWQDTgVW2z-oyiq"
               />
-            </div>
+            </a>
             <div class="p-4 flex flex-col flex-1">
-              <h3 class="text-base font-semibold text-text-light">
-                Air Glide Pro
+              <h3 class="text-base font-semibold text-primary">
+                {{ product.name }}
               </h3>
-              <p class="text-sm text-text-subtle-light">Zapatillas Mujer</p>
-              <p class="mt-auto pt-2 text-lg font-bold text-text-light">
-                $120.00
+              <p class="text-sm text-gray-500">
+                {{ product.category | titlecase }}
+              </p>
+              <p class="mt-auto pt-2 text-lg font-bold text-primary">
+                {{ product.price | currency : "EUR" }}
               </p>
             </div>
-            <div
-              class="absolute inset-x-0 bottom-0 flex translate-y-full justify-center transition-transform duration-300 group-hover:translate-y-0"
-            >
-              <button
-                class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary hover:text-primary transition-colors"
-              >
-                Añadir al carrito
-              </button>
-            </div>
-          </div>
 
-          <!-- Producto 2 -->
-          <div
-            class="group relative flex flex-col overflow-hidden rounded-lg border border-border-light bg-background-light transition-shadow hover:shadow-lg"
-          >
-            <div class="aspect-h-4 aspect-w-3 bg-gray-200">
-              <img
-                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVV25MeoXutE2S-rbzNDweKytacUi1Kl2JMKIltDHtU6QraJtNv_EdC5Rxi0ubfppnmdJhTBGFAPD8WukQkIlLhp7VqlgDtXlMHkq7GTHXoPc6Gx3_zI5llop74IDLXn8CZMnHRQ_kh8_QXB7xaccmrV2GUJFxM6bmQN9jIE-ifqlInHyxu-mFuhvrL3W02LM6YeKZNYjSZoBIaLBPWTW_keaoeKaiwtYf62ewQVm4wgaP8R1KqWj9hgZgFDLraiqI0_0stjBo0dDB"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1">
-              <h3 class="text-base font-semibold text-text-light">
-                Ignite Runner
-              </h3>
-              <p class="text-sm text-text-subtle-light">Zapatillas Hombre</p>
-              <p class="mt-auto pt-2 text-lg font-bold text-text-light">
-                $150.00
-              </p>
-            </div>
             <div
               class="absolute inset-x-0 bottom-0 flex translate-y-full justify-center transition-transform duration-300 group-hover:translate-y-0"
             >
-              <button
-                class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary hover:text-primary transition-colors"
+              <!-- Ruta corregida a /products/product/:id -->
+              <a
+                [routerLink]="['/products', 'product', product.id]"
+                class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary-dark transition-colors text-center"
               >
-                Añadir al carrito
-              </button>
-            </div>
-          </div>
-
-          <!-- Producto 3 -->
-          <div
-            class="group relative flex flex-col overflow-hidden rounded-lg border border-border-light bg-background-light transition-shadow hover:shadow-lg"
-          >
-            <div class="aspect-h-4 aspect-w-3 bg-gray-200">
-              <img
-                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiO75GbpuqdTJZgzd1nzfWxbo9hJJ8xoxSQdTpDiC7iEVqZrbTgK-rvW16Rz-v2lzfS4SI4cuSdRenwxdmb5v-WVUK2AkwfSyBmpAojDTzQkO4FmvUMeEh2D9Ccb14_2OmaYPwk-Nx_T4vwwVPcmk87tehyHrQ_OCbwIX8WbsBBiQ6aieZoEi4LniUnGrZoaABcYSY4o6khzLowq1xi3poU29b_S5PRCClNhjxjpJII6E1R2kQMhiQfzL8Yi0hGaEJHoaSTIxNiiSw"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1">
-              <h3 class="text-base font-semibold text-text-light">
-                Urban Hoodie
-              </h3>
-              <p class="text-sm text-text-subtle-light">Sudadera Unisex</p>
-              <p class="mt-auto pt-2 text-lg font-bold text-text-light">
-                $80.00
-              </p>
-            </div>
-            <div
-              class="absolute inset-x-0 bottom-0 flex translate-y-full justify-center transition-transform duration-300 group-hover:translate-y-0"
-            >
-              <button
-                class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary hover:text-primary transition-colors"
-              >
-                Añadir al carrito
-              </button>
-            </div>
-          </div>
-
-          <!-- Producto 4 -->
-          <div
-            class="group relative flex flex-col overflow-hidden rounded-lg border border-border-light bg-background-light transition-shadow hover:shadow-lg"
-          >
-            <div class="aspect-h-4 aspect-w-3 bg-gray-200">
-              <img
-                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                src="https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/025994/06/fnd/VNM/fmt/png/Essentials-Metal-PUMA-Cat-Baseball-Cap"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1">
-              <h3 class="text-base font-semibold text-text-light">
-                Street Cap
-              </h3>
-              <p class="text-sm text-text-subtle-light">Accesorios</p>
-              <p class="mt-auto pt-2 text-lg font-bold text-text-light">
-                $25.00
-              </p>
-            </div>
-            <div
-              class="absolute inset-x-0 bottom-0 flex translate-y-full justify-center transition-transform duration-300 group-hover:translate-y-0"
-            >
-              <button
-                class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary hover:text-primary transition-colors"
-              >
-                Añadir al carrito
-              </button>
+                Ver Producto
+              </a>
             </div>
           </div>
         </div>
