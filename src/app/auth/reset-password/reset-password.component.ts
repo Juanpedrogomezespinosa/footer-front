@@ -8,13 +8,38 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
+  ValidatorFn,
 } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { AuthService } from "app/core/services/auth.service";
 import { ToastService } from "app/core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
-// --- Validador Personalizado ---
+// Validador de robustez (sin cambios)
+export function passwordStrengthValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (!value) {
+      return null;
+    }
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+    const hasMinLength = value.length >= 8;
+    const errors: ValidationErrors = {};
+    if (!hasMinLength) {
+      errors["minLength"] = true;
+    }
+    if (!hasUpperCase) {
+      errors["requireUppercase"] = true;
+    }
+    if (!hasSpecialChar) {
+      errors["requireSpecialChar"] = true;
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  };
+}
+
+// Validador de Coincidencia (sin cambios)
 export function passwordMatchValidator(
   control: AbstractControl
 ): ValidationErrors | null {
@@ -26,18 +51,15 @@ export function passwordMatchValidator(
     confirmPassword &&
     newPassword.value !== confirmPassword.value
   ) {
-    // Devuelve el error en el control 'confirmPassword'
     confirmPassword.setErrors({ passwordMismatch: true });
     return { passwordMismatch: true };
   } else {
-    // Si coinciden, quita el error
     if (confirmPassword?.hasError("passwordMismatch")) {
       confirmPassword.setErrors(null);
     }
     return null;
   }
 }
-// --- Fin del Validador ---
 
 @Component({
   selector: "app-reset-password",
@@ -52,6 +74,9 @@ export class ResetPasswordComponent implements OnInit {
   token: string | null = null;
   tokenError = signal<string | null>(null);
 
+  // --- 👇 PROPIEDAD AÑADIDA ---
+  passwordFieldType = "password"; // Para controlar la visibilidad
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -61,17 +86,15 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     this.resetPasswordForm = this.fb.group(
       {
-        newPassword: ["", [Validators.required, Validators.minLength(8)]],
+        newPassword: ["", [Validators.required, passwordStrengthValidator()]],
         confirmPassword: ["", [Validators.required]],
       },
-      { validators: passwordMatchValidator } // Aplicar el validador al grupo
+      { validators: passwordMatchValidator }
     );
   }
 
   ngOnInit(): void {
-    // Capturar el token de la URL
     this.token = this.route.snapshot.paramMap.get("token");
-
     if (!this.token) {
       this.tokenError.set(
         "Token no encontrado. Por favor, solicita un nuevo enlace."
@@ -87,7 +110,6 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     this.isLoading.set(true);
-
     const { newPassword } = this.resetPasswordForm.value;
 
     this.authService
@@ -97,7 +119,6 @@ export class ResetPasswordComponent implements OnInit {
           this.isLoading.set(false);
           this.successMessage.set(response.message);
           this.resetPasswordForm.disable();
-          // Redirigir al login después de 3 segundos
           setTimeout(() => {
             this.router.navigate(["/login"]);
           }, 3000);
@@ -108,12 +129,20 @@ export class ResetPasswordComponent implements OnInit {
             err.error?.message ||
             "Error al procesar la solicitud. Inténtalo de nuevo.";
           this.toastService.showError(errorMsg);
-          // Si el token es inválido, mostramos el error y deshabilitamos el form
           if (err.status === 400 || err.status === 401) {
             this.tokenError.set(errorMsg);
             this.resetPasswordForm.disable();
           }
         },
       });
+  }
+
+  // --- 👇 MÉTODO AÑADIDO ---
+  /**
+   * Cambia la visibilidad del campo de contraseña (texto/password)
+   */
+  togglePasswordVisibility(): void {
+    this.passwordFieldType =
+      this.passwordFieldType === "password" ? "text" : "password";
   }
 }
