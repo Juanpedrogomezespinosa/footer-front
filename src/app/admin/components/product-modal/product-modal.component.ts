@@ -30,7 +30,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
-  uniqueSize = "Talla Única";
+  uniqueSize = "Talla Única"; // Ya no lo usaremos por defecto
 
   constructor(
     private fb: FormBuilder,
@@ -86,7 +86,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
 
   addColorGroup(): void {
     this.colorGroups.push(this.createColorGroup());
-    // Aplicar la lógica de tallas a la primera fila del nuevo grupo
     const newGroupIndex = this.colorGroups.length - 1;
     const sizeStockArray = this.getSizeStocks(newGroupIndex);
     const sizeControl = sizeStockArray.at(0).get("size");
@@ -117,7 +116,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
 
   addSizeStock(colorIndex: number): void {
     this.getSizeStocks(colorIndex).push(this.createSizeStockGroup());
-    // No hace falta aplicar applySizeLogic aquí porque ya se hace en createSizeStockGroup
   }
 
   removeSizeStock(colorIndex: number, sizeIndex: number): void {
@@ -129,10 +127,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Itera por TODOS los grupos y TODAS las tallas y aplica la lógica de validación y estado.
-   * Utiliza `AbstractControl.enable()`/`disable()` y `setValue()` para evitar la advertencia de Angular.
-   */
   updateAllSizeControls(category: string): void {
     this.colorGroups.controls.forEach((colorGroup) => {
       const sizeStocks = (colorGroup as FormGroup).get(
@@ -147,15 +141,14 @@ export class ProductModalComponent implements OnInit, OnDestroy {
 
   /**
    * Aplica validadores/valor/estado a UN solo control de talla.
-   * La clave para la advertencia de `disabled` es usar `control.disable()`/`enable()`
-   * en lugar de `[disabled]` en el HTML.
    */
   applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
     if (!sizeControl) return;
 
     sizeControl.clearValidators();
-    sizeControl.enable(); // Primero habilitar para limpiar estados anteriores
-    sizeControl.setValue(""); // Siempre resetear el valor
+    sizeControl.enable();
+    // No reseteamos el valor si la categoría no ha cambiado
+    // sizeControl.setValue(""); // Evitar resetear si solo se añade talla
 
     if (category === "zapatillas") {
       sizeControl.setValidators([
@@ -163,18 +156,37 @@ export class ProductModalComponent implements OnInit, OnDestroy {
         Validators.min(this.sneakerMin),
         Validators.max(this.sneakerMax),
       ]);
-    } else if (category === "ropa") {
+      if (
+        !sizeControl.value ||
+        isNaN(sizeControl.value) ||
+        sizeControl.value < this.sneakerMin
+      ) {
+        sizeControl.setValue("");
+      }
+    }
+    // --- 👇 CORRECCIÓN AQUÍ ---
+    // Agrupamos 'ropa' y 'complementos' para que usen la misma lógica
+    else if (category === "ropa" || category === "complementos") {
       sizeControl.setValidators([Validators.required]);
-    } else if (category === "complementos") {
-      sizeControl.setValue(this.uniqueSize);
-      sizeControl.disable(); // Deshabilitar el control en TS
-    } else {
+      if (!this.clothingSizes.includes(sizeControl.value)) {
+        sizeControl.setValue("");
+      }
+    }
+    // --- FIN DE CORRECCIÓN ---
+
+    // --- ❌ BLOQUE ELIMINADO ---
+    // else if (category === "complementos") {
+    //   sizeControl.setValue(this.uniqueSize);
+    //   sizeControl.disable();
+    // }
+    // --- FIN DE BLOQUE ELIMINADO ---
+    else {
       // Categoría no seleccionada o inválida
       sizeControl.setValidators([Validators.required]);
-      sizeControl.disable(); // Deshabilitar el control en TS
-      sizeControl.setValue(""); // Asegurarse de que esté vacío
+      sizeControl.disable();
+      sizeControl.setValue("");
     }
-    sizeControl.updateValueAndValidity(); // Actualizar validación
+    sizeControl.updateValueAndValidity();
   }
 
   onFileChange(event: Event): void {
@@ -196,7 +208,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     if (this.productForm.invalid) {
       this.toast.showError("Por favor, completa todos los campos requeridos.");
       this.productForm.markAllAsTouched();
-      // Debugging más profundo para formularios anidados
       console.log("Formulario inválido:", this.productForm.value);
       this.colorGroups.controls.forEach((colorGroup, i) => {
         if (colorGroup.invalid) {
@@ -221,9 +232,8 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     }
 
     const formData = new FormData();
-    const formValue = this.productForm.getRawValue(); // Incluir campos disabled
+    const formValue = this.productForm.getRawValue();
 
-    // 1. Aplanar la estructura de 'colorGroups' a 'variants'
     const variantsForApi: { color: string; size: string; stock: number }[] = [];
     formValue.colorGroups.forEach(
       (group: {
@@ -241,23 +251,18 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       }
     );
 
-    // 2. Añadir los campos del producto padre
     Object.keys(formValue).forEach((key) => {
-      // Omitimos 'images' y la estructura anidada 'colorGroups'
       if (key !== "images" && key !== "colorGroups") {
         formData.append(key, formValue[key]);
       }
     });
 
-    // 3. Añadir el array "aplastado" como string JSON
     formData.append("variants", JSON.stringify(variantsForApi));
 
-    // 4. Añadir todas las imágenes seleccionadas
     this.selectedFiles.forEach((file) => {
       formData.append("images", file, file.name);
     });
 
-    // 5. Enviar a la API
     this.adminService.createProduct(formData).subscribe({
       next: (response) => {
         this.toast.showSuccess("¡Producto creado con éxito!");
@@ -279,9 +284,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       price: 0,
       category: "",
     });
-    // Reseteamos el FormArray
     this.colorGroups.clear();
-    // Añadimos un grupo de color inicial y aplicamos la lógica de talla
     const initialColorGroup = this.createColorGroup();
     this.colorGroups.push(initialColorGroup);
     const initialSizeControl = (
@@ -289,7 +292,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     )
       .at(0)
       .get("size");
-    this.applySizeLogic(initialSizeControl, ""); // Aplicar estado inicial (categoría vacía)
+    this.applySizeLogic(initialSizeControl, "");
 
     this.selectedFiles = [];
     this.fileNames = [];
