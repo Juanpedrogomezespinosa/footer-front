@@ -25,15 +25,14 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
   product: FullAdminProduct | null = null;
   private productSubscription: Subscription | null = null;
-  private categorySubscription: Subscription | null = null; // <-- Para cambios de categoría
+  private categorySubscription: Subscription | null = null;
 
-  // --- Variables de estado para las tallas ---
-  currentCategory = signal<string>(""); // Rastrea la categoría
+  // Variables de estado para las tallas
+  currentCategory = signal<string>("");
   clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
-  uniqueSize = "Talla Única";
-  // --------------------------------------------------
+  // uniqueSize = "Talla Única"; // Ya no se usa por defecto
 
   constructor(
     private fb: FormBuilder,
@@ -41,7 +40,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private toast: ToastService
   ) {
-    // --- Formulario actualizado a la estructura anidada ---
     this.productForm = this.fb.group({
       name: ["", Validators.required],
       description: ["", Validators.required],
@@ -52,20 +50,17 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       material: [""],
       season: [""],
       is_new: [false],
-      // 'variants' se reemplaza por 'colorGroups'
-      colorGroups: this.fb.array([], Validators.required), // Empezar vacío
+      colorGroups: this.fb.array([], Validators.required),
     });
   }
 
   ngOnInit(): void {
-    // Nos suscribimos al producto que el ModalService nos pasa
     this.productSubscription = this.modalService.productToEdit$.subscribe(
       (product) => {
         if (product) {
           this.product = product;
-          this.currentCategory.set(product.category); // Establecer categoría actual
+          this.currentCategory.set(product.category);
 
-          // Rellenamos los campos principales
           this.productForm.patchValue({
             name: product.name,
             description: product.description,
@@ -78,20 +73,15 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             is_new: product.is_new,
           });
 
-          // --- ¡¡¡NUEVA LÓGICA DE CARGA DE VARIANTES!!! ---
-          // 1. Agrupar las variantes planas por color
           const groupedVariants = this.groupVariantsByColor(product.variants);
-          this.colorGroups.clear(); // Limpiar el array
+          this.colorGroups.clear();
 
-          // 2. Crear los FormGroups anidados a partir de los datos agrupados
           groupedVariants.forEach((group) => {
             const sizeStockFormGroups = group.sizeStocks.map((ss) => {
-              // Creamos el grupo de talla/stock...
               const sizeStockGroup = this.createSizeStockGroup();
-              // ...le aplicamos la lógica de talla...
+              // ¡IMPORTANTE! Aplicar la lógica de talla ANTES de 'patchValue'
               this.applySizeLogic(sizeStockGroup.get("size"), product.category);
-              // ...y le ponemos los valores
-              sizeStockGroup.patchValue(ss);
+              sizeStockGroup.patchValue(ss); // Rellenar con los datos existentes
               return sizeStockGroup;
             });
 
@@ -106,19 +96,17 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             );
           });
 
-          // Si por alguna razón no hay variantes, añadir un grupo vacío
           if (groupedVariants.length === 0) {
             this.colorGroups.push(this.createColorGroup());
             this.updateAllSizeControls(this.currentCategory());
           }
 
-          // 3. Escuchar cambios en la categoría (si el admin la cambia)
-          this.categorySubscription?.unsubscribe(); // Limpiar listener anterior
+          this.categorySubscription?.unsubscribe();
           this.categorySubscription = this.productForm
             .get("category")!
             .valueChanges.subscribe((newCategory) => {
               this.currentCategory.set(newCategory);
-              this.updateAllSizeControls(newCategory);
+              this.updateAllSizeControls(newCategory); // <-- Aquí se aplica la lógica
             });
         }
       }
@@ -126,31 +114,21 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpiamos las suscripciones
     this.productSubscription?.unsubscribe();
     this.categorySubscription?.unsubscribe();
   }
 
-  /**
-   * Helper para agrupar el array plano de variantes de la API
-   * en la estructura anidada que necesita nuestro formulario.
-   */
   groupVariantsByColor(
     variants: FullAdminProduct["variants"]
   ): { color: string; sizeStocks: { size: string; stock: number }[] }[] {
     if (!variants) return [];
-
     const grouped = new Map<string, { size: string; stock: number }[]>();
-
-    // Agrupar
     variants.forEach((v) => {
       if (!grouped.has(v.color)) {
         grouped.set(v.color, []);
       }
       grouped.get(v.color)!.push({ size: v.size, stock: v.stock });
     });
-
-    // Convertir de Map a Array
     return Array.from(grouped.entries()).map(([color, sizeStocks]) => ({
       color,
       sizeStocks,
@@ -183,7 +161,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
   removeColorGroup(index: number): void {
     if (this.colorGroups.length > 0) {
-      // Permitir borrar hasta el último
       this.colorGroups.removeAt(index);
     }
   }
@@ -208,7 +185,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   removeSizeStock(colorIndex: number, sizeIndex: number): void {
     const sizeStocks = this.getSizeStocks(colorIndex);
     if (sizeStocks.length > 1) {
-      // Permitir borrar hasta la última
       sizeStocks.removeAt(sizeIndex);
     } else {
       this.toast.showError("Debe haber al menos una talla por color.");
@@ -222,21 +198,40 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       ) as FormArray;
       sizeStocks.controls.forEach((sizeStockControl) => {
         const sizeControl = (sizeStockControl as FormGroup).get("size");
+
+        // --- 👇 CORRECCIÓN AQUÍ ---
+        // Guardamos el valor actual antes de aplicar la lógica
+        const currentValue = sizeControl?.value;
         this.applySizeLogic(sizeControl, category);
-        if (category !== "complementos") {
-          sizeControl?.setValue("");
+
+        // Si la categoría NO es zapatillas (es ropa o complemento),
+        // y el valor actual es una de las tallas de ropa, lo preservamos.
+        if (category === "ropa" || category === "complementos") {
+          if (this.clothingSizes.includes(currentValue)) {
+            sizeControl?.setValue(currentValue);
+          } else {
+            sizeControl?.setValue(""); // Resetear si no es una talla válida
+          }
         }
+        // Si es zapatillas, preservamos si es un número
+        else if (category === "zapatillas") {
+          if (typeof currentValue === "number") {
+            sizeControl?.setValue(currentValue);
+          } else {
+            sizeControl?.setValue("");
+          }
+        }
+        // --- FIN DE CORRECCIÓN ---
       });
     });
   }
 
+  // --- 👇 CORRECCIÓN AQUÍ: LÓGICA IDÉNTICA A 'create-product' ---
   applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
     if (!sizeControl) return;
-    sizeControl.clearValidators();
-    sizeControl.enable();
 
-    // Guardar el valor actual ANTES de resetear
-    const currentValue = sizeControl.value;
+    sizeControl.clearValidators();
+    sizeControl.enable(); // Habilitar siempre primero
 
     if (category === "zapatillas") {
       sizeControl.setValidators([
@@ -244,31 +239,23 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
         Validators.min(this.sneakerMin),
         Validators.max(this.sneakerMax),
       ]);
-    } else if (category === "ropa") {
+    } else if (category === "ropa" || category === "complementos") {
+      // 'complementos' ahora usa la lista de tallas de ropa
       sizeControl.setValidators([Validators.required]);
-    } else if (category === "complementos") {
-      sizeControl.setValue(this.uniqueSize);
-      sizeControl.disable();
     } else {
+      // Categoría no seleccionada
       sizeControl.setValidators([Validators.required]);
-      sizeControl.disable();
+      sizeControl.disable(); // Deshabilitar si no hay categoría
     }
 
-    // Si la categoría no es complementos, re-aplicar el valor (si es válido)
-    if (category !== "complementos") {
-      sizeControl.setValue(currentValue);
-    }
-
-    sizeControl.updateValueAndValidity();
+    sizeControl.updateValueAndValidity(); // Actualizar el estado
   }
-
-  // --- FIN DE HELPERS ---
+  // --- FIN DE CORRECCIÓN ---
 
   onSubmit(): void {
     if (this.productForm.invalid || !this.product) {
       this.toast.showError("Formulario inválido. Revisa las variantes.");
       this.productForm.markAllAsTouched();
-      // Debugging
       this.colorGroups.controls.forEach((colorGroup, i) => {
         if (colorGroup.invalid) {
           console.log(`Grupo de Color ${i} inválido:`, colorGroup.value);
@@ -286,7 +273,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
     const formValue = this.productForm.getRawValue();
 
-    // 1. Aplanar la estructura de 'colorGroups' a 'variants'
     const variantsForApi: { color: string; size: string; stock: number }[] = [];
     formValue.colorGroups.forEach(
       (group: {
@@ -304,13 +290,12 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       }
     );
 
-    // 2. Preparar los datos para enviar
     const updatedData = {
       ...formValue,
-      colorGroups: undefined, // No enviar la estructura anidada
-      variants: JSON.stringify(variantsForApi), // Enviar la estructura plana
+      colorGroups: undefined,
+      variants: JSON.stringify(variantsForApi),
     };
-    delete updatedData.colorGroups; // Asegurarse de que se elimina
+    delete updatedData.colorGroups;
 
     this.adminService.updateProduct(this.product.id, updatedData).subscribe({
       next: () => {
