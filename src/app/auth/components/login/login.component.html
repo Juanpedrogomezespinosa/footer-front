@@ -1,111 +1,319 @@
-<div
-  class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12"
->
-  <div class="w-full max-w-md rounded-2xl p-8 space-y-8">
-    <div class="text-center">
-      <h2 class="text-3xl font-semibold text-primary mb-2">
-        Accede a tu cuenta
-      </h2>
-      <p class="text-gray-500 text-sm">
-        Bienvenido de nuevo. Introduce tus credenciales para continuar.
-      </p>
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
-      <!-- Email -->
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
-          >Email</label
+<!-- src/app/auth/components/login/login.component.html -->
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="w-full max-w-md">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-lg">
+      <div class="p-6 sm:p-8">
+        <!-- Toggle: Iniciar sesión / Registrarse -->
+        <div
+          class="flex h-10 w-full items-center justify-center rounded-lg bg-gray-100 p-1 mb-6"
         >
-        <input
-          id="email"
-          type="email"
-          autocomplete="email"
-          formControlName="email"
-          placeholder="Introduce tu email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
-          [class.border-red-500]="
-            form.get('email')?.invalid && form.get('email')?.touched
-          "
-        />
-        <p
-          *ngIf="form.get('email')?.touched && form.get('email')?.invalid"
-          class="mt-1 text-sm text-red-500"
-        >
-          <span *ngIf="form.get('email')?.errors?.['required']">
-            El email es obligatorio.
-          </span>
-          <span *ngIf="form.get('email')?.errors?.['email']">
-            Introduce un email válido.
-          </span>
-        </p>
-      </div>
-
-      <!-- Contraseña -->
-      <div>
-        <label
-          for="password"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Contraseña
-        </label>
-        <div class="relative">
-          <input
-            id="password"
-            [type]="passwordFieldType"
-            autocomplete="current-password"
-            formControlName="password"
-            placeholder="Introduce tu contraseña"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
-            [class.border-red-500]="
-              form.get('password')?.invalid && form.get('password')?.touched
-            "
-          />
           <button
-            type="button"
-            (click)="togglePasswordVisibility()"
-            class="absolute inset-y-0 right-3 flex items-center"
+            (click)="authMode.set('login')"
+            class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 text-sm font-medium leading-normal transition-all duration-200"
+            [ngClass]="{
+              'bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)] text-primary':
+                authMode() === 'login',
+              'text-gray-500 hover:bg-gray-200': authMode() === 'register'
+            }"
           >
-            <img
-              *ngIf="passwordFieldType === 'password'"
-              src="assets/icons/ver.svg"
-              alt="Mostrar contraseña"
-              class="w-5 h-5 opacity-70"
-            />
-            <img
-              *ngIf="passwordFieldType === 'text'"
-              src="assets/icons/ocultar.svg"
-              alt="Ocultar contraseña"
-              class="w-5 h-5 opacity-70"
-            />
+            <span class="truncate">Iniciar sesión</span>
+          </button>
+          <button
+            (click)="authMode.set('register')"
+            class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 text-sm font-medium leading-normal transition-all duration-200"
+            [ngClass]="{
+              'bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)] text-primary':
+                authMode() === 'register',
+              'text-gray-500 hover:bg-gray-200': authMode() === 'login'
+            }"
+          >
+            <span class="truncate">Registrarse</span>
           </button>
         </div>
-        <p
-          *ngIf="form.get('password')?.touched && form.get('password')?.invalid"
-          class="mt-1 text-sm text-red-500"
-        >
-          La contraseña es obligatoria.
-        </p>
+
+        <!-- 
+          =========================
+          FORMULARIO DE LOGIN
+          =========================
+        -->
+        <div *ngIf="authMode() === 'login'" class="space-y-6">
+          <div>
+            <h1
+              class="text-primary tracking-tight text-2xl font-bold leading-tight text-center"
+            >
+              Bienvenido de nuevo
+            </h1>
+            <p
+              class="text-gray-600 text-sm font-normal leading-normal text-center mt-1"
+            >
+              Inicia sesión para continuar.
+            </p>
+          </div>
+
+          <form
+            [formGroup]="loginForm"
+            (ngSubmit)="onLoginSubmit()"
+            class="space-y-4"
+          >
+            <!-- Email -->
+            <div>
+              <label
+                class="block text-primary text-sm font-medium leading-normal pb-2"
+                >Email</label
+              >
+              <input
+                formControlName="email"
+                type="email"
+                placeholder="tu.email@ejemplo.com"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] text-base font-normal leading-normal"
+              />
+              <p
+                *ngIf="
+                  loginForm.get('email')?.touched &&
+                  loginForm.get('email')?.invalid
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                Introduce un email válido.
+              </p>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+              <div class="flex justify-between items-baseline pb-2">
+                <label class="text-primary text-sm font-medium leading-normal"
+                  >Contraseña</label
+                >
+                <!-- ¡¡AQUÍ ESTÁ EL ENLACE!! -->
+                <a
+                  routerLink="/forgot-password"
+                  class="text-sm font-medium text-secondary hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </a>
+              </div>
+              <div class="relative flex w-full flex-1 items-stretch rounded-lg">
+                <input
+                  [type]="passwordFieldType"
+                  formControlName="password"
+                  placeholder="Introduce tu contraseña"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal"
+                />
+                <button
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  aria-label="Toggle password visibility"
+                  class="text-gray-500 flex border border-gray-300 bg-white items-center justify-center px-3 rounded-r-lg border-l-0"
+                >
+                  <span
+                    *ngIf="passwordFieldType === 'password'"
+                    class="material-symbols-outlined text-xl"
+                    >visibility</span
+                  >
+                  <span
+                    *ngIf="passwordFieldType === 'text'"
+                    class="material-symbols-outlined text-xl"
+                    >visibility_off</span
+                  >
+                </button>
+              </div>
+              <p
+                *ngIf="
+                  loginForm.get('password')?.touched &&
+                  loginForm.get('password')?.invalid
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                La contraseña es obligatoria.
+              </p>
+            </div>
+
+            <!-- Botones de Login -->
+            <div class="flex flex-col space-y-4 pt-2">
+              <button
+                type="submit"
+                [disabled]="isLoading() || loginForm.invalid"
+                class="flex items-center justify-center whitespace-nowrap rounded-lg h-12 px-6 text-sm font-bold leading-normal text-white bg-secondary hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50"
+              >
+                {{ isLoading() ? "Accediendo..." : "Iniciar sesión" }}
+              </button>
+              <button
+                type="button"
+                class="flex items-center justify-center whitespace-nowrap rounded-lg h-12 px-6 text-sm font-medium leading-normal text-primary bg-gray-50 border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
+              >
+                <img
+                  alt="Google logo"
+                  class="w-5 h-5 mr-3"
+                  src="https-lh3.googleusercontent.com/aida-public/AB6AXuDoCMXzSuytbIak3n4qXcSkDlg6FlYmP_ayIpy-1TFTVSY21ORfCxVCkHTIs8BomRwWWmj9lo70nLZ2MEzmgMnB103giiOnUe9SNm1duV4Hgty-NmF0sXNELLxwl74Y-Q9zhSwQtcAZmYwbQZ-I4EmU9Dwom2hdcGmjaJIVkGRRJZeiMQa-fGkLTuwWFPU-LE-SJbnW1jwLP2mHJniAaGqMRhLrPzTM5Sl2rtWGKIpoDXUBHCPKAKthuq35G1xmAx_PsyBhQN7M3EhE"
+                />
+                Continuar con Google
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 
+          =========================
+          FORMULARIO DE REGISTRO
+          =========================
+        -->
+        <div *ngIf="authMode() === 'register'" class="space-y-6">
+          <div>
+            <h1
+              class="text-primary tracking-tight text-2xl font-bold leading-tight text-center"
+            >
+              Crea tu cuenta
+            </h1>
+            <p
+              class="text-gray-600 text-sm font-normal leading-normal text-center mt-1"
+            >
+              Únete a la comunidad Footer.
+            </p>
+          </div>
+
+          <form
+            [formGroup]="registerForm"
+            (ngSubmit)="onRegisterSubmit()"
+            class="space-y-4"
+          >
+            <!-- Nombre -->
+            <div>
+              <label
+                class="block text-primary text-sm font-medium leading-normal pb-2"
+                >Nombre</label
+              >
+              <input
+                formControlName="name"
+                type="text"
+                placeholder="Tu nombre completo"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] text-base font-normal leading-normal"
+              />
+              <p
+                *ngIf="
+                  registerForm.get('name')?.touched &&
+                  registerForm.get('name')?.invalid
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                El nombre es obligatorio.
+              </p>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label
+                class="block text-primary text-sm font-medium leading-normal pb-2"
+                >Email</label
+              >
+              <input
+                formControlName="email"
+                type="email"
+                placeholder="tu.email@ejemplo.com"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] text-base font-normal leading-normal"
+              />
+              <p
+                *ngIf="
+                  registerForm.get('email')?.touched &&
+                  registerForm.get('email')?.invalid
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                Introduce un email válido.
+              </p>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+              <label
+                class="block text-primary text-sm font-medium leading-normal pb-2"
+                >Contraseña</label
+              >
+              <div class="relative flex w-full flex-1 items-stretch rounded-lg">
+                <input
+                  [type]="passwordFieldType"
+                  formControlName="password"
+                  placeholder="Crea una contraseña (mín. 8 caracteres)"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal"
+                />
+                <button
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  aria-label="Toggle password visibility"
+                  class="text-gray-500 flex border border-gray-300 bg-white items-center justify-center px-3 rounded-r-lg border-l-0"
+                >
+                  <span
+                    *ngIf="passwordFieldType === 'password'"
+                    class="material-symbols-outlined text-xl"
+                    >visibility</span
+                  >
+                  <span
+                    *ngIf="passwordFieldType === 'text'"
+                    class="material-symbols-outlined text-xl"
+                    >visibility_off</span
+                  >
+                </button>
+              </div>
+              <p
+                *ngIf="
+                  registerForm.get('password')?.touched &&
+                  registerForm.get('password')?.invalid
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                <span *ngIf="registerForm.get('password')?.errors?.['required']"
+                  >La contraseña es obligatoria.</span
+                >
+                <span
+                  *ngIf="registerForm.get('password')?.errors?.['minlength']"
+                  >Debe tener al menos 8 caracteres.</span
+                >
+              </p>
+            </div>
+
+            <!-- Confirmar Contraseña -->
+            <div>
+              <label
+                class="block text-primary text-sm font-medium leading-normal pb-2"
+                >Confirmar Contraseña</label
+              >
+              <input
+                [type]="passwordFieldType"
+                formControlName="confirmPassword"
+                placeholder="Repite tu contraseña"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-primary focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary border border-gray-300 bg-white h-12 placeholder:text-gray-400 p-[15px] text-base font-normal leading-normal"
+              />
+              <p
+                *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched"
+                class="mt-1 text-xs text-red-500"
+              >
+                Las contraseñas no coinciden.
+              </p>
+            </div>
+
+            <!-- Botones de Registro -->
+            <div class="flex flex-col space-y-4 pt-2">
+              <button
+                type="submit"
+                [disabled]="isLoading() || registerForm.invalid"
+                class="flex items-center justify-center whitespace-nowrap rounded-lg h-12 px-6 text-sm font-bold leading-normal text-white bg-secondary hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50"
+              >
+                {{ isLoading() ? "Creando cuenta..." : "Crear cuenta" }}
+              </button>
+              <button
+                type="button"
+                class="flex items-center justify-center whitespace-nowrap rounded-lg h-12 px-6 text-sm font-medium leading-normal text-primary bg-gray-50 border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
+              >
+                <img
+                  alt="Google logo"
+                  class="w-5 h-5 mr-3"
+                  src="https-lh3.googleusercontent.com/aida-public/AB6AXuDoCMXzSuytbIak3n4qXcSkDlg6FlYmP_ayIpy-1TFTVSY21ORfCxVCkHTIs8BomRwWWmj9lo70nLZ2MEzmgMnB103giiOnUe9SNm1duV4Hgty-NmF0sXNELLxwl74Y-Q9zhSwQtcAZmYwbQZ-I4EmU9Dwom2hdcGmjaJIVkGRRJZeiMQa-fGkLTuwWFPU-LE-SJbnW1jwLP2mHJniAaGqMRhLrPzTM5Sl2rtWGKIpoDXUBHCPKAKthuq35G1xmAx_PsyBhQN7M3EhE"
+                />
+                Continuar con Google
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <!-- Botón -->
-      <button
-        type="submit"
-        [disabled]="form.invalid"
-        class="w-full py-2 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition disabled:opacity-50"
-      >
-        Iniciar sesión
-      </button>
-
-      <!-- Registro -->
-      <p class="text-center text-sm text-gray-600">
-        ¿No tienes cuenta?
-        <a
-          routerLink="/register"
-          class="text-secondary hover:underline font-medium"
-          >Regístrate</a
-        >
-      </p>
-    </form>
+    </div>
   </div>
 </div>

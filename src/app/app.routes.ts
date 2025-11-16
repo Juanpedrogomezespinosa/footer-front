@@ -22,11 +22,30 @@ export const routes: Routes = [
       ),
   },
   {
+    // --- 👇 CAMBIO AQUÍ ---
+    // La ruta de registro ahora carga el MISMO componente que login
     path: "register",
     loadComponent: () =>
-      import("./auth/components/register/register.component").then(
-        (m) => m.RegisterComponent
+      import("./auth/components/login/login.component").then(
+        (m) => m.LoginComponent
       ),
+    // (Opcional: podrías pasar un `data: { mode: 'register' }` si quisieras)
+  },
+  {
+    path: "forgot-password",
+    loadComponent: () =>
+      import("./auth/forgot-password/forgot-password.component").then(
+        (m) => m.ForgotPasswordComponent
+      ),
+    title: "Recuperar Contraseña",
+  },
+  {
+    path: "reset-password/:token",
+    loadComponent: () =>
+      import("./auth/reset-password/reset-password.component").then(
+        (m) => m.ResetPasswordComponent
+      ),
+    title: "Restablecer Contraseña",
   },
   {
     path: "profile",
@@ -88,7 +107,7 @@ export const routes: Routes = [
     title: "Contacto",
   },
 
-  // --- 🚀 NUEVAS PÁGINAS ESTÁTICAS ---
+  // --- 🚀 PÁGINAS ESTÁTICAS ---
   {
     path: "about",
     loadComponent: () =>
@@ -125,7 +144,7 @@ export const routes: Routes = [
       ),
     title: "Política de Privacidad",
   },
-  // --- FIN DE NUEVAS PÁGINAS ---
+  // --- FIN DE PÁGINAS ESTÁTICAS ---
 
   {
     path: "",

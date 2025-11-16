@@ -1,3 +1,4 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
@@ -32,6 +33,17 @@ export interface LoginResponse {
   user: User;
   token: string;
 }
+
+// --- 👇 NUEVAS INTERFACES AÑADIDAS ---
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  newPassword: string;
+}
+// --- FIN DE NUEVAS INTERFACES ---
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
@@ -85,7 +97,6 @@ export class AuthService {
 
   /**
    * Actualiza el avatar del usuario en el estado global.
-   * Esto notificará a la Navbar y a cualquier otro componente que escuche user$.
    */
   public updateUserAvatar(avatarUrl: string): void {
     const currentUser = this.userSubject.getValue();
@@ -110,4 +121,29 @@ export class AuthService {
     localStorage.setItem("user", JSON.stringify(res.user));
     this.userSubject.next(res.user);
   }
+
+  // --- 👇 NUEVOS MÉTODOS AÑADIDOS ---
+
+  /**
+   * Pide al backend que envíe un correo de reseteo.
+   * @param email El email del usuario
+   */
+  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+    return this.http.post<ForgotPasswordResponse>(
+      `${this.backendUrl}/forgot-password`,
+      { email }
+    );
+  }
+
+  /**
+   * Envía el token (del enlace del email) y la nueva contraseña.
+   * @param data Objeto con el token y la newPassword
+   */
+  resetPassword(data: ResetPasswordData): Observable<ForgotPasswordResponse> {
+    return this.http.post<ForgotPasswordResponse>(
+      `${this.backendUrl}/reset-password`,
+      data
+    );
+  }
+  // --- FIN DE NUEVOS MÉTODOS ---
 }

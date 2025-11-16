@@ -1,17 +1,19 @@
 // src/app/auth/components/login/login.component.ts
-import { Component } from "@angular/core";
+import { Component, signal } from "@angular/core"; // Importar signal
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  ValidatorFn,
+  AbstractControl,
 } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import {
   AuthService,
   LoginResponse,
-} from "../../../core/services/auth.service"; // 1. Importa LoginResponse
+} from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
 @Component({
@@ -21,8 +23,15 @@ import { ToastService } from "../../../core/services/toast.service";
   templateUrl: "./login.component.html",
 })
 export class LoginComponent {
-  form: FormGroup;
+  // --- LÓGICA DEL COMPONENTE ACTUALIZADA ---
+
+  // Señal para controlar qué formulario se muestra: 'login' o 'register'
+  authMode = signal<"login" | "register">("login");
   passwordFieldType = "password";
+  isLoading = signal(false);
+
+  loginForm: FormGroup;
+  registerForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -30,46 +39,93 @@ export class LoginComponent {
     private router: Router,
     private toast: ToastService
   ) {
-    this.form = this.fb.group({
+    // Formulario de Login
+    this.loginForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
       password: ["", [Validators.required]],
     });
+
+    // Formulario de Registro (lógica traída de register.component.ts)
+    this.registerForm = this.fb.group(
+      {
+        name: ["", Validators.required],
+        email: ["", [Validators.required, Validators.email]],
+        password: ["", [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ["", Validators.required],
+      },
+      { validators: this.passwordMatchValidator() }
+    );
   }
 
+  // --- MÉTODOS DE LOGIN ---
+  onLoginSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login({ email, password }).subscribe({
+      next: (response: LoginResponse) => {
+        this.isLoading.set(false);
+        this.toast.showSuccess("Inicio de sesión exitoso");
+
+        if (response.user.role === "admin") {
+          this.router.navigate(["/admin"]);
+        } else {
+          this.router.navigate(["/home"]);
+        }
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const message = err?.error?.message || "Error en el inicio de sesión";
+        this.toast.showError(message);
+      },
+    });
+  }
+
+  // --- MÉTODOS DE REGISTRO ---
+  onRegisterSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+    const { name, email, password } = this.registerForm.value;
+
+    this.authService.register({ username: name, email, password }).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.toast.showSuccess("Registro completado. Ahora inicia sesión.");
+        // Cambiamos al modo login para que el usuario entre
+        this.authMode.set("login");
+        this.loginForm.controls["email"].setValue(email); // Rellenamos el email
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const message = err?.error?.message || "Error en el registro";
+        this.toast.showError(message);
+      },
+    });
+  }
+
+  // --- MÉTODOS AUXILIARES ---
   togglePasswordVisibility(): void {
     this.passwordFieldType =
       this.passwordFieldType === "password" ? "text" : "password";
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const { email, password } = this.form.value;
-
-    // El 'login' ya guarda el token y el usuario (gracias al 'tap' en tu servicio)
-    // Aquí solo nos preocupamos de la redirección.
-    this.authService.login({ email, password }).subscribe({
-      // --- ¡CAMBIO AQUÍ! ---
-      // 2. Recibimos la respuesta (response) que incluye el usuario
-      next: (response: LoginResponse) => {
-        this.toast.showSuccess("Inicio de sesión exitoso");
-
-        // 3. Comprobamos el rol y redirigimos
-        if (response.user.role === "admin") {
-          this.router.navigate(["/admin"]); // <-- Redirigir a admin
-        } else {
-          this.router.navigate(["/home"]); // <-- Redirigir a home
-        }
-      },
-      // --------------------
-
-      error: (err) => {
-        const message = err?.error?.message || "Error en el inicio de sesión";
-        this.toast.showError(message);
-      },
-    });
+  // Validador de contraseñas (traído de register.component.ts)
+  private passwordMatchValidator(): ValidatorFn {
+    return (form: AbstractControl) => {
+      const pass = form.get("password")?.value;
+      const confirm = form.get("confirmPassword")?.value;
+      return pass && confirm && pass !== confirm
+        ? { passwordMismatch: true }
+        : null;
+    };
   }
 }
