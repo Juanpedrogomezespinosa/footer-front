@@ -19,10 +19,14 @@
         ¡Bienvenido de nuevo, Admin! Aquí tienes un resumen de la actividad.
       </p>
     </div>
-    <!-- Botón con ancho completo en móvil (w-full) y auto en sm -->
+    <!-- 
+      Botón (MODIFICADO)
+      - Añadido 'whitespace-nowrap' para evitar que el texto se parta.
+      - w-full en móvil y sm:w-auto en pantallas mayores.
+    -->
     <button
       (click)="openProductModal()"
-      class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity w-full sm:w-auto"
+      class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity w-full sm:w-auto whitespace-nowrap"
     >
       <span>Añadir Producto</span>
     </button>
@@ -212,7 +216,6 @@
               Fecha
             </th>
             <th
-              classsemicolon
               class="p-4 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary"
             >
               Total
