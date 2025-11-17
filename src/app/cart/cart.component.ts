@@ -14,11 +14,14 @@ import { OrderService } from "../core/services/order.service";
 import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
+import { FormsModule } from "@angular/forms"; // Necesario para [(ngModel)] en los radio buttons
+
+type ShippingMethod = "standard" | "express";
 
 @Component({
   selector: "app-cart",
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule], // Agregamos FormsModule
   templateUrl: "./cart.component.html",
   styleUrls: [],
 })
@@ -31,14 +34,44 @@ export class CartComponent implements OnInit {
   public isLoadingAddresses = signal(true);
   public selectedAddressId = signal<number | null>(null);
 
-  public subtotal: Signal<number> = computed(() => {
+  // --- NUEVO: Estado del método de envío ---
+  public selectedShipping: WritableSignal<ShippingMethod> = signal("standard");
+
+  // 1. TOTAL PRODUCTOS (PVP con IVA)
+  // Este valor lo usamos para calcular si el envío es gratis (> 50€)
+  public productsTotal: Signal<number> = computed(() => {
     return this.cartItems().reduce((sum, item) => {
       return sum + Number(item.product.price) * item.quantity;
     }, 0);
   });
 
-  public taxes: Signal<number> = computed(() => this.subtotal() * 0.21);
-  public total: Signal<number> = computed(() => this.subtotal() + this.taxes());
+  // 2. BASE IMPONIBLE (Productos / 1.21)
+  public subtotal: Signal<number> = computed(() => {
+    return this.productsTotal() / 1.21;
+  });
+
+  // 3. IVA (Productos - Base)
+  public taxes: Signal<number> = computed(() => {
+    return this.productsTotal() - this.subtotal();
+  });
+
+  // --- NUEVO: Cálculo del Costo de Envío ---
+  public shippingCost: Signal<number> = computed(() => {
+    const method = this.selectedShipping();
+    const totalProducts = this.productsTotal();
+
+    if (method === "express") {
+      return 7.95;
+    } else {
+      // Lógica Estándar: Gratis si supera 50€, si no 4.95€
+      return totalProducts >= 50 ? 0 : 4.95;
+    }
+  });
+
+  // 4. GRAN TOTAL (Productos + Envío)
+  public total: Signal<number> = computed(() => {
+    return this.productsTotal() + this.shippingCost();
+  });
 
   constructor(
     private cartService: CartService,
@@ -49,7 +82,6 @@ export class CartComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("CartComponent re-inicializado.");
     this.loadCart();
     this.loadAddresses();
   }
@@ -128,23 +160,19 @@ export class CartComponent implements OnInit {
       return;
     }
 
-    // --- NUEVA VALIDACIÓN ---
-    // Buscamos la dirección seleccionada para comprobar si tiene teléfono
     const selectedAddress = this.addresses().find((a) => a.id === addressId);
-
     if (!selectedAddress?.phone) {
       this.toastService.showError(
         "La dirección seleccionada no tiene teléfono. Por favor, edítala o selecciona otra."
       );
-      return; // Detenemos el proceso aquí
+      return;
     }
-    // ------------------------
 
     this.isLoading.set(true);
 
+    // TODO: Deberías enviar también this.selectedShipping() al backend si guardas el método de envío en la orden.
     this.orderService.createOrder(addressId).subscribe({
       next: (response) => {
-        // Redirigimos a Stripe
         window.location.href = response.checkoutUrl;
       },
       error: (err: HttpErrorResponse) => {
