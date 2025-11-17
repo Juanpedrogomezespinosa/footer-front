@@ -239,8 +239,6 @@
                       </option>
                     </select>
 
-                    <!-- --- 👇 CORRECCIÓN AQUÍ --- -->
-                    <!-- Reemplazamos el 'input readonly' por el mismo 'select' que 'ropa' -->
                     <select
                       *ngSwitchCase="'complementos'"
                       [id]="'size-' + i + '-' + j"
@@ -252,8 +250,6 @@
                         {{ s }}
                       </option>
                     </select>
-                    <!-- --- FIN DE CORRECCIÓN --- -->
-
                     <input
                       *ngSwitchDefault
                       type="text"
@@ -336,6 +332,8 @@
           for="images"
           class="w-full flex items-center px-4 py-2 bg-background-light border-2 border-border-light border-dashed rounded-lg cursor-pointer hover:bg-gray-100"
         >
+          <span class="material-symbols-outlined mr-2 text-secondary"
+            >upload_file</span
           >
           <span class="text-sm text-text-light-secondary">{{
             fileNames.length > 0

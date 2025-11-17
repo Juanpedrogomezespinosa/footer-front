@@ -240,8 +240,6 @@
                       </option>
                     </select>
 
-                    <!-- --- 👇 CORRECCIÓN AQUÍ --- -->
-                    <!-- Reemplazado input por select, igual que 'ropa' -->
                     <select
                       *ngSwitchCase="'complementos'"
                       [id]="'size-edit-' + i + '-' + j"
@@ -253,8 +251,6 @@
                         {{ s }}
                       </option>
                     </select>
-                    <!-- --- FIN DE CORRECCIÓN --- -->
-
                     <input
                       *ngSwitchDefault
                       type="text"

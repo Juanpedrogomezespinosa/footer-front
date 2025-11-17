@@ -27,12 +27,11 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   private productSubscription: Subscription | null = null;
   private categorySubscription: Subscription | null = null;
 
-  // Variables de estado para las tallas
   currentCategory = signal<string>("");
-  clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  // Añadida Talla Única
+  clothingSizes = ["Talla Única", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
-  // uniqueSize = "Talla Única"; // Ya no se usa por defecto
 
   constructor(
     private fb: FormBuilder,
@@ -79,9 +78,9 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
           groupedVariants.forEach((group) => {
             const sizeStockFormGroups = group.sizeStocks.map((ss) => {
               const sizeStockGroup = this.createSizeStockGroup();
-              // ¡IMPORTANTE! Aplicar la lógica de talla ANTES de 'patchValue'
+              // Aplicar lógica ANTES de rellenar
               this.applySizeLogic(sizeStockGroup.get("size"), product.category);
-              sizeStockGroup.patchValue(ss); // Rellenar con los datos existentes
+              sizeStockGroup.patchValue(ss);
               return sizeStockGroup;
             });
 
@@ -106,7 +105,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             .get("category")!
             .valueChanges.subscribe((newCategory) => {
               this.currentCategory.set(newCategory);
-              this.updateAllSizeControls(newCategory); // <-- Aquí se aplica la lógica
+              this.updateAllSizeControls(newCategory);
             });
         }
       }
@@ -134,8 +133,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       sizeStocks,
     }));
   }
-
-  // --- HELPERS PARA FORMULARIOS ANIDADOS ---
 
   get colorGroups(): FormArray {
     return this.productForm.get("colorGroups") as FormArray;
@@ -198,40 +195,32 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       ) as FormArray;
       sizeStocks.controls.forEach((sizeStockControl) => {
         const sizeControl = (sizeStockControl as FormGroup).get("size");
-
-        // --- 👇 CORRECCIÓN AQUÍ ---
-        // Guardamos el valor actual antes de aplicar la lógica
         const currentValue = sizeControl?.value;
         this.applySizeLogic(sizeControl, category);
 
-        // Si la categoría NO es zapatillas (es ropa o complemento),
-        // y el valor actual es una de las tallas de ropa, lo preservamos.
+        // Lógica unificada para ropa y complementos
         if (category === "ropa" || category === "complementos") {
           if (this.clothingSizes.includes(currentValue)) {
             sizeControl?.setValue(currentValue);
           } else {
-            sizeControl?.setValue(""); // Resetear si no es una talla válida
+            sizeControl?.setValue("");
           }
-        }
-        // Si es zapatillas, preservamos si es un número
-        else if (category === "zapatillas") {
+        } else if (category === "zapatillas") {
           if (typeof currentValue === "number") {
             sizeControl?.setValue(currentValue);
           } else {
             sizeControl?.setValue("");
           }
         }
-        // --- FIN DE CORRECCIÓN ---
       });
     });
   }
 
-  // --- 👇 CORRECCIÓN AQUÍ: LÓGICA IDÉNTICA A 'create-product' ---
   applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
     if (!sizeControl) return;
 
     sizeControl.clearValidators();
-    sizeControl.enable(); // Habilitar siempre primero
+    sizeControl.enable();
 
     if (category === "zapatillas") {
       sizeControl.setValidators([
@@ -240,34 +229,18 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
         Validators.max(this.sneakerMax),
       ]);
     } else if (category === "ropa" || category === "complementos") {
-      // 'complementos' ahora usa la lista de tallas de ropa
       sizeControl.setValidators([Validators.required]);
     } else {
-      // Categoría no seleccionada
       sizeControl.setValidators([Validators.required]);
-      sizeControl.disable(); // Deshabilitar si no hay categoría
+      sizeControl.disable();
     }
-
-    sizeControl.updateValueAndValidity(); // Actualizar el estado
+    sizeControl.updateValueAndValidity();
   }
-  // --- FIN DE CORRECCIÓN ---
 
   onSubmit(): void {
     if (this.productForm.invalid || !this.product) {
       this.toast.showError("Formulario inválido. Revisa las variantes.");
       this.productForm.markAllAsTouched();
-      this.colorGroups.controls.forEach((colorGroup, i) => {
-        if (colorGroup.invalid) {
-          console.log(`Grupo de Color ${i} inválido:`, colorGroup.value);
-          (
-            (colorGroup as FormGroup).get("sizeStocks") as FormArray
-          ).controls.forEach((sizeStock, j) => {
-            if (sizeStock.invalid) {
-              console.log(`  Talla/Stock ${j} inválida:`, sizeStock.value);
-            }
-          });
-        }
-      });
       return;
     }
 

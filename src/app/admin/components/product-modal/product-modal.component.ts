@@ -27,10 +27,10 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   private categorySubscription: Subscription | null = null;
 
   currentCategory = signal<string>("");
-  clothingSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  // Añadimos "Talla Única" al array de tallas disponibles
+  clothingSizes = ["Talla Única", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
-  uniqueSize = "Talla Única"; // Ya no lo usaremos por defecto
 
   constructor(
     private fb: FormBuilder,
@@ -69,7 +69,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     this.categorySubscription?.unsubscribe();
   }
 
-  // --- GRUPO DE COLOR ---
   get colorGroups(): FormArray {
     return this.productForm.get("colorGroups") as FormArray;
   }
@@ -78,7 +77,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     return this.fb.group({
       color: ["", Validators.required],
       sizeStocks: this.fb.array(
-        [this.createSizeStockGroup()], // Inicializar con una talla/stock
+        [this.createSizeStockGroup()],
         Validators.required
       ),
     });
@@ -100,14 +99,13 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- PAREJA TALLA/STOCK ---
   getSizeStocks(colorIndex: number): FormArray {
     return this.colorGroups.at(colorIndex).get("sizeStocks") as FormArray;
   }
 
   createSizeStockGroup(): FormGroup {
-    const sizeControl = this.fb.control(""); // Valor inicial vacío
-    this.applySizeLogic(sizeControl, this.currentCategory()); // Aplicar lógica inicial
+    const sizeControl = this.fb.control("");
+    this.applySizeLogic(sizeControl, this.currentCategory());
     return this.fb.group({
       size: sizeControl,
       stock: [0, [Validators.required, Validators.min(0)]],
@@ -139,16 +137,11 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Aplica validadores/valor/estado a UN solo control de talla.
-   */
   applySizeLogic(sizeControl: AbstractControl | null, category: string): void {
     if (!sizeControl) return;
 
     sizeControl.clearValidators();
     sizeControl.enable();
-    // No reseteamos el valor si la categoría no ha cambiado
-    // sizeControl.setValue(""); // Evitar resetear si solo se añade talla
 
     if (category === "zapatillas") {
       sizeControl.setValidators([
@@ -164,24 +157,13 @@ export class ProductModalComponent implements OnInit, OnDestroy {
         sizeControl.setValue("");
       }
     }
-    // --- 👇 CORRECCIÓN AQUÍ ---
-    // Agrupamos 'ropa' y 'complementos' para que usen la misma lógica
+    // CAMBIO: Ropa y Complementos ahora comparten lógica
     else if (category === "ropa" || category === "complementos") {
       sizeControl.setValidators([Validators.required]);
       if (!this.clothingSizes.includes(sizeControl.value)) {
         sizeControl.setValue("");
       }
-    }
-    // --- FIN DE CORRECCIÓN ---
-
-    // --- ❌ BLOQUE ELIMINADO ---
-    // else if (category === "complementos") {
-    //   sizeControl.setValue(this.uniqueSize);
-    //   sizeControl.disable();
-    // }
-    // --- FIN DE BLOQUE ELIMINADO ---
-    else {
-      // Categoría no seleccionada o inválida
+    } else {
       sizeControl.setValidators([Validators.required]);
       sizeControl.disable();
       sizeControl.setValue("");
@@ -208,19 +190,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     if (this.productForm.invalid) {
       this.toast.showError("Por favor, completa todos los campos requeridos.");
       this.productForm.markAllAsTouched();
-      console.log("Formulario inválido:", this.productForm.value);
-      this.colorGroups.controls.forEach((colorGroup, i) => {
-        if (colorGroup.invalid) {
-          console.log(`Grupo de Color ${i} inválido:`, colorGroup.value);
-          (
-            (colorGroup as FormGroup).get("sizeStocks") as FormArray
-          ).controls.forEach((sizeStock, j) => {
-            if (sizeStock.invalid) {
-              console.log(`  Talla/Stock ${j} inválida:`, sizeStock.value);
-            }
-          });
-        }
-      });
       return;
     }
 
