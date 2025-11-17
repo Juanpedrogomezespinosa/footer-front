@@ -1,6 +1,4 @@
-<!-- src/app/profile/components/profile-addresses/profile-addresses.component.html -->
 <section id="mis-direcciones">
-  <!-- 1. Cabecera y Botón "Añadir" -->
   <div class="flex flex-col p-4 pb-0 lg:p-0">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -25,7 +23,6 @@
     </div>
   </div>
 
-  <!-- 2. Formulario de Crear/Editar (Oculto por defecto) -->
   <div
     *ngIf="showForm"
     class="bg-white p-6 rounded-xl border border-gray-200 mt-6"
@@ -39,7 +36,6 @@
         {{ isEditing ? "Editar Dirección" : "Añadir Nueva Dirección" }}
       </h3>
 
-      <!-- Fila 1: Alias -->
       <label class="flex flex-col">
         <p class="text-text-light-primary text-sm font-medium pb-2">
           Alias (ej: Casa, Oficina)
@@ -56,16 +52,20 @@
         </div>
       </label>
 
-      <!-- Fila 2: Dirección -->
       <label class="flex flex-col">
         <p class="text-text-light-primary text-sm font-medium pb-2">Calle</p>
         <input
           formControlName="street"
           class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
         />
+        <div
+          *ngIf="f['street'].invalid && f['street'].touched"
+          class="text-red-500 text-xs mt-1"
+        >
+          La calle es obligatoria.
+        </div>
       </label>
 
-      <!-- Fila 3: Ciudad y Provincia/Estado -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <label class="flex flex-col">
           <p class="text-text-light-primary text-sm font-medium pb-2">Ciudad</p>
@@ -73,6 +73,12 @@
             formControlName="city"
             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
           />
+          <div
+            *ngIf="f['city'].invalid && f['city'].touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            La ciudad es obligatoria.
+          </div>
         </label>
         <label class="flex flex-col">
           <p class="text-text-light-primary text-sm font-medium pb-2">
@@ -82,10 +88,15 @@
             formControlName="state"
             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
           />
+          <div
+            *ngIf="f['state'].invalid && f['state'].touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            La provincia es obligatoria.
+          </div>
         </label>
       </div>
 
-      <!-- Fila 4: C. Postal y País -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <label class="flex flex-col">
           <p class="text-text-light-primary text-sm font-medium pb-2">
@@ -95,6 +106,12 @@
             formControlName="postalCode"
             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
           />
+          <div
+            *ngIf="f['postalCode'].invalid && f['postalCode'].touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            El código postal es obligatorio.
+          </div>
         </label>
         <label class="flex flex-col">
           <p class="text-text-light-primary text-sm font-medium pb-2">País</p>
@@ -102,19 +119,30 @@
             formControlName="country"
             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
           />
+          <div
+            *ngIf="f['country'].invalid && f['country'].touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            El país es obligatorio.
+          </div>
         </label>
       </div>
 
-      <!-- Fila 5: Teléfono y Checkbox -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <label class="flex flex-col">
           <p class="text-text-light-primary text-sm font-medium pb-2">
-            Teléfono (Opcional)
+            Teléfono
           </p>
           <input
             formControlName="phone"
             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary focus:outline-0 focus:ring-2 focus:ring-secondary focus:ring-opacity-50 border border-gray-300 bg-gray-50 h-12 placeholder:text-text-light-secondary px-4 text-base"
           />
+          <div
+            *ngIf="f['phone'].invalid && f['phone'].touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            El teléfono es obligatorio.
+          </div>
         </label>
         <div class="flex items-center pt-6">
           <label class="flex items-center gap-2 cursor-pointer">
@@ -130,7 +158,6 @@
         </div>
       </div>
 
-      <!-- Fila 6: Botones de Acción -->
       <div
         class="flex items-center gap-4 pt-4 border-t border-gray-200 flex-wrap"
       >
@@ -154,19 +181,15 @@
     </form>
   </div>
 
-  <!-- 3. Lista de Direcciones Guardadas -->
   <div class="mt-8">
-    <!-- Estado de Carga -->
     <div *ngIf="loading" class="text-center py-10 text-gray-500">
       Cargando direcciones...
     </div>
 
-    <!-- Estado de Error -->
     <div *ngIf="error && !loading" class="text-center py-10 text-red-500">
       {{ error }}
     </div>
 
-    <!-- Estado Vacío -->
     <div
       *ngIf="!loading && !error && addresses.length === 0 && !showForm"
       class="bg-white p-6 rounded-xl border border-gray-200 mt-6 text-center text-gray-500"
@@ -174,13 +197,11 @@
       <p>No tienes ninguna dirección guardada.</p>
     </div>
 
-    <!-- Lista -->
     <div *ngIf="!loading && addresses.length > 0" class="flex flex-col gap-4">
       <div
         *ngFor="let address of addresses"
         class="bg-white p-6 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:justify-between"
       >
-        <!-- Detalles de la dirección -->
         <div class="flex-1">
           <p
             class="text-base font-semibold text-text-light-primary flex items-center gap-2"
@@ -205,9 +226,11 @@
           >
             Teléfono: {{ address.phone }}
           </p>
+          <p *ngIf="!address.phone" class="text-sm text-red-500 mt-2 font-bold">
+            ⚠️ Falta teléfono (Necesario para pedidos)
+          </p>
         </div>
 
-        <!-- Acciones -->
         <div class="flex gap-2 mt-4 sm:mt-0">
           <button
             (click)="toggleForm(address)"

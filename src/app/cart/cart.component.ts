@@ -10,13 +10,9 @@ import {
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { CartService, CartItem } from "../core/services/cart.service";
-// --- ¡CAMBIO AQUÍ! ---
-// Ya no necesitamos OrderItemInput
 import { OrderService } from "../core/services/order.service";
-// --------------------
 import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
-import { ProductApiResponse } from "../core/services/product.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
@@ -123,26 +119,30 @@ export class CartComponent implements OnInit {
     this.selectedAddressId.set(addressId);
   }
 
-  /**
-   * --- ¡¡¡FUNCIÓN 'onCheckout' CORREGIDA!!! ---
-   */
   onCheckout(): void {
-    if (!this.selectedAddressId()) {
+    const addressId = this.selectedAddressId();
+    if (!addressId) {
       this.toastService.showError(
         "Por favor, selecciona una dirección de envío."
       );
       return;
     }
 
+    // --- NUEVA VALIDACIÓN ---
+    // Buscamos la dirección seleccionada para comprobar si tiene teléfono
+    const selectedAddress = this.addresses().find((a) => a.id === addressId);
+
+    if (!selectedAddress?.phone) {
+      this.toastService.showError(
+        "La dirección seleccionada no tiene teléfono. Por favor, edítala o selecciona otra."
+      );
+      return; // Detenemos el proceso aquí
+    }
+    // ------------------------
+
     this.isLoading.set(true);
 
-    // --- ¡BLOQUE ELIMINADO! ---
-    // Ya no creamos el array 'itemsToOrder' en el frontend.
-    // const itemsToOrder: OrderItemInput[] = ...
-
-    // --- ¡LLAMADA CORREGIDA! ---
-    // Simplemente llamamos al servicio con el ID de la dirección.
-    this.orderService.createOrder(this.selectedAddressId()!).subscribe({
+    this.orderService.createOrder(addressId).subscribe({
       next: (response) => {
         // Redirigimos a Stripe
         window.location.href = response.checkoutUrl;

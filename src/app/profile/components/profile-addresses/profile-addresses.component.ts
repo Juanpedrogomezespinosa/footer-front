@@ -55,7 +55,8 @@ export class ProfileAddressesComponent implements OnInit {
       state: ["", [Validators.required, Validators.maxLength(100)]],
       postalCode: ["", [Validators.required, Validators.maxLength(20)]],
       country: ["España", [Validators.required, Validators.maxLength(100)]], // Valor por defecto
-      phone: ["", [Validators.maxLength(20)]],
+      // --- CAMBIO: Añadido Validators.required ---
+      phone: ["", [Validators.required, Validators.maxLength(20)]],
       isDefault: [false, Validators.required],
     });
   }
