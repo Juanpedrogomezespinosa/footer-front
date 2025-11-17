@@ -60,4 +60,31 @@ export class OrderDetailsModalComponent implements OnInit {
   close(): void {
     this.modalService.closeOrderDetailsModal();
   }
+
+  // --- MÉTODOS HELPERS PARA CÁLCULOS MATEMÁTICOS ---
+
+  getProductsTotal(order: any): number {
+    if (!order?.OrderItems) return 0;
+    return order.OrderItems.reduce((acc: number, item: any) => {
+      // Aseguramos que item.price sea número
+      return acc + Number(item.price) * item.quantity;
+    }, 0);
+  }
+
+  getShippingCost(order: any): number {
+    if (!order) return 0;
+    const total = Number(order.total);
+    const productsTotal = this.getProductsTotal(order);
+    const diff = total - productsTotal;
+    return diff > 0.01 ? diff : 0;
+  }
+
+  getSubtotal(order: any): number {
+    return this.getProductsTotal(order) / 1.21;
+  }
+
+  getTax(order: any): number {
+    const productsTotal = this.getProductsTotal(order);
+    return productsTotal - productsTotal / 1.21;
+  }
 }

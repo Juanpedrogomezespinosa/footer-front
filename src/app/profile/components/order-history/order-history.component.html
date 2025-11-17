@@ -12,19 +12,15 @@
     </p>
   </div>
 
-  <!-- Estado de Carga -->
   <div *ngIf="loading" class="text-center py-10 text-gray-500">
     Cargando historial...
   </div>
 
-  <!-- Estado de Error -->
   <div *ngIf="error" class="text-center py-10 text-red-500">
     {{ error }}
   </div>
 
-  <!-- Contenido Principal -->
   <div *ngIf="orders$ | async as data">
-    <!-- Estado Vacío -->
     <div
       *ngIf="!data?.orders || data.orders.length === 0; else showOrders"
       class="bg-white p-6 rounded-xl border border-gray-200 mt-6 text-center text-gray-500"
@@ -32,14 +28,12 @@
       <p>Aún no has realizado ningún pedido.</p>
     </div>
 
-    <!-- Lista de Pedidos -->
     <ng-template #showOrders>
       <div class="flex flex-col gap-6 mt-6">
         <div
           *ngFor="let order of data.orders"
           class="bg-white p-6 rounded-xl border border-gray-200"
         >
-          <!-- Cabecera del Pedido -->
           <div
             class="flex flex-col md:flex-row justify-between md:items-center pb-4 border-b border-gray-200"
           >
@@ -53,11 +47,8 @@
               </p>
             </div>
             <div class="mt-2 md:mt-0 text-left md:text-right">
-              <p class="text-lg font-bold text-secondary">
-                {{ order.total | currency : "EUR" }}
-              </p>
               <span
-                class="text-xs font-medium px-2.5 py-0.5 rounded"
+                class="text-xs font-medium px-2.5 py-0.5 rounded block w-fit ml-auto mb-1"
                 [ngClass]="{
                   'bg-green-100 text-green-800': order.status === 'pagado',
                   'bg-yellow-100 text-yellow-800': order.status === 'pendiente',
@@ -70,8 +61,7 @@
             </div>
           </div>
 
-          <!-- Items del Pedido -->
-          <div class="flex flex-col gap-4 pt-4">
+          <div class="flex flex-col gap-4 pt-4 border-b border-gray-100 pb-4">
             <div
               *ngFor="let item of order.OrderItems"
               class="flex items-center gap-4"
@@ -92,6 +82,35 @@
                 <p class="text-sm text-text-light-secondary">
                   {{ item.quantity }} x {{ item.price | currency : "EUR" }}
                 </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-4">
+            <div class="w-full md:w-1/2 lg:w-1/3 text-right space-y-1">
+              <div
+                class="flex justify-between text-sm text-text-light-secondary"
+              >
+                <span>Base Imponible:</span>
+                <span>{{ getSubtotal(order) | currency : "EUR" }}</span>
+              </div>
+              <div
+                class="flex justify-between text-sm text-text-light-secondary"
+              >
+                <span>IVA (21%):</span>
+                <span>{{ getTax(order) | currency : "EUR" }}</span>
+              </div>
+              <div
+                class="flex justify-between text-sm text-text-light-secondary"
+              >
+                <span>Envío:</span>
+                <span>{{ getShippingCost(order) | currency : "EUR" }}</span>
+              </div>
+              <div
+                class="flex justify-between text-lg font-bold text-text-light-primary pt-2 border-t border-gray-200"
+              >
+                <span>Total:</span>
+                <span>{{ order.total | currency : "EUR" }}</span>
               </div>
             </div>
           </div>

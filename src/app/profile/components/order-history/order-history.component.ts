@@ -1,3 +1,4 @@
+// src/app/profile/components/order-history/order-history.component.ts
 import { Component, OnInit } from "@angular/core";
 import {
   CommonModule,
@@ -13,13 +14,10 @@ import { RouterModule } from "@angular/router";
 @Component({
   selector: "app-order-history",
   standalone: true,
-  // Importamos Pipes para formatear fecha, moneda y el estado (titlecase)
-  // Importamos RouterModule para los enlaces a los productos
   imports: [CommonModule, DatePipe, CurrencyPipe, TitleCasePipe, RouterModule],
   templateUrl: "./order-history.component.html",
 })
 export class OrderHistoryComponent implements OnInit {
-  // Usamos un observable para manejar los datos con el pipe async
   public orders$: Observable<{ orders: OrderDetails[] } | null> | undefined;
   public loading: boolean = true;
   public error: string | null = null;
@@ -30,21 +28,45 @@ export class OrderHistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Llamamos al servicio para obtener el historial
     this.orders$ = this.orderService.getOrderHistory().pipe(
       tap(() => {
-        // Cuando los datos llegan, ocultamos el loading
         this.loading = false;
       }),
       catchError((err) => {
-        // Si hay un error, lo manejamos
         this.loading = false;
         this.error = "No se pudo cargar el historial de pedidos.";
         this.toastService.showError(this.error);
         console.error("Error fetching order history:", err);
-        // Devolvemos un observable nulo para que el pipe async no falle
         return of(null);
       })
     );
+  }
+
+  // --- HELPER: Calcular Total de Productos (Precio x Cantidad) ---
+  private getProductsTotal(order: any): number {
+    if (!order.OrderItems) return 0;
+    return order.OrderItems.reduce((acc: number, item: any) => {
+      return acc + Number(item.price) * item.quantity;
+    }, 0);
+  }
+
+  // --- HELPER: Calcular Envío (Total Pedido - Total Productos) ---
+  getShippingCost(order: any): number {
+    const total = Number(order.total);
+    const productsTotal = this.getProductsTotal(order);
+    // Si la diferencia es muy pequeña (por flotantes), es 0
+    const diff = total - productsTotal;
+    return diff > 0.01 ? diff : 0;
+  }
+
+  // --- HELPER: Calcular Base Imponible (Productos / 1.21) ---
+  getSubtotal(order: any): number {
+    return this.getProductsTotal(order) / 1.21;
+  }
+
+  // --- HELPER: Calcular IVA (Productos - Base) ---
+  getTax(order: any): number {
+    const productsTotal = this.getProductsTotal(order);
+    return productsTotal - productsTotal / 1.21;
   }
 }
