@@ -27,7 +27,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   private productSubscription: Subscription | null = null;
   private categorySubscription: Subscription | null = null;
 
-  // Mapa para almacenar archivos por índice de grupo de color
   filesByColorIndex: Map<number, File[]> = new Map();
 
   currentCategory = signal<string>("");
@@ -45,6 +44,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       name: ["", Validators.required],
       description: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
+      discountPrice: [null], // <-- AÑADIDO
       brand: ["", Validators.required],
       category: ["", Validators.required],
       gender: ["", Validators.required],
@@ -61,12 +61,15 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
         if (product) {
           this.product = product;
           this.currentCategory.set(product.category);
-          this.filesByColorIndex.clear(); // Limpiar archivos anteriores
+          this.filesByColorIndex.clear();
 
           this.productForm.patchValue({
             name: product.name,
             description: product.description,
             price: parseFloat(product.price),
+            discountPrice: product.discountPrice
+              ? parseFloat(product.discountPrice)
+              : null, // <-- MAPEO
             brand: product.brand,
             category: product.category,
             gender: product.gender,
@@ -89,7 +92,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             this.colorGroups.push(
               this.fb.group({
                 color: [group.color, Validators.required],
-                price: [group.price || 0], // <-- Cargamos precio de la variante si existe
+                price: [group.price || 0],
                 sizeStocks: this.fb.array(
                   sizeStockFormGroups,
                   Validators.required
@@ -98,7 +101,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             );
           });
 
-          // Si no hay variantes (caso raro), creamos una vacía
           if (groupedVariants.length === 0) {
             this.colorGroups.push(this.createColorGroup());
             this.updateAllSizeControls(this.currentCategory());
@@ -121,14 +123,12 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     this.categorySubscription?.unsubscribe();
   }
 
-  // Agrupamos variantes por color para llenar el FormArray
   groupVariantsByColor(variants: FullAdminProduct["variants"]): {
     color: string;
     price: number;
     sizeStocks: { size: string; stock: number }[];
   }[] {
     if (!variants) return [];
-    // Usamos un objeto o mapa para agrupar
     const grouped = new Map<
       string,
       { price: number; sizeStocks: { size: string; stock: number }[] }
@@ -136,7 +136,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
     variants.forEach((v) => {
       if (!grouped.has(v.color)) {
-        // Tomamos el precio de la primera variante de ese color (asumimos homogeneidad por color)
         grouped.set(v.color, { price: v.price || 0, sizeStocks: [] });
       }
       grouped.get(v.color)!.sizeStocks.push({ size: v.size, stock: v.stock });
@@ -156,7 +155,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   createColorGroup(): FormGroup {
     return this.fb.group({
       color: ["", Validators.required],
-      price: [0], // <-- Campo Precio Variante
+      price: [0],
       sizeStocks: this.fb.array(
         [this.createSizeStockGroup()],
         Validators.required
@@ -175,7 +174,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
   removeColorGroup(index: number): void {
     if (this.colorGroups.length > 0) {
       this.colorGroups.removeAt(index);
-      this.filesByColorIndex.delete(index); // Borrar archivos asociados
+      this.filesByColorIndex.delete(index);
     }
   }
 
@@ -215,7 +214,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
         const currentValue = sizeControl?.value;
         this.applySizeLogic(sizeControl, category);
 
-        // Lógica unificada para preservar valores si es posible
         if (category === "ropa" || category === "complementos") {
           if (this.clothingSizes.includes(currentValue)) {
             sizeControl?.setValue(currentValue);
@@ -254,7 +252,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     sizeControl.updateValueAndValidity();
   }
 
-  // --- GESTIÓN DE IMÁGENES ---
   onColorImagesChange(event: Event, index: number): void {
     const element = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = element.files;
@@ -285,7 +282,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     const formValue = this.productForm.getRawValue();
 
-    // 1. Preparar variantes (con precio individual)
     const variantsForApi: {
       color: string;
       size: string;
@@ -300,20 +296,19 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
         sizeStocks: { size: string; stock: number }[];
       }) => {
         const color = group.color;
-        const variantPrice = group.price; // Precio específico de la variante
+        const variantPrice = group.price;
 
         group.sizeStocks.forEach((sizeStock) => {
           variantsForApi.push({
             color: color,
             size: sizeStock.size.toString(),
             stock: sizeStock.stock,
-            price: variantPrice, // Enviamos el precio
+            price: variantPrice,
           });
         });
       }
     );
 
-    // 2. Campos básicos al FormData
     Object.keys(formValue).forEach((key) => {
       if (key !== "colorGroups") {
         formData.append(key, formValue[key]);
@@ -322,7 +317,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
     formData.append("variants", JSON.stringify(variantsForApi));
 
-    // 3. Imágenes Nuevas y Metadatos
     const imageMetadata: { filename: string; color: string }[] = [];
 
     this.colorGroups.controls.forEach((control, index) => {
@@ -344,9 +338,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       formData.append("imageMetadata", JSON.stringify(imageMetadata));
     }
 
-    // Nota: updateProduct en adminService debe soportar FormData
-    // Si tu adminService.updateProduct espera JSON, esto fallará.
-    // Asegúrate de que el servicio y el backend (updateProduct) soporten multipart/form-data
     this.adminService.updateProduct(this.product.id, formData).subscribe({
       next: () => {
         this.toast.showSuccess("¡Producto actualizado con éxito!");

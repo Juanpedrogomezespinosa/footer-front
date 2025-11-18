@@ -1,6 +1,5 @@
 // src/app/core/models/admin.types.ts
 
-// --- Para: /api/admin/stats/dashboard ---
 export interface DashboardStats {
   totalRevenue: StatCard;
   ordersToday: StatCard;
@@ -14,7 +13,6 @@ export interface StatCard {
   percentage: number;
 }
 
-// --- Para: /api/admin/stats/sales-graph ---
 export interface SalesGraph {
   totalSales: number;
   percentage: number;
@@ -24,7 +22,6 @@ export interface SalesGraph {
   };
 }
 
-// --- Interfaz Reutilizable para Direcciones ---
 export interface AdminAddress {
   id: number;
   userId: number;
@@ -40,7 +37,6 @@ export interface AdminAddress {
   updated_at: string;
 }
 
-// --- Para: /api/admin/orders ---
 export interface AdminOrdersResponse {
   currentPage: number;
   totalPages: number;
@@ -65,7 +61,6 @@ export interface AdminOrder {
   Address: AdminAddress | null;
 }
 
-// --- Para: /api/admin/users ---
 export interface AdminUser {
   id: number;
   username: string;
@@ -77,12 +72,10 @@ export interface AdminUser {
   created_at: string;
 }
 
-// --- Para: GET /api/admin/users/:id ---
 export interface FullAdminUser extends AdminUser {
   Addresses: AdminAddress[];
 }
 
-// --- Para: GET /api/products (Listado) ---
 export interface AdminProductsResponse {
   currentPage: number;
   totalPages: number;
@@ -105,45 +98,39 @@ export interface AdminProduct {
   totalStock: number;
 }
 
-// --- NUEVA INTERFAZ PARA LA VARIANTE ---
-// Esto soluciona el error TS2339 al incluir 'price'
 export interface AdminVariant {
   id: number;
   color: string;
   size: string;
   stock: number;
-  price?: number; // <--- ¡CAMPO AÑADIDO!
+  price?: number;
 }
 
-// --- Para: GET /api/products/:id (Detalle para editar) ---
+// --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
 export interface FullAdminProduct {
   id: number;
   name: string;
   description: string;
-  price: string; // Precio base
+  price: string;
+  discountPrice?: string | null; // <--- ¡ESTO FALTABA!
   color: string;
   brand: string;
   category: string;
   sub_category?: string | null;
-  gender: "hombre" | "mujer" | "unisex"; // Ajustado para coincidir con el form
+  gender: "hombre" | "mujer" | "unisex";
   material: string | null;
   season: string | null;
   is_new: boolean;
-  is_active: boolean; // Añadido is_active que suele ser necesario
+  is_active: boolean;
   images: { id: number; imageUrl: string; displayOrder: number }[];
   averageRating: number;
-
-  // Usamos la nueva interfaz AdminVariant
   variants: AdminVariant[];
-
   siblings: {
     id: number;
     color: string;
     image: string | null;
   }[];
 }
-
-// --- Para: GET /api/orders/:id (Detalle) ---
 
 export interface AdminOrderItemProduct {
   id: number;

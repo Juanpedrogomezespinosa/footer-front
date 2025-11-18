@@ -109,9 +109,13 @@ export class ProductDetailComponent implements OnInit {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: ProductApiResponse) => {
         if (foundProduct) {
-          if (foundProduct.price < 150) {
-            foundProduct.oldPrice = foundProduct.price + 30;
+          // --- CAMBIO LÓGICO: Usamos discountPrice ---
+          if (foundProduct.discountPrice) {
+            foundProduct.oldPrice = Number(foundProduct.discountPrice);
+          } else {
+            foundProduct.oldPrice = undefined;
           }
+          // ------------------------------------------
 
           this.product.set(foundProduct);
           this.currentPrice.set(foundProduct.price); // Precio base inicial
@@ -200,7 +204,6 @@ export class ProductDetailComponent implements OnInit {
     this.availableSizes.set([...new Set(sizes)]);
 
     // 3. ACTUALIZAR PRECIO
-    // Buscamos si alguna variante de este color tiene un precio específico distinto de 0
     const variantWithPrice = variantsForColor.find(
       (v) => v.price && v.price > 0
     );
@@ -208,7 +211,6 @@ export class ProductDetailComponent implements OnInit {
     if (variantWithPrice) {
       this.currentPrice.set(variantWithPrice.price!);
     } else {
-      // Si no tiene precio específico, volvemos al precio base del producto padre
       this.currentPrice.set(product.price);
     }
   }

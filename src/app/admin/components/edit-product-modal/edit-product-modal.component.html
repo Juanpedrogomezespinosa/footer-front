@@ -8,7 +8,6 @@
     class="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-card-dark rounded-xl shadow-lg flex flex-col animate-scale-in"
     (click)="$event.stopPropagation()"
   >
-    <!-- Header -->
     <div
       class="flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark"
     >
@@ -25,14 +24,12 @@
       </button>
     </div>
 
-    <!-- Formulario -->
     <form
       *ngIf="product"
       [formGroup]="productForm"
       (ngSubmit)="onSubmit()"
       class="flex-1 overflow-y-auto p-6 space-y-6"
     >
-      <!-- Información General -->
       <div class="space-y-4">
         <div>
           <label
@@ -79,6 +76,25 @@
               step="0.01"
               required
             />
+          </div>
+
+          <div>
+            <label
+              for="discountPrice-edit"
+              class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
+              >Precio Original (Tachado)</label
+            >
+            <input
+              type="number"
+              id="discountPrice-edit"
+              formControlName="discountPrice"
+              placeholder="Opcional. Ej: 80.00"
+              class="w-full p-2 border border-border-light rounded-lg bg-background-light focus:ring-primary focus:border-primary"
+              step="0.01"
+            />
+            <p class="text-[10px] text-gray-500 mt-1">
+              Si se rellena, el producto aparecerá en oferta.
+            </p>
           </div>
 
           <div>
@@ -164,7 +180,6 @@
         </div>
       </div>
 
-      <!-- Variantes por Color -->
       <div class="space-y-4 pt-4">
         <h3
           class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary"
@@ -178,7 +193,6 @@
             [formGroupName]="i"
             class="p-5 bg-gray-50 border-2 border-gray-200 dark:border-border-dark rounded-xl shadow-sm relative transition-all hover:border-gray-300"
           >
-            <!-- Cabecera del Grupo -->
             <div
               class="flex items-center justify-between mb-4 gap-3 border-b pb-3 border-gray-200"
             >
@@ -197,7 +211,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <!-- Input Nombre Color -->
               <div>
                 <label
                   [for]="'color-edit-' + i"
@@ -214,7 +227,6 @@
                 />
               </div>
 
-              <!-- NUEVO: Input Precio Específico -->
               <div>
                 <label
                   [for]="'price-variant-' + i"
@@ -236,7 +248,6 @@
               </div>
             </div>
 
-            <!-- Sección de Subida de Imágenes -->
             <div
               class="mb-6 bg-white p-4 rounded-lg border border-dashed border-gray-300"
             >
@@ -285,7 +296,6 @@
               </ul>
             </div>
 
-            <!-- Tallas y Stock -->
             <div class="space-y-3">
               <label class="block text-xs uppercase font-bold text-gray-500"
                 >Inventario (Tallas y Cantidad)</label
@@ -415,7 +425,6 @@
       </div>
     </form>
 
-    <!-- Footer -->
     <div
       class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-3"
     >

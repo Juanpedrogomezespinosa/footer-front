@@ -1,3 +1,4 @@
+// src/app/core/services/product.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -33,11 +34,13 @@ export interface ProductApiResponse {
   name: string;
   description?: string;
   price: number;
-  image?: string; // Imagen principal para listados
+  // --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
+  discountPrice?: number | null; // <--- ¡ESTO FALTABA!
+  image?: string;
   averageRating?: number;
   ratingCount?: number;
   brand?: string;
-  color?: string; // Color principal
+  color?: string;
   category: "zapatillas" | "ropa" | "complementos";
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
@@ -45,7 +48,6 @@ export interface ProductApiResponse {
   oldPrice?: number;
 
   // --- Datos específicos de la vista de detalle ---
-  // Los definimos obligatorios porque el backend corregido SIEMPRE los envía
   availableColors: string[];
   imagesByColor: { [key: string]: ProductImage[] };
   variantsByColor: { [key: string]: VariantOption[] };
