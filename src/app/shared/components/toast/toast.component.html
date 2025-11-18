@@ -1,8 +1,6 @@
 <!-- 
-  👇 CAMBIO: 
-
-  Añadido: "left-5" (posiciona en móvil abajo a la izquierda)
-  Las clases 'md:' se encargan de moverlo a la derecha en escritorio.
+  Toast Container
+  Se ajusta automáticamente si está en página de productos (bottom-20) o normal (bottom-6)
 -->
 <div
   class="fixed bottom-5 left-5 flex flex-col gap-3 z-[1000] md:left-auto md:right-6 md:-translate-x-0"
@@ -13,25 +11,43 @@
 >
   <div
     *ngFor="let toast of toasts"
-    class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white fade-in"
+    class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white fade-in min-w-[300px]"
     [ngClass]="{
       'bg-green-600': toast.type === 'success',
-      'bg-red-600': toast.type === 'error'
+      'bg-red-600': toast.type === 'error',
+      'bg-blue-600': toast.type === 'info',
+      'bg-amber-500': toast.type === 'warning'
     }"
     [@fadeAnimation]
   >
-    <img
-      *ngIf="toast.type === 'success'"
-      src="assets/icons/check.svg"
-      alt="Éxito"
-      class="w-5 h-5 opacity-90"
-    />
-    <img
-      *ngIf="toast.type === 'error'"
-      src="assets/icons/error.svg"
-      alt="Error"
-      class="w-5 h-5 opacity-90"
-    />
-    <span [innerHTML]="toast.message" class="font-medium"></span>
+    <!-- Icono para Success -->
+    <ng-container *ngIf="toast.type === 'success'">
+      <span class="material-symbols-outlined text-white">check_circle</span>
+    </ng-container>
+
+    <!-- Icono para Error -->
+    <ng-container *ngIf="toast.type === 'error'">
+      <span class="material-symbols-outlined text-white">error</span>
+    </ng-container>
+
+    <!-- Icono para Info -->
+    <ng-container *ngIf="toast.type === 'info'">
+      <span class="material-symbols-outlined text-white">info</span>
+    </ng-container>
+
+    <!-- Icono para Warning -->
+    <ng-container *ngIf="toast.type === 'warning'">
+      <span class="material-symbols-outlined text-white">warning</span>
+    </ng-container>
+
+    <span [innerHTML]="toast.message" class="font-medium text-sm"></span>
+
+    <!-- Botón cerrar manual -->
+    <button
+      (click)="removeToast(toast)"
+      class="ml-auto text-white/80 hover:text-white"
+    >
+      <span class="material-symbols-outlined text-lg">close</span>
+    </button>
   </div>
 </div>

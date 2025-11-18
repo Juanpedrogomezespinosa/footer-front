@@ -1,11 +1,13 @@
+// src/app/core/services/toast.service.ts
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
 
-export type ToastType = "success" | "error";
+// Actualizamos los tipos permitidos
+export type ToastType = "success" | "error" | "info" | "warning";
 
 export interface Toast {
   type: ToastType;
-  message: string; // HTML permitido
+  message: string;
 }
 
 @Injectable({
@@ -21,6 +23,16 @@ export class ToastService {
 
   showError(message: string) {
     this.showToast("error", message);
+  }
+
+  // --- MÉTODO QUE FALTABA (Soluciona tu error) ---
+  showInfo(message: string) {
+    this.showToast("info", message);
+  }
+
+  // Ya que estamos, añadimos warning por si lo usas en el futuro
+  showWarning(message: string) {
+    this.showToast("warning", message);
   }
 
   private showToast(type: ToastType, message: string) {

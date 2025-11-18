@@ -12,6 +12,7 @@ import {
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
+import { AuthService } from "app/core/services/auth.service"; // <-- 1. IMPORTAR AUTH SERVICE
 
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
 
@@ -69,7 +70,8 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService // <-- 2. INYECTAR EL SERVICIO DE AUTH
   ) {}
 
   ngOnInit(): void {
@@ -204,6 +206,7 @@ export class ProductDetailComponent implements OnInit {
     this.availableSizes.set([...new Set(sizes)]);
 
     // 3. ACTUALIZAR PRECIO
+    // Buscamos si alguna variante de este color tiene un precio específico distinto de 0
     const variantWithPrice = variantsForColor.find(
       (v) => v.price && v.price > 0
     );
@@ -211,6 +214,7 @@ export class ProductDetailComponent implements OnInit {
     if (variantWithPrice) {
       this.currentPrice.set(variantWithPrice.price!);
     } else {
+      // Si no tiene precio específico, volvemos al precio base del producto padre
       this.currentPrice.set(product.price);
     }
   }
@@ -227,7 +231,29 @@ export class ProductDetailComponent implements OnInit {
     this.quantity.update((q) => (q > 1 ? q - 1 : 1));
   }
 
+  // --- 3. HELPER PARA VERIFICAR SESIÓN ---
+  private requireLogin(): boolean {
+    if (this.authService.isAuthenticated()) {
+      return true;
+    }
+
+    this.toastService.showInfo(
+      "Debes iniciar sesión para realizar una compra."
+    );
+
+    // --- CORRECCIÓN AQUÍ ---
+    // Antes: "/auth/login"  ->  Ahora: "/login"
+    this.router.navigate(["/login"], {
+      queryParams: { returnUrl: this.router.url },
+    });
+
+    return false;
+  }
+
   addToCart(): void {
+    // Primero verificamos si el usuario está autenticado
+    if (!this.requireLogin()) return;
+
     const variantId = this.selectedVariantId();
     if (!variantId) {
       this.toastService.showError(
@@ -249,6 +275,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   buyNow(): void {
+    // Primero verificamos si el usuario está autenticado
+    if (!this.requireLogin()) return;
+
     const variantId = this.selectedVariantId();
     if (!variantId) {
       this.toastService.showError(
