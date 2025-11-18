@@ -9,9 +9,8 @@
           Inicio
         </a>
       </li>
-      <li>
-        <span class="select-none">/</span>
-      </li>
+      <li><span class="select-none">/</span></li>
+
       <li>
         <a
           [routerLink]="['/products']"
@@ -21,9 +20,9 @@
           {{ prod.category }}
         </a>
       </li>
-      <li>
-        <span class="select-none">/</span>
-      </li>
+
+      <li><span class="select-none">/</span></li>
+
       <li class="font-medium text-primary truncate">
         {{ prod.name }}
       </li>
@@ -34,6 +33,7 @@
     class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start"
     style="overflow: hidden"
   >
+    <!-- IMAGEN PRINCIPAL -->
     <div class="w-full min-w-0">
       <div class="flex flex-col gap-4 sticky top-28 w-full">
         <div
@@ -46,6 +46,7 @@
             loading="eager"
             (error)="getPlaceholderImage($event)"
           />
+
           <div
             *ngIf="availableColors().length === 0"
             class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
@@ -54,6 +55,7 @@
           </div>
         </div>
 
+        <!-- MINIATURAS -->
         <div class="grid grid-cols-5 gap-3" *ngIf="currentImages().length > 1">
           <button
             *ngFor="let image of currentImages()"
@@ -81,6 +83,7 @@
       </div>
     </div>
 
+    <!-- INFORMACIÓN DEL PRODUCTO -->
     <div class="flex flex-col gap-6 min-w-0">
       <div>
         <p
@@ -89,10 +92,12 @@
         >
           {{ prod.brand }}
         </p>
+
         <h1 class="text-4xl font-bold text-gray-900 leading-tight mt-1">
           {{ prod.name }}
         </h1>
 
+        <!-- ESTRELLAS -->
         <div
           class="flex items-center gap-2 mt-3"
           *ngIf="prod.ratingCount && prod.ratingCount > 0"
@@ -125,15 +130,18 @@
               />
             </svg>
           </div>
+
           <span class="text-sm text-gray-500">
             ({{ prod.ratingCount }} valoraciones)
           </span>
         </div>
 
+        <!-- PRECIO -->
         <div class="flex items-center gap-4 mt-3">
           <p class="text-3xl font-bold text-primary">
             {{ currentPrice() | currency : "EUR" : "symbol" : "1.2-2" }}
           </p>
+
           <p
             *ngIf="prod.oldPrice"
             class="text-2xl font-medium text-gray-400 line-through"
@@ -143,11 +151,13 @@
         </div>
       </div>
 
+      <!-- COLORES -->
       <div *ngIf="availableColors().length > 0">
         <label class="block text-gray-800 font-medium mb-2">
           Selecciona tu color:
           <span class="text-gray-600 capitalize">{{ selectedColor() }}</span>
         </label>
+
         <div class="flex flex-wrap gap-3">
           <button
             *ngFor="let color of availableColors()"
@@ -166,11 +176,13 @@
         </div>
       </div>
 
+      <!-- TALLAS -->
       <div *ngIf="availableSizes().length > 0">
         <div class="flex justify-between items-center mb-2">
           <label class="block text-gray-800 font-medium">
             Selecciona tu talla:
           </label>
+
           <button
             type="button"
             (click)="openSizeGuide()"
@@ -179,6 +191,7 @@
             Guía de tallas
           </button>
         </div>
+
         <div class="flex flex-wrap gap-3">
           <button
             *ngFor="let size of availableSizes()"
@@ -197,6 +210,7 @@
         </div>
       </div>
 
+      <!-- PRODUCTO AGOTADO -->
       <div
         *ngIf="availableColors().length === 0"
         class="p-4 bg-red-50 text-red-700 rounded-lg"
@@ -207,8 +221,10 @@
         </p>
       </div>
 
+      <!-- CANTIDAD -->
       <div *ngIf="availableColors().length > 0">
         <label class="block text-gray-800 font-medium mb-2"> Cantidad: </label>
+
         <div class="flex items-center border border-gray-300 rounded-lg w-fit">
           <button
             (click)="decrementQuantity()"
@@ -217,9 +233,11 @@
           >
             -
           </button>
+
           <span class="w-12 text-center font-medium">
             {{ quantity() }}
           </span>
+
           <button
             (click)="incrementQuantity()"
             class="h-10 w-10 text-xl text-gray-600 hover:bg-gray-100"
@@ -229,6 +247,7 @@
         </div>
       </div>
 
+      <!-- BOTONES -->
       <div class="flex flex-col sm:flex-row gap-4 mt-2">
         <button
           class="flex-1 bg-secondary text-white py-3 px-8 rounded-xl font-medium text-lg shadow-sm hover:shadow-md transition-all duration-200 hover:bg-secondary-light disabled:opacity-50 disabled:cursor-not-allowed"
@@ -237,6 +256,7 @@
         >
           Comprar ahora
         </button>
+
         <button
           class="flex-1 py-3 px-8 rounded-xl font-medium text-lg text-primary bg-secondary/10 hover:bg-secondary/20 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           (click)="addToCart()"
@@ -248,6 +268,7 @@
     </div>
   </div>
 
+  <!-- SECCIÓN TABS -->
   <div class="mt-16">
     <div class="border-b border-gray-200">
       <nav class="flex -mb-px gap-6">
@@ -262,6 +283,7 @@
         >
           Descripción
         </button>
+
         <button
           (click)="setActiveTab('specs')"
           class="py-4 px-1 text-sm font-medium border-b-2 transition-colors"
@@ -273,6 +295,7 @@
         >
           Especificaciones
         </button>
+
         <button
           *ngIf="prod.ratingCount && prod.ratingCount > 0"
           (click)="setActiveTab('reviews')"
@@ -294,22 +317,27 @@
           {{ prod.description }}
         </p>
       </div>
+
       <div *ngIf="activeTab() === 'specs'">
         <ul class="list-disc list-inside text-gray-600 space-y-2">
           <li *ngIf="prod.brand">
             <span class="font-medium">Marca:</span> {{ prod.brand }}
           </li>
+
           <li *ngIf="prod.color">
             <span class="font-medium">Color:</span> {{ prod.color }}
           </li>
+
           <li *ngIf="prod.material">
             <span class="font-medium">Material:</span> {{ prod.material }}
           </li>
+
           <li *ngIf="prod.gender">
             <span class="font-medium">Género:</span> {{ prod.gender }}
           </li>
         </ul>
       </div>
+
       <div *ngIf="activeTab() === 'reviews'">
         <p class="text-gray-600">
           Mostrando {{ prod.ratingCount }} valoraciones...
@@ -318,6 +346,7 @@
     </div>
   </div>
 
+  <!-- PRODUCTOS RELACIONADOS -->
   <div class="mt-16">
     <app-related-products
       *ngIf="prod"
@@ -326,17 +355,20 @@
   </div>
 </main>
 
+<!-- CARGA O ERROR -->
 <ng-template #loadingOrError>
   <main class="max-w-4xl mx-auto px-4 py-24 text-center">
     <div *ngIf="isLoading()" class="animate-pulse text-lg text-gray-500">
       Cargando producto...
     </div>
+
     <div *ngIf="error()" class="text-red-500 font-medium">
       {{ error() }}
     </div>
   </main>
 </ng-template>
 
+<!-- MODAL GUÍA DE TALLAS -->
 <div
   *ngIf="isSizeGuideOpen()"
   class="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -356,6 +388,7 @@
       <h2 id="size-guide-title" class="text-xl font-semibold text-primary">
         Guía de Tallas
       </h2>
+
       <button
         (click)="closeSizeGuide()"
         class="text-gray-400 hover:text-secondary transition-colors"
@@ -366,176 +399,91 @@
     </div>
 
     <div class="p-6 max-h-[70vh] overflow-y-auto space-y-6">
+      <!-- TABLA ROPA -->
       <div>
         <h3 class="text-lg font-medium text-primary mb-3">
           Guía de Ropa (Unisex)
         </h3>
+
         <div class="overflow-x-auto rounded-lg border border-gray-200">
           <table class="w-full min-w-[500px] text-sm text-left">
             <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
               <tr>
-                <th scope="col" class="px-4 py-3">Talla</th>
-                <th scope="col" class="px-4 py-3">Pecho (cm)</th>
-                <th scope="col" class="px-4 py-3">Cintura (cm)</th>
-                <th scope="col" class="px-4 py-3">Cadera (cm)</th>
+                <th class="px-4 py-3">Talla</th>
+                <th class="px-4 py-3">Pecho (cm)</th>
+                <th class="px-4 py-3">Cintura (cm)</th>
+                <th class="px-4 py-3">Cadera (cm)</th>
               </tr>
             </thead>
+
             <tbody>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">XS</td>
-                <td class="px-4 py-3">80-88</td>
-                <td class="px-4 py-3">65-73</td>
-                <td class="px-4 py-3">80-88</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">S</td>
-                <td class="px-4 py-3">88-96</td>
-                <td class="px-4 py-3">73-81</td>
-                <td class="px-4 py-3">88-96</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">M</td>
-                <td class="px-4 py-3">96-104</td>
-                <td class="px-4 py-3">81-89</td>
-                <td class="px-4 py-3">96-104</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">L</td>
-                <td class="px-4 py-3">104-112</td>
-                <td class="px-4 py-3">89-97</td>
-                <td class="px-4 py-3">104-112</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">XL</td>
-                <td class="px-4 py-3">112-124</td>
-                <td class="px-4 py-3">97-109</td>
-                <td class="px-4 py-3">112-120</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium text-gray-900">XXL</td>
-                <td class="px-4 py-3">124-136</td>
-                <td class="px-4 py-3">109-121</td>
-                <td class="px-4 py-3">120-128</td>
-              </tr>
-              <tr class="bg-white">
-                <td class="px-4 py-3 font-medium text-gray-900">XXXL</td>
-                <td class="px-4 py-3">136-148</td>
-                <td class="px-4 py-3">121-133</td>
-                <td class="px-4 py-3">128-136</td>
+              <tr
+                class="bg-white border-b"
+                *ngFor="
+                  let row of [
+                    { t: 'XS', p: '80-88', c: '65-73', ca: '80-88' },
+                    { t: 'S', p: '88-96', c: '73-81', ca: '88-96' },
+                    { t: 'M', p: '96-104', c: '81-89', ca: '96-104' },
+                    { t: 'L', p: '104-112', c: '89-97', ca: '104-112' },
+                    { t: 'XL', p: '112-124', c: '97-109', ca: '112-120' },
+                    { t: 'XXL', p: '124-136', c: '109-121', ca: '120-128' },
+                    { t: 'XXXL', p: '136-148', c: '121-133', ca: '128-136' }
+                  ]
+                "
+              >
+                <td class="px-4 py-3 font-medium text-gray-900">{{ row.t }}</td>
+                <td class="px-4 py-3">{{ row.p }}</td>
+                <td class="px-4 py-3">{{ row.c }}</td>
+                <td class="px-4 py-3">{{ row.ca }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- TABLA CALZADO -->
       <div>
         <h3 class="text-lg font-medium text-primary mb-3">
           Guía de Calzado (EUR)
         </h3>
+
         <div class="overflow-x-auto rounded-lg border border-gray-200">
           <table class="w-full min-w-[500px] text-sm text-left">
             <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
               <tr>
-                <th scope="col" class="px-4 py-3">EUR</th>
-                <th scope="col" class="px-4 py-3">UK</th>
-                <th scope="col" class="px-4 py-3">US (Hombre)</th>
-                <th scope="col" class="px-4 py-3">US (Mujer)</th>
-                <th scope="col" class="px-4 py-3">CM</th>
+                <th class="px-4 py-3">EUR</th>
+                <th class="px-4 py-3">UK</th>
+                <th class="px-4 py-3">US (Hombre)</th>
+                <th class="px-4 py-3">US (Mujer)</th>
+                <th class="px-4 py-3">CM</th>
               </tr>
             </thead>
+
             <tbody>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">34</td>
-                <td class="px-4 py-3">2</td>
-                <td class="px-4 py-3">3</td>
-                <td class="px-4 py-3">4.5</td>
-                <td class="px-4 py-3">21.5</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">35</td>
-                <td class="px-4 py-3">2.5</td>
-                <td class="px-4 py-3">3.5</td>
-                <td class="px-4 py-3">5</td>
-                <td class="px-4 py-3">22</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">36</td>
-                <td class="px-4 py-3">3.5</td>
-                <td class="px-4 py-3">4.5</td>
-                <td class="px-4 py-3">6</td>
-                <td class="px-4 py-3">22.5</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">37</td>
-                <td class="px-4 py-3">4.5</td>
-                <td class="px-4 py-3">5.5</td>
-                <td class="px-4 py-3">7</td>
-                <td class="px-4 py-3">23.5</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">38</td>
-                <td class="px-4 py-3">5</td>
-                <td class="px-4 py-3">6</td>
-                <td class="px-4 py-3">7.5</td>
-                <td class="px-4 py-3">24</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">39</td>
-                <td class="px-4 py-3">6</td>
-                <td class="px-4 py-3">7</td>
-                <td class="px-4 py-3">8.5</td>
-                <td class="px-4 py-3">25</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">40</td>
-                <td class="px-4 py-3">6.5</td>
-                <td class="px-4 py-3">7.5</td>
-                <td class="px-4 py-3">9</td>
-                <td class="px-4 py-3">25.5</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">41</td>
-                <td class="px-4 py-3">7.5</td>
-                <td class="px-4 py-3">8.5</td>
-                <td class="px-4 py-3">10</td>
-                <td class="px-4 py-3">26.5</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">42</td>
-                <td class="px-4 py-3">8</td>
-                <td class="px-4 py-3">9</td>
-                <td class="px-4 py-3">10.5</td>
-                <td class="px-4 py-3">27</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">43</td>
-                <td class="px-4 py-3">9</td>
-                <td class="px-4 py-3">10</td>
-                <td class="px-4 py-3">11.5</td>
-                <td class="px-4 py-3">28</td>
-              </tr>
-              <tr class="bg-white border-b">
-                <td class="px-4 py-3 font-medium">44</td>
-                <td class="px-4 py-3">9.5</td>
-                <td class="px-4 py-3">10.5</td>
-                <td class="px-4 py-3">12</td>
-                <td class="px-4 py-3">28.5</td>
-              </tr>
-              <tr class="bg-white">
-                <td class="px-4 py-3 font-medium">45</td>
-                <td class="px-4 py-3">10.5</td>
-                <td class="px-4 py-3">11.5</td>
-                <td class="px-4 py-3">13</td>
-                <td class="px-4 py-3">29.5</td>
+              <tr
+                class="bg-white border-b"
+                *ngFor="
+                  let row of [
+                    { e: 34, uk: 2, usH: 3, usM: 4.5, cm: 21.5 },
+                    { e: 35, uk: 2.5, usH: 3.5, usM: 5, cm: 22 },
+                    { e: 36, uk: 3.5, usH: 4.5, usM: 6, cm: 22.5 },
+                    { e: 37, uk: 4, usH: 5, usM: 6.5, cm: 23 },
+                    { e: 38, uk: 5, usH: 6, usM: 7.5, cm: 24 },
+                    { e: 39, uk: 6, usH: 7, usM: 8.5, cm: 25 },
+                    { e: 40, uk: 6.5, usH: 7.5, usM: 9, cm: 25.5 }
+                  ]
+                "
+              >
+                <td class="px-4 py-3 font-medium">{{ row.e }}</td>
+                <td class="px-4 py-3">{{ row.uk }}</td>
+                <td class="px-4 py-3">{{ row.usH }}</td>
+                <td class="px-4 py-3">{{ row.usM }}</td>
+                <td class="px-4 py-3">{{ row.cm }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <p class="text-xs text-gray-500 text-center">
-        * Estas guías son una referencia. Las tallas pueden variar ligeramente
-        entre marcas.
-      </p>
     </div>
   </div>
 </div>
