@@ -37,12 +37,8 @@
     <div class="w-full min-w-0">
       <div class="flex flex-col gap-4 sticky top-28 w-full">
         <div
-          class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm"
+          class="w-full flex justify-center aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-sm relative"
         >
-          <!-- 
-            --- 👇 CORRECCIÓN 1 ---
-            Cambiado (error) para llamar a la función
-          -->
           <img
             [src]="getProductImage()"
             [alt]="prod.name"
@@ -50,27 +46,30 @@
             loading="eager"
             (error)="getPlaceholderImage($event)"
           />
+          <div
+            *ngIf="availableColors().length === 0"
+            class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+          >
+            Agotado
+          </div>
         </div>
 
-        <div class="grid grid-cols-5 gap-3">
+        <div class="grid grid-cols-5 gap-3" *ngIf="currentImages().length > 1">
           <button
-            *ngFor="let image of prod.images"
+            *ngFor="let image of currentImages()"
             (click)="selectImage(image.imageUrl)"
             (mouseenter)="selectImage(image.imageUrl)"
             type="button"
             class="aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 group hover:opacity-95 hover:border-secondary"
             [ngClass]="{
               'border-secondary opacity-100':
-                selectedImageUrl() === image.imageUrl,
+                selectedImageUrl() === image.imageUrl ||
+                (!selectedImageUrl() && image === currentImages()[0]),
               'border-gray-200 opacity-70':
                 selectedImageUrl() !== image.imageUrl
             }"
             [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
           >
-            <!-- 
-              --- 👇 CORRECCIÓN 2 ---
-              Cambiado (error) para llamar a la función
-            -->
             <img
               [src]="backendUrl + image.imageUrl"
               (error)="getPlaceholderImage($event)"
@@ -133,7 +132,7 @@
 
         <div class="flex items-center gap-4 mt-3">
           <p class="text-3xl font-bold text-primary">
-            {{ prod.price | currency : "EUR" : "symbol" : "1.2-2" }}
+            {{ currentPrice() | currency : "EUR" : "symbol" : "1.2-2" }}
           </p>
           <p
             *ngIf="prod.oldPrice"
@@ -166,6 +165,7 @@
           </button>
         </div>
       </div>
+
       <div *ngIf="availableSizes().length > 0">
         <div class="flex justify-between items-center mb-2">
           <label class="block text-gray-800 font-medium">
@@ -196,6 +196,7 @@
           </button>
         </div>
       </div>
+
       <div
         *ngIf="availableColors().length === 0"
         class="p-4 bg-red-50 text-red-700 rounded-lg"
@@ -311,8 +312,7 @@
       </div>
       <div *ngIf="activeTab() === 'reviews'">
         <p class="text-gray-600">
-          Mostrando {{ prod.ratingCount }} valoraciones... (Funcionalidad
-          pendiente)
+          Mostrando {{ prod.ratingCount }} valoraciones...
         </p>
       </div>
     </div>
@@ -337,9 +337,6 @@
   </main>
 </ng-template>
 
-<!-- 
-  --- MODAL DE GUÍA DE TALLAS ---
--->
 <div
   *ngIf="isSizeGuideOpen()"
   class="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -347,17 +344,14 @@
   aria-modal="true"
   aria-labelledby="size-guide-title"
 >
-  <!-- Backdrop (Fondo) -->
   <div
     (click)="closeSizeGuide()"
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
   ></div>
 
-  <!-- Panel del Modal -->
   <div
     class="relative w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden"
   >
-    <!-- Encabezado del Modal -->
     <div class="flex items-center justify-between p-4 border-b border-gray-200">
       <h2 id="size-guide-title" class="text-xl font-semibold text-primary">
         Guía de Tallas
@@ -371,9 +365,7 @@
       </button>
     </div>
 
-    <!-- Contenido del Modal (con scroll) -->
     <div class="p-6 max-h-[70vh] overflow-y-auto space-y-6">
-      <!-- Tabla de Ropa -->
       <div>
         <h3 class="text-lg font-medium text-primary mb-3">
           Guía de Ropa (Unisex)
@@ -436,7 +428,6 @@
         </div>
       </div>
 
-      <!-- Tabla de Calzado -->
       <div>
         <h3 class="text-lg font-medium text-primary mb-3">
           Guía de Calzado (EUR)

@@ -8,6 +8,7 @@
     class="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-card-dark rounded-xl shadow-lg flex flex-col animate-scale-in"
     (click)="$event.stopPropagation()"
   >
+    <!-- Header -->
     <div
       class="flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark"
     >
@@ -24,12 +25,14 @@
       </button>
     </div>
 
+    <!-- Formulario -->
     <form
       *ngIf="product"
       [formGroup]="productForm"
       (ngSubmit)="onSubmit()"
       class="flex-1 overflow-y-auto p-6 space-y-6"
     >
+      <!-- Información General -->
       <div class="space-y-4">
         <div>
           <label
@@ -66,7 +69,7 @@
             <label
               for="price-edit"
               class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1"
-              >Precio (€)</label
+              >Precio Base (€)</label
             >
             <input
               type="number"
@@ -161,46 +164,131 @@
         </div>
       </div>
 
+      <!-- Variantes por Color -->
       <div class="space-y-4 pt-4">
         <h3
           class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary"
         >
-          Variantes por Color
+          Configuración de Variantes
         </h3>
 
-        <div formArrayName="colorGroups" class="space-y-6">
+        <div formArrayName="colorGroups" class="space-y-8">
           <div
             *ngFor="let colorGroup of colorGroups.controls; let i = index"
             [formGroupName]="i"
-            class="p-4 bg-gray-100 border border-border-light dark:border-border-dark rounded-lg shadow-sm relative"
+            class="p-5 bg-gray-50 border-2 border-gray-200 dark:border-border-dark rounded-xl shadow-sm relative transition-all hover:border-gray-300"
           >
-            <div class="flex items-center justify-between mb-3 gap-2">
-              <label
-                [for]="'color-edit-' + i"
-                class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary flex-1"
-                >Color {{ i + 1 }}</label
-              >
+            <!-- Cabecera del Grupo -->
+            <div
+              class="flex items-center justify-between mb-4 gap-3 border-b pb-3 border-gray-200"
+            >
+              <h4 class="font-semibold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">palette</span>
+                Variante {{ i + 1 }}
+              </h4>
               <button
                 type="button"
                 (click)="removeColorGroup(i)"
-                [disabled]="colorGroups.length < 1"
-                class="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex-shrink-0"
+                class="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-1 bg-white px-3 py-1 rounded-md border border-red-100 shadow-sm hover:bg-red-50 transition-colors"
               >
-                Eliminar Color
+                <span class="material-symbols-outlined text-lg">delete</span>
+                Eliminar Variante
               </button>
             </div>
-            <input
-              type="text"
-              [id]="'color-edit-' + i"
-              formControlName="color"
-              placeholder="Ej: Negro, Blanco, Azul"
-              class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm mb-4 focus:ring-primary focus:border-primary"
-            />
 
-            <div class="space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <!-- Input Nombre Color -->
+              <div>
+                <label
+                  [for]="'color-edit-' + i"
+                  class="block text-xs uppercase font-bold text-gray-500 mb-1"
+                >
+                  Nombre del Color
+                </label>
+                <input
+                  type="text"
+                  [id]="'color-edit-' + i"
+                  formControlName="color"
+                  placeholder="Escribe el color..."
+                  class="w-full p-2 border border-border-light rounded-lg bg-white text-sm focus:ring-secondary focus:border-secondary font-medium"
+                />
+              </div>
+
+              <!-- NUEVO: Input Precio Específico -->
+              <div>
+                <label
+                  [for]="'price-variant-' + i"
+                  class="block text-xs uppercase font-bold text-gray-500 mb-1"
+                >
+                  Precio Específico (€)
+                </label>
+                <input
+                  type="number"
+                  [id]="'price-variant-' + i"
+                  formControlName="price"
+                  placeholder="Dejar 0 para usar precio base"
+                  step="0.01"
+                  class="w-full p-2 border border-border-light rounded-lg bg-white text-sm focus:ring-secondary focus:border-secondary font-medium"
+                />
+                <p class="text-[10px] text-gray-400 mt-1">
+                  * Si es 0, usa el precio base del producto.
+                </p>
+              </div>
+            </div>
+
+            <!-- Sección de Subida de Imágenes -->
+            <div
+              class="mb-6 bg-white p-4 rounded-lg border border-dashed border-gray-300"
+            >
               <label
-                class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
-                >Tallas y Stock</label
+                class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
+              >
+                Añadir NUEVAS imágenes para
+                {{ colorGroup.get("color")?.value || "esta variante" }}
+              </label>
+              <label
+                [for]="'images-edit-' + i"
+                class="w-full flex flex-col items-center justify-center px-4 py-4 bg-blue-50/50 border-2 border-blue-200 border-dashed rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl text-blue-400 mb-1"
+                  >add_photo_alternate</span
+                >
+                <span class="text-sm font-medium text-blue-600">
+                  {{
+                    getFileCountForColor(i) > 0
+                      ? getFileCountForColor(i) + " nuevas seleccionadas"
+                      : "Haz click para subir nuevas fotos"
+                  }}
+                </span>
+                <span class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP</span>
+              </label>
+              <input
+                type="file"
+                [id]="'images-edit-' + i"
+                (change)="onColorImagesChange($event, i)"
+                class="hidden"
+                accept="image/png, image/jpeg, image/webp"
+                multiple
+              />
+              <ul *ngIf="getFileCountForColor(i) > 0" class="mt-2 space-y-1">
+                <li
+                  *ngFor="let file of getFilesForColor(i)"
+                  class="text-xs text-gray-500 flex items-center gap-1"
+                >
+                  <span
+                    class="material-symbols-outlined text-[14px] text-green-500"
+                    >check_circle</span
+                  >
+                  {{ file.name }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- Tallas y Stock -->
+            <div class="space-y-3">
+              <label class="block text-xs uppercase font-bold text-gray-500"
+                >Inventario (Tallas y Cantidad)</label
               >
               <div formArrayName="sizeStocks" class="space-y-2">
                 <div
@@ -209,7 +297,7 @@
                     let j = index
                   "
                   [formGroupName]="j"
-                  class="grid grid-cols-6 gap-3 items-center"
+                  class="grid grid-cols-6 gap-3 items-center bg-white p-2 rounded-md border border-gray-100"
                 >
                   <div class="col-span-3" [ngSwitch]="currentCategory()">
                     <label [for]="'size-edit-' + i + '-' + j" class="sr-only"
@@ -225,14 +313,14 @@
                       [placeholder]="
                         'Talla (' + sneakerMin + '-' + sneakerMax + ')'
                       "
-                      class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm focus:ring-primary focus:border-primary"
+                      class="w-full p-2 border border-border-light rounded-lg text-sm focus:ring-primary focus:border-primary"
                     />
 
                     <select
                       *ngSwitchCase="'ropa'"
                       [id]="'size-edit-' + i + '-' + j"
                       formControlName="size"
-                      class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm focus:ring-primary focus:border-primary"
+                      class="w-full p-2 border border-border-light rounded-lg text-sm focus:ring-primary focus:border-primary"
                     >
                       <option value="" disabled>Selecciona talla...</option>
                       <option *ngFor="let s of clothingSizes" [value]="s">
@@ -244,7 +332,7 @@
                       *ngSwitchCase="'complementos'"
                       [id]="'size-edit-' + i + '-' + j"
                       formControlName="size"
-                      class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm focus:ring-primary focus:border-primary"
+                      class="w-full p-2 border border-border-light rounded-lg text-sm focus:ring-primary focus:border-primary"
                     >
                       <option value="" disabled>Selecciona talla...</option>
                       <option *ngFor="let s of clothingSizes" [value]="s">
@@ -257,7 +345,7 @@
                       [id]="'size-edit-' + i + '-' + j"
                       formControlName="size"
                       placeholder="Selecciona categoría"
-                      class="w-full p-2 border border-border-light rounded-lg bg-gray-200 text-gray-500 text-sm cursor-not-allowed"
+                      class="w-full p-2 border border-border-light rounded-lg bg-gray-100 text-gray-500 text-sm cursor-not-allowed"
                       readonly
                     />
                   </div>
@@ -271,7 +359,7 @@
                       [id]="'stock-edit-' + i + '-' + j"
                       formControlName="stock"
                       placeholder="Stock"
-                      class="w-full p-2 border border-border-light rounded-lg bg-background-light text-sm focus:ring-primary focus:border-primary"
+                      class="w-full p-2 border border-border-light rounded-lg text-sm focus:ring-primary focus:border-primary"
                     />
                   </div>
 
@@ -280,10 +368,10 @@
                       type="button"
                       (click)="removeSizeStock(i, j)"
                       [disabled]="getSizeStocks(i).length <= 1"
-                      class="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded-full"
+                      class="text-red-500 hover:text-red-700 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed p-1 rounded-full transition-colors"
                     >
                       <span class="material-symbols-outlined text-xl"
-                        >delete</span
+                        >remove_circle</span
                       >
                     </button>
                   </div>
@@ -293,9 +381,10 @@
                 type="button"
                 (click)="addSizeStock(i)"
                 [disabled]="!currentCategory()"
-                class="mt-3 text-sm font-medium text-secondary hover:text-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+                class="mt-2 text-sm font-bold text-secondary hover:text-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 px-2 py-1 rounded hover:bg-orange-50 transition-colors"
               >
-                + Añadir Talla para este color
+                <span class="material-symbols-outlined text-lg">add</span>
+                Añadir Talla
               </button>
             </div>
           </div>
@@ -304,33 +393,36 @@
         <button
           type="button"
           (click)="addColorGroup()"
-          class="w-full px-4 py-2 text-sm font-medium text-primary border-2 border-dashed border-primary/50 rounded-lg hover:bg-primary/10 transition-colors"
+          class="w-full px-4 py-3 text-sm font-bold text-primary border-2 border-dashed border-primary/30 rounded-xl hover:bg-primary/5 hover:border-primary transition-all flex items-center justify-center gap-2"
         >
-          + Añadir Nuevo Grupo de Color
+          <span class="material-symbols-outlined">add_circle</span>
+          Añadir Nueva Variante de Color
         </button>
       </div>
-      <div class="flex items-center gap-2 pt-4">
+
+      <div class="flex items-center gap-2 pt-4 border-t border-gray-100">
         <input
           type="checkbox"
           id="is_new-edit"
           formControlName="is_new"
-          class="h-4 w-4 rounded text-primary border-border-light focus:ring-primary"
+          class="h-5 w-5 rounded text-secondary border-gray-300 focus:ring-secondary cursor-pointer"
         />
         <label
           for="is_new-edit"
-          class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary"
+          class="text-sm font-medium text-gray-700 cursor-pointer select-none"
           >Marcar como "Nuevo"</label
         >
       </div>
     </form>
 
+    <!-- Footer -->
     <div
-      class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-2"
+      class="flex items-center justify-end p-4 border-t border-border-light dark:border-border-dark space-x-3"
     >
       <button
         (click)="close()"
         type="button"
-        class="px-4 py-2 rounded-lg text-sm font-medium text-text-light-secondary bg-gray-100 hover:bg-gray-200"
+        class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
       >
         Cancelar
       </button>
@@ -338,7 +430,7 @@
         (click)="onSubmit()"
         type="submit"
         [disabled]="productForm.invalid"
-        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-secondary hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-secondary hover:bg-secondary-dark shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
       >
         Guardar Cambios
       </button>

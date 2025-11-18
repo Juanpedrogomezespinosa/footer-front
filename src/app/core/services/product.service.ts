@@ -1,21 +1,20 @@
-// src/app/core/services/product.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 
-// Interfaz para los "hermanos" (otros colores)
+// Interfaz para los "hermanos" (otros colores como productos distintos)
 export interface ProductSibling {
   id: number;
   color: string;
   image: string | null;
 }
 
-// Interfaz para las variantes de TALLA y STOCK del producto actual
-export interface ProductVariantStock {
+// Interfaz simple para la variante dentro del grupo de colores
+export interface VariantOption {
   id: number;
-  color: string;
   size: string;
   stock: number;
+  price?: number;
 }
 
 // Interfaz para las imágenes de la galería
@@ -26,56 +25,41 @@ export interface ProductImage {
 }
 
 /**
- * Interfaz para los productos recibidos desde la API.
- * Esta es la respuesta DIRECTA del backend.
+ * Interfaz principal de respuesta de la API.
+ * Contiene toda la información del producto.
  */
 export interface ProductApiResponse {
   id: number;
   name: string;
   description?: string;
   price: number;
-  image?: string; // Imagen principal (de la lista)
+  image?: string; // Imagen principal para listados
   averageRating?: number;
   ratingCount?: number;
-  // 'size: string' ya no existe
   brand?: string;
   color?: string; // Color principal
   category: "zapatillas" | "ropa" | "complementos";
   sub_category?: string;
   gender?: "hombre" | "mujer" | "unisex";
   material?: string | null;
-  images?: ProductImage[]; // Galería de imágenes
-  variants?: ProductVariantStock[]; // Tallas y stock
-  siblings?: ProductSibling[]; // Hermanos (otros colores)
-}
-
-/**
- * Interfaz de producto para uso interno del frontend.
- * (Completa y actualizada)
- */
-export interface Product {
-  id: number;
-  name: string;
-  description?: string;
-  price: number;
-  image?: string;
-  rating?: number;
-  ratingCount?: number;
-  category: "zapatillas" | "ropa" | "complementos";
-  brand?: string;
   oldPrice?: number;
-  color?: string;
-  material?: string | null;
-  gender?: "hombre" | "mujer" | "unisex";
-  // --- ¡CAMBIOS AQUÍ! Hechos opcionales ---
+
+  // --- Datos específicos de la vista de detalle ---
+  // Los definimos obligatorios porque el backend corregido SIEMPRE los envía
+  availableColors: string[];
+  imagesByColor: { [key: string]: ProductImage[] };
+  variantsByColor: { [key: string]: VariantOption[] };
+
+  siblings?: ProductSibling[];
+
+  // Mantenemos compatibilidad
   images?: ProductImage[];
-  variants?: ProductVariantStock[];
-  siblings?: ProductSibling[]; // <-- Arregla el error "siblings"
+  variants?: any[];
 }
 
-/**
- * Estructura de la respuesta paginada desde el backend.
- */
+// Alias para mantener compatibilidad con otros componentes (Home, etc.)
+export type Product = ProductApiResponse;
+
 export interface PaginatedProductResponse {
   currentPage: number;
   totalPages: number;

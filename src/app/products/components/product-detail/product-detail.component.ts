@@ -6,18 +6,14 @@ import { FormsModule } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import {
   ProductService,
-  Product,
-  ProductImage,
   ProductApiResponse,
-  ProductVariantStock,
+  ProductImage,
   ProductSibling,
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
 
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
-
-type ProductDetail = Product;
 
 @Component({
   selector: "app-product-detail",
@@ -28,7 +24,7 @@ type ProductDetail = Product;
 })
 export class ProductDetailComponent implements OnInit {
   // Señales de estado
-  product = signal<ProductDetail | null>(null);
+  product = signal<ProductApiResponse | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
@@ -40,28 +36,33 @@ export class ProductDetailComponent implements OnInit {
   activeTab = signal("description");
   isSizeGuideOpen = signal(false);
 
-  // Señales dinámicas para la UI
-  availableColors = signal<string[]>([]);
+  // Señales dinámicas
+  currentImages = signal<ProductImage[]>([]);
   availableSizes = signal<string[]>([]);
+  availableColors = signal<string[]>([]);
 
-  // Señal computada para obtener la variante
+  // Nueva señal para el precio dinámico
+  currentPrice = signal<number>(0);
+
+  // Señal computada para obtener el ID de la variante seleccionada
   selectedVariantId = computed<number | null>(() => {
     const p = this.product();
     const color = this.selectedColor();
     const size = this.selectedSize();
 
-    if (!p || !p.variants || !color || !size) return null;
+    if (!p || !p.variantsByColor || !color || !size) return null;
 
-    const variant = p.variants.find(
-      (v) => v.color === color && v.size === size
-    );
+    const variantsForColor = p.variantsByColor[color];
+    if (!variantsForColor) return null;
+
+    const variant = variantsForColor.find((v) => v.size === size);
     return variant ? variant.id : null;
   });
 
   siblings = signal<ProductSibling[]>([]);
 
   backendUrl = "http://localhost:3000";
-  defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=Footer";
+  defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=No+Image";
 
   constructor(
     private route: ActivatedRoute,
@@ -76,16 +77,7 @@ export class ProductDetailComponent implements OnInit {
       const productIdParam = params.get("id");
       const productId = Number(productIdParam);
 
-      this.isLoading.set(true);
-      this.product.set(null);
-      window.scrollTo(0, 0);
-
-      this.selectedColor.set("");
-      this.selectedSize.set("");
-      this.availableColors.set([]);
-      this.availableSizes.set([]);
-      this.siblings.set([]);
-      this.isSizeGuideOpen.set(false); // Asegurarse de que el modal esté cerrado al navegar
+      this.resetState();
 
       if (isNaN(productId)) {
         this.error.set("ID de producto inválido.");
@@ -97,52 +89,54 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  private resetState() {
+    this.isLoading.set(true);
+    this.product.set(null);
+    this.error.set(null);
+    window.scrollTo(0, 0);
+
+    this.selectedColor.set("");
+    this.selectedSize.set("");
+    this.availableSizes.set([]);
+    this.availableColors.set([]);
+    this.siblings.set([]);
+    this.currentImages.set([]);
+    this.currentPrice.set(0); // Resetear precio
+    this.isSizeGuideOpen.set(false);
+  }
+
   loadProduct(productId: number): void {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: ProductApiResponse) => {
         if (foundProduct) {
-          const variants = foundProduct.variants || [];
-          const siblings = foundProduct.siblings || [];
-
-          const colorsWithStock = variants
-            .filter((v) => v.stock > 0)
-            .map((v) => v.color)
-            .filter((v, i, a) => a.indexOf(v) === i); // Unique
-          this.availableColors.set(colorsWithStock);
-
-          this.siblings.set(siblings);
-
-          const productData: ProductDetail = {
-            id: foundProduct.id,
-            name: foundProduct.name,
-            description: foundProduct.description,
-            price: Number(foundProduct.price),
-            rating: foundProduct.averageRating,
-            ratingCount: foundProduct.ratingCount,
-            images: foundProduct.images || [],
-            variants: variants,
-            siblings: siblings,
-            oldPrice:
-              Number(foundProduct.price) < 150
-                ? Number(foundProduct.price) + 30
-                : undefined,
-            color: foundProduct.color,
-            material: foundProduct.material,
-            gender: foundProduct.gender,
-            category: foundProduct.category,
-            brand: foundProduct.brand,
-          };
-          this.product.set(productData);
-
-          if (productData.images && productData.images.length > 0) {
-            this.selectedImageUrl.set(productData.images[0]?.imageUrl || "");
+          if (foundProduct.price < 150) {
+            foundProduct.oldPrice = foundProduct.price + 30;
           }
 
-          const mainColor = foundProduct.color;
-          if (mainColor && colorsWithStock.includes(mainColor)) {
-            this.selectColor(mainColor);
-          } else if (colorsWithStock.length > 0) {
-            this.selectColor(colorsWithStock[0]);
+          this.product.set(foundProduct);
+          this.currentPrice.set(foundProduct.price); // Precio base inicial
+          this.siblings.set(foundProduct.siblings || []);
+
+          const colors = foundProduct.availableColors || [];
+          this.availableColors.set(colors);
+
+          let initialColor = foundProduct.color;
+          if (!initialColor || !colors.includes(initialColor)) {
+            initialColor = colors.length > 0 ? colors[0] : "";
+          }
+
+          if (initialColor) {
+            this.selectColor(initialColor);
+          } else {
+            if (
+              foundProduct.imagesByColor &&
+              foundProduct.imagesByColor["generic"]
+            ) {
+              this.currentImages.set(foundProduct.imagesByColor["generic"]);
+              this.selectedImageUrl.set(
+                this.currentImages()[0]?.imageUrl || ""
+              );
+            }
           }
         } else {
           this.error.set("Producto no encontrado.");
@@ -157,14 +151,13 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Métodos de la Galería ---
   getProductImage(): string {
     if (this.selectedImageUrl()) {
       return `${this.backendUrl}${this.selectedImageUrl()}`;
     }
-    const product = this.product();
-    if (product && product.images && product.images.length > 0) {
-      return `${this.backendUrl}${product.images[0]?.imageUrl || ""}`;
+    const images = this.currentImages();
+    if (images && images.length > 0) {
+      return `${this.backendUrl}${images[0].imageUrl}`;
     }
     return this.defaultImage;
   }
@@ -173,25 +166,51 @@ export class ProductDetailComponent implements OnInit {
     this.selectedImageUrl.set(imageUrl || "");
   }
 
-  // --- Métodos de Acciones de Producto ---
+  getPlaceholderImage(event: Event) {
+    (event.target as HTMLImageElement).src = this.defaultImage;
+  }
+
   selectColor(color: string): void {
     this.selectedColor.set(color);
     this.selectedSize.set("");
 
     const product = this.product();
-    if (!product) {
-      this.availableSizes.set([]);
-      return;
+    if (!product) return;
+
+    // 1. Actualizar Imágenes
+    let imagesForColor = product.imagesByColor[color];
+    if (!imagesForColor || imagesForColor.length === 0) {
+      imagesForColor = product.imagesByColor["generic"] || [];
     }
 
-    const variants = product.variants || [];
+    this.currentImages.set(imagesForColor);
 
-    const sizesForColor = variants
-      .filter((v) => v.color === color && v.stock > 0)
-      .map((v) => v.size)
-      .filter((v, i, a) => a.indexOf(v) === i); // Unique
+    if (imagesForColor.length > 0) {
+      this.selectedImageUrl.set(imagesForColor[0].imageUrl);
+    } else {
+      this.selectedImageUrl.set("");
+    }
 
-    this.availableSizes.set(sizesForColor);
+    // 2. Actualizar Tallas y STOCK
+    const variantsForColor = product.variantsByColor[color] || [];
+    const sizes = variantsForColor
+      .filter((v) => v.stock > 0)
+      .map((v) => v.size);
+
+    this.availableSizes.set([...new Set(sizes)]);
+
+    // 3. ACTUALIZAR PRECIO
+    // Buscamos si alguna variante de este color tiene un precio específico distinto de 0
+    const variantWithPrice = variantsForColor.find(
+      (v) => v.price && v.price > 0
+    );
+
+    if (variantWithPrice) {
+      this.currentPrice.set(variantWithPrice.price!);
+    } else {
+      // Si no tiene precio específico, volvemos al precio base del producto padre
+      this.currentPrice.set(product.price);
+    }
   }
 
   selectSize(size: string): void {
@@ -248,15 +267,13 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Métodos de Pestañas ---
   setActiveTab(tab: string): void {
     this.activeTab.set(tab);
   }
 
-  // --- Métodos de Valoración (Estrellas) ---
   getStars(): ("full" | "half" | "empty")[] {
     const stars: ("full" | "half" | "empty")[] = [];
-    let rating = this.product()?.rating ?? 0;
+    let rating = this.product()?.averageRating ?? 0;
     for (let i = 1; i <= 5; i++) {
       if (rating >= 1) {
         stars.push("full");
@@ -270,17 +287,6 @@ export class ProductDetailComponent implements OnInit {
     return stars;
   }
 
-  // --- 👇 FUNCIÓN AÑADIDA ---
-  /**
-   * Maneja el evento de error de carga de una imagen
-   * y lo reemplaza con un placeholder.
-   */
-  getPlaceholderImage(event: Event) {
-    // Usamos el 'defaultImage' que ya está definido en el componente
-    (event.target as HTMLImageElement).src = this.defaultImage;
-  }
-
-  // --- Métodos para el Modal ---
   openSizeGuide(): void {
     this.isSizeGuideOpen.set(true);
   }

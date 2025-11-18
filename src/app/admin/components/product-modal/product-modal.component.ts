@@ -22,12 +22,12 @@ import { Subscription } from "rxjs";
 })
 export class ProductModalComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
-  selectedFiles: File[] = [];
-  fileNames: string[] = [];
   private categorySubscription: Subscription | null = null;
 
+  // Mapa para almacenar archivos por índice de grupo de color
+  filesByColorIndex: Map<number, File[]> = new Map();
+
   currentCategory = signal<string>("");
-  // Añadimos "Talla Única" al array de tallas disponibles
   clothingSizes = ["Talla Única", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
   sneakerMax = 45;
@@ -48,7 +48,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       material: [""],
       season: [""],
       is_new: [true],
-      images: [null, Validators.required],
       colorGroups: this.fb.array(
         [this.createColorGroup()],
         Validators.required
@@ -76,6 +75,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   createColorGroup(): FormGroup {
     return this.fb.group({
       color: ["", Validators.required],
+      price: [0], // <-- AÑADIDO: Precio de la variante
       sizeStocks: this.fb.array(
         [this.createSizeStockGroup()],
         Validators.required
@@ -94,9 +94,23 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   removeColorGroup(index: number): void {
     if (this.colorGroups.length > 1) {
       this.colorGroups.removeAt(index);
+      this.filesByColorIndex.delete(index);
+      this.reindexFilesMap(index);
     } else {
       this.toast.showError("Debe haber al menos un grupo de color.");
     }
+  }
+
+  private reindexFilesMap(deletedIndex: number) {
+    const newMap = new Map<number, File[]>();
+    this.filesByColorIndex.forEach((files, key) => {
+      if (key < deletedIndex) {
+        newMap.set(key, files);
+      } else if (key > deletedIndex) {
+        newMap.set(key - 1, files);
+      }
+    });
+    this.filesByColorIndex = newMap;
   }
 
   getSizeStocks(colorIndex: number): FormArray {
@@ -150,17 +164,17 @@ export class ProductModalComponent implements OnInit, OnDestroy {
         Validators.max(this.sneakerMax),
       ]);
       if (
-        !sizeControl.value ||
-        isNaN(sizeControl.value) ||
-        sizeControl.value < this.sneakerMin
+        sizeControl.value &&
+        (isNaN(sizeControl.value) || sizeControl.value < this.sneakerMin)
       ) {
         sizeControl.setValue("");
       }
-    }
-    // CAMBIO: Ropa y Complementos ahora comparten lógica
-    else if (category === "ropa" || category === "complementos") {
+    } else if (category === "ropa" || category === "complementos") {
       sizeControl.setValidators([Validators.required]);
-      if (!this.clothingSizes.includes(sizeControl.value)) {
+      if (
+        sizeControl.value &&
+        !this.clothingSizes.includes(sizeControl.value)
+      ) {
         sizeControl.setValue("");
       }
     } else {
@@ -171,19 +185,24 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     sizeControl.updateValueAndValidity();
   }
 
-  onFileChange(event: Event): void {
+  onColorImagesChange(event: Event, index: number): void {
     const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
+    const fileList: FileList | null = element.files;
 
     if (fileList && fileList.length > 0) {
-      this.selectedFiles = Array.from(fileList);
-      this.fileNames = this.selectedFiles.map((f) => f.name);
-      this.productForm.patchValue({ images: this.selectedFiles });
+      const files = Array.from(fileList);
+      this.filesByColorIndex.set(index, files);
     } else {
-      this.selectedFiles = [];
-      this.fileNames = [];
-      this.productForm.patchValue({ images: null });
+      this.filesByColorIndex.delete(index);
     }
+  }
+
+  getFileCountForColor(index: number): number {
+    return this.filesByColorIndex.get(index)?.length || 0;
+  }
+
+  getFilesForColor(index: number): File[] {
+    return this.filesByColorIndex.get(index) || [];
   }
 
   onSubmit(): void {
@@ -193,9 +212,19 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.selectedFiles.length === 0) {
+    let allColorsHaveImages = true;
+    this.colorGroups.controls.forEach((_, index) => {
+      if (
+        !this.filesByColorIndex.has(index) ||
+        this.filesByColorIndex.get(index)!.length === 0
+      ) {
+        allColorsHaveImages = false;
+      }
+    });
+
+    if (!allColorsHaveImages) {
       this.toast.showError(
-        "Por favor, selecciona al menos una imagen para el producto."
+        "Debes subir al menos una imagen para cada variante de color."
       );
       return;
     }
@@ -203,34 +232,59 @@ export class ProductModalComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     const formValue = this.productForm.getRawValue();
 
-    const variantsForApi: { color: string; size: string; stock: number }[] = [];
+    const variantsForApi: {
+      color: string;
+      size: string;
+      stock: number;
+      price: number;
+    }[] = [];
+
     formValue.colorGroups.forEach(
       (group: {
         color: string;
+        price: number; // Recibimos el precio
         sizeStocks: { size: string; stock: number }[];
       }) => {
         const color = group.color;
+        const variantPrice = group.price;
+
         group.sizeStocks.forEach((sizeStock) => {
           variantsForApi.push({
             color: color,
-            size: sizeStock.size,
+            size: sizeStock.size.toString(),
             stock: sizeStock.stock,
+            price: variantPrice, // Lo enviamos al API
           });
         });
       }
     );
 
     Object.keys(formValue).forEach((key) => {
-      if (key !== "images" && key !== "colorGroups") {
+      if (key !== "colorGroups") {
         formData.append(key, formValue[key]);
       }
     });
 
     formData.append("variants", JSON.stringify(variantsForApi));
 
-    this.selectedFiles.forEach((file) => {
-      formData.append("images", file, file.name);
+    const imageMetadata: { filename: string; color: string }[] = [];
+
+    this.colorGroups.controls.forEach((control, index) => {
+      const colorName = control.get("color")?.value;
+      const files = this.filesByColorIndex.get(index);
+
+      if (files && colorName) {
+        files.forEach((file) => {
+          formData.append("images", file, file.name);
+          imageMetadata.push({
+            filename: file.name,
+            color: colorName,
+          });
+        });
+      }
     });
+
+    formData.append("imageMetadata", JSON.stringify(imageMetadata));
 
     this.adminService.createProduct(formData).subscribe({
       next: (response) => {
@@ -254,6 +308,8 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       category: "",
     });
     this.colorGroups.clear();
+    this.filesByColorIndex.clear();
+
     const initialColorGroup = this.createColorGroup();
     this.colorGroups.push(initialColorGroup);
     const initialSizeControl = (
@@ -262,8 +318,5 @@ export class ProductModalComponent implements OnInit, OnDestroy {
       .at(0)
       .get("size");
     this.applySizeLogic(initialSizeControl, "");
-
-    this.selectedFiles = [];
-    this.fileNames = [];
   }
 }

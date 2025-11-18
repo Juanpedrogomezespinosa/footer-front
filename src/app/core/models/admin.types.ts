@@ -9,8 +9,8 @@ export interface DashboardStats {
 }
 
 export interface StatCard {
-  amount?: number; // Usado para totalRevenue
-  count?: number; // Usado para los otros
+  amount?: number;
+  count?: number;
   percentage: number;
 }
 
@@ -24,8 +24,7 @@ export interface SalesGraph {
   };
 }
 
-// --- ¡¡¡NUEVA INTERFAZ REUTILIZABLE!!! ---
-// Una única fuente de verdad para las Direcciones
+// --- Interfaz Reutilizable para Direcciones ---
 export interface AdminAddress {
   id: number;
   userId: number;
@@ -63,8 +62,6 @@ export interface AdminOrder {
     username: string;
     email: string;
   };
-  // --- ¡REFACTORIZADO! ---
-  // Ahora usa la interfaz reutilizable
   Address: AdminAddress | null;
 }
 
@@ -80,13 +77,12 @@ export interface AdminUser {
   created_at: string;
 }
 
-// --- ¡NUEVA INTERFAZ! ---
-// Para: GET /api/admin/users/:id
+// --- Para: GET /api/admin/users/:id ---
 export interface FullAdminUser extends AdminUser {
-  Addresses: AdminAddress[]; // <-- Reutiliza la interfaz
+  Addresses: AdminAddress[];
 }
 
-// --- Para: GET /api/products (Listado de productos) ---
+// --- Para: GET /api/products (Listado) ---
 export interface AdminProductsResponse {
   currentPage: number;
   totalPages: number;
@@ -99,38 +95,47 @@ export interface AdminProductsResponse {
 export interface AdminProduct {
   id: number;
   name: string;
-  price: string; // La API lo devuelve como string
-  stock: number; // Este 'stock' es el que tu HTML usaba antes
+  price: string;
+  stock: number;
   category: string;
   brand: string;
-  image: string | null; // La imagen principal
+  image: string | null;
   averageRating: number;
   ratingCount: number;
-  totalStock: number; // Este es el nuevo campo correcto para la lista
+  totalStock: number;
 }
 
-// --- Para: GET /api/products/:id (Detalle de producto para editar) ---
+// --- NUEVA INTERFAZ PARA LA VARIANTE ---
+// Esto soluciona el error TS2339 al incluir 'price'
+export interface AdminVariant {
+  id: number;
+  color: string;
+  size: string;
+  stock: number;
+  price?: number; // <--- ¡CAMPO AÑADIDO!
+}
+
+// --- Para: GET /api/products/:id (Detalle para editar) ---
 export interface FullAdminProduct {
   id: number;
   name: string;
   description: string;
-  price: string;
-  color: string; // Color principal del producto padre
+  price: string; // Precio base
+  color: string;
   brand: string;
   category: string;
   sub_category?: string | null;
-  gender: string;
+  gender: "hombre" | "mujer" | "unisex"; // Ajustado para coincidir con el form
   material: string | null;
   season: string | null;
   is_new: boolean;
+  is_active: boolean; // Añadido is_active que suele ser necesario
   images: { id: number; imageUrl: string; displayOrder: number }[];
   averageRating: number;
-  variants: {
-    id: number;
-    color: string;
-    size: string;
-    stock: number;
-  }[];
+
+  // Usamos la nueva interfaz AdminVariant
+  variants: AdminVariant[];
+
   siblings: {
     id: number;
     color: string;
@@ -138,32 +143,17 @@ export interface FullAdminProduct {
   }[];
 }
 
-// --- Para: GET /api/orders/:id (Detalle de un pedido) ---
-
-// --- ¡INTERFAZ ELIMINADA! ---
-// 'AdminOrderUserAddress' ya no es necesaria, usamos 'AdminAddress'
-/*
-export interface AdminOrderUserAddress {
-  id: number;
-  alias: string;
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  phone?: string | null;
-}
-*/
+// --- Para: GET /api/orders/:id (Detalle) ---
 
 export interface AdminOrderItemProduct {
   id: number;
   name: string;
-  image: string | null; // Asumimos que el backend devuelve la imagen principal
+  image: string | null;
 }
 
 export interface AdminOrderItem {
   quantity: number;
-  price: string; // La API devuelve 'price' como string
+  price: string;
   Product: AdminOrderItemProduct;
 }
 
@@ -177,8 +167,6 @@ export interface FullAdminOrder {
     username: string;
     email: string;
   };
-  // --- ¡REFACTORIZADO! ---
-  // Ahora usa la interfaz reutilizable
   Address: AdminAddress;
   OrderItems: AdminOrderItem[];
 }

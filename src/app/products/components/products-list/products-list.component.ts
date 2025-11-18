@@ -19,7 +19,7 @@ import {
   Product,
   ProductApiResponse,
 } from "app/core/services/product.service";
-import { ActivatedRoute, Router, ParamMap } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest } from "rxjs";
 import { UiStateService } from "app/core/services/ui-state.service";
 
@@ -200,7 +200,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
-          // --- ¡MAPEO CORREGIDO! ---
+          // --- CORRECCIÓN: Mapeo completo para cumplir la interfaz Product ---
           const mappedProducts: Product[] = response.products.map(
             (product: ProductApiResponse) => ({
               id: product.id,
@@ -219,13 +219,17 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
               color: product.color || "",
               material: product.material || null,
               gender: product.gender || "unisex",
-              // --- CAMPO ELIMINADO ---
-              // 'size' ya no existe en la API, lo eliminamos (Arregla error 4)
-              // 'siblings' y 'variants' son opcionales, así que no es
-              // necesario añadirlos aquí (Arregla error 3)
+
+              // --- CAMPOS AÑADIDOS PARA EVITAR ERROR TS2322 ---
+              // Inicializamos estos campos como vacíos porque en el listado
+              // no necesitamos el detalle de variantes, pero el tipo lo exige.
+              availableColors: [],
+              imagesByColor: {},
+              variantsByColor: {},
+              siblings: [],
+              // -----------------------------------------------
             })
           );
-          // --------------------------
 
           this.products.set(mappedProducts);
           this.totalPages.set(response.totalPages);
@@ -261,7 +265,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goToPreviousPage(): void {
-    this.goToPage(this.currentPage() - 1); // <-- Bug corregido (era +1)
+    this.goToPage(this.currentPage() - 1);
   }
 
   onFiltersChanged(filters: Record<string, string | string[]>): void {
