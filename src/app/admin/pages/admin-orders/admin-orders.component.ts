@@ -37,8 +37,8 @@ export class AdminOrdersComponent implements OnInit {
         this.loadOrders(this.ordersResponse?.currentPage || 1);
       });
 
-    // --- ¡AÑADIDO! ---
     // Escuchar el cierre del modal de ESTADO para refrescar la lista
+    // Esto asegura que cuando cambies el estado, la tabla se actualice sola
     this.modalService.isStatusUpdateModalOpen$
       .pipe(
         skip(1),
@@ -80,12 +80,10 @@ export class AdminOrdersComponent implements OnInit {
     this.modalService.openOrderDetailsModal(orderId);
   }
 
-  // --- ¡MÉTODO MODIFICADO! ---
   /**
    * Abre el modal para cambiar el estado del pedido.
    */
   openChangeStatusModal(orderId: number, currentStatus: string): void {
-    // Ya no es un demo, llama al servicio del modal
     this.modalService.openStatusUpdateModal({
       id: orderId,
       status: currentStatus,

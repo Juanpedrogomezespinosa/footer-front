@@ -32,7 +32,7 @@
       <div class="flex flex-col gap-6 mt-6">
         <div
           *ngFor="let order of data.orders"
-          class="bg-white p-6 rounded-xl border border-gray-200"
+          class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
         >
           <div
             class="flex flex-col md:flex-row justify-between md:items-center pb-4 border-b border-gray-200"
@@ -48,15 +48,27 @@
             </div>
             <div class="mt-2 md:mt-0 text-left md:text-right">
               <span
-                class="text-xs font-medium px-2.5 py-0.5 rounded block w-fit ml-auto mb-1"
+                class="text-xs font-medium px-3 py-1 rounded-full block w-fit ml-auto mb-1"
                 [ngClass]="{
-                  'bg-green-100 text-green-800': order.status === 'pagado',
+                  'bg-green-100 text-green-800': order.status === 'entregado',
+                  'bg-blue-100 text-blue-800': order.status === 'enviado',
+                  'bg-indigo-100 text-indigo-800': order.status === 'pagado',
                   'bg-yellow-100 text-yellow-800': order.status === 'pendiente',
-                  'bg-red-100 text-red-800': order.status === 'cancelado',
-                  'bg-blue-100 text-blue-800': order.status === 'enviado'
+                  'bg-red-100 text-red-800': order.status === 'cancelado'
                 }"
               >
-                {{ order.status | titlecase }}
+                <!-- Lógica de texto amigable -->
+                <ng-container [ngSwitch]="order.status">
+                  <ng-container *ngSwitchCase="'pagado'"
+                    >Preparando</ng-container
+                  >
+                  <ng-container *ngSwitchCase="'pendiente'"
+                    >Pendiente de Pago</ng-container
+                  >
+                  <ng-container *ngSwitchDefault>{{
+                    order.status | titlecase
+                  }}</ng-container>
+                </ng-container>
               </span>
             </div>
           </div>
@@ -75,7 +87,7 @@
               <div class="flex-1">
                 <a
                   [routerLink]="['/products', 'product', item.Product.id]"
-                  class="text-sm font-medium text-text-light-primary hover:text-secondary"
+                  class="text-sm font-medium text-text-light-primary hover:text-secondary transition-colors"
                 >
                   {{ item.Product.name }}
                 </a>
