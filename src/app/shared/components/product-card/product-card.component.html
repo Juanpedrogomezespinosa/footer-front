@@ -1,71 +1,46 @@
+<!-- Tarjeta estilo Homepage (Sin botón hover) -->
 <div
-  class="w-full bg-white rounded-xl flex flex-col transition duration-300 group mx-auto"
+  class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-lg h-full cursor-pointer"
   (click)="goToProductDetail()"
-  tabindex="0"
-  role="button"
-  [attr.aria-label]="'Ver detalles de ' + product.name"
 >
-  <div
-    class="relative h-64 w-full flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden"
-  >
+  <!-- 
+    CONTENEDOR DE IMAGEN - Estilo Homepage
+    Usamos 'aspect-h-4 aspect-w-3' para mantener la proporción vertical exacta de la home.
+  -->
+  <div class="aspect-h-4 aspect-w-3 bg-gray-200 overflow-hidden relative">
     <img
       [src]="getProductImage()"
       [alt]="product.name"
-      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
       (error)="onImageError($event)"
       loading="lazy"
     />
+    <!-- ELIMINADO: Botón "Ver Producto" deslizante -->
   </div>
 
-  <div class="px-2 py-4">
-    <p
-      *ngIf="product.brand"
-      class="text-sm text-text-light-secondary capitalize mb-1"
-    >
-      {{ product.brand }}
-    </p>
-
-    <h2
-      class="text-base font-semibold text-gray-900 truncate"
-      [title]="product.name"
-    >
-      {{ product.name }}
-    </h2>
-
-    <div class="flex items-center justify-between gap-3 mt-2">
-      <div class="flex items-center gap-3">
-        <p class="text-base font-semibold text-black">
-          {{ product.price | currency : "EUR" : "symbol" : "1.2-2" }}
-        </p>
-        <p
-          *ngIf="product.oldPrice"
-          class="text-sm text-text-light-secondary line-through"
-        >
-          {{ product.oldPrice | currency : "EUR" : "symbol" : "1.2-2" }}
-        </p>
-      </div>
-
+  <!-- INFO DEL PRODUCTO -->
+  <div class="p-4 flex flex-col flex-1">
+    <h3 class="text-base font-semibold text-primary truncate">
       <a
         [routerLink]="['/products', 'product', product.id]"
-        (click)="$event.stopPropagation()"
-        aria-label="Ver opciones del producto"
-        title="Ver opciones"
-        class="text-gray-500 hover:text-primary transition-colors duration-200 p-2 rounded-full hover:bg-primary/10"
+        class="hover:underline"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          fill="currentColor"
-          class="bi bi-arrow-right"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
-          />
-        </svg>
+        {{ product.name }}
       </a>
+    </h3>
+
+    <p class="text-sm text-gray-500 capitalize mt-1">
+      {{ product.category }}
+    </p>
+
+    <div class="mt-auto pt-3 flex items-center gap-2">
+      <p class="text-lg font-bold text-primary">
+        {{ product.price | currency : "EUR" }}
+      </p>
+
+      <p *ngIf="product.oldPrice" class="text-sm text-gray-400 line-through">
+        {{ product.oldPrice | currency : "EUR" }}
+      </p>
     </div>
   </div>
 </div>
