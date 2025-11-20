@@ -2,10 +2,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-// import { ProductApiResponse } from "./product.service"; // <-- Ya no es necesaria
 
-// --- ¡¡¡INTERFACES REESCRITAS!!! ---
-// Definen la nueva estructura que devuelve la API (desde getCart)
+// --- INTERFACES DE CARRITO ---
 
 /**
  * El producto "padre" dentro del carrito
@@ -13,7 +11,7 @@ import { Observable } from "rxjs";
 export interface CartProduct {
   id: number;
   name: string;
-  price: string; // El precio viene del modelo Product (Decimal/String)
+  price: string; // El precio base del producto
   image: string | null;
 }
 
@@ -24,19 +22,20 @@ export interface CartVariant {
   id: number; // Este es el productVariantStockId
   color: string;
   size: string;
-  stock: number; // Stock actual de esta variante
+  stock: number;
+  // CORRECCIÓN: Añadimos el precio específico de la variante para que TypeScript no se queje
+  price?: string;
 }
 
 /**
  * La estructura principal de un item en el carrito
  */
 export interface CartItem {
-  id: number; // ID del CartItem (para borrarlo)
-  quantity: number; // Cantidad en el carrito
+  id: number; // ID del CartItem
+  quantity: number;
   product: CartProduct;
   variant: CartVariant;
 }
-// ------------------------------------
 
 @Injectable({
   providedIn: "root",
@@ -48,21 +47,15 @@ export class CartService {
 
   /**
    * Obtiene los productos del carrito.
-   * Devuelve la nueva interfaz CartItem[]
    */
   getCartItems(): Observable<CartItem[]> {
     return this.http.get<CartItem[]>(this.apiUrl);
   }
 
   /**
-   * --- ¡¡¡FUNCIÓN CORREGIDA!!! ---
    * Añade una variante de producto específica al carrito.
    */
-  addToCart(
-    productVariantStockId: number, // <-- CAMBIADO
-    quantity: number
-  ): Observable<any> {
-    // Envía los nuevos campos al backend
+  addToCart(productVariantStockId: number, quantity: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/add`, {
       productVariantStockId,
       quantity,
@@ -70,16 +63,14 @@ export class CartService {
   }
 
   /**
-   * Actualiza la cantidad de un item (por su cart_items.id)
-   * (Esta función ya era correcta)
+   * Actualiza la cantidad de un item
    */
   updateItemQuantity(itemId: number, quantity: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/item/${itemId}`, { quantity });
   }
 
   /**
-   * Elimina un item del carrito (por su cart_items.id)
-   * (Esta función ya era correcta)
+   * Elimina un item del carrito
    */
   removeItem(itemId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/item/${itemId}`);

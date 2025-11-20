@@ -59,8 +59,9 @@
                 >
                   Talla: {{ item.variant.size }}
                 </p>
+                <!-- CORREGIDO: Usamos getItemPrice(item) en móvil -->
                 <p class="text-text-muted-light text-sm mt-2 md:hidden">
-                  {{ item.product.price | currency : "EUR" }}
+                  {{ getItemPrice(item) | currency : "EUR" }}
                 </p>
               </div>
               <div class="flex items-center gap-3">
@@ -87,10 +88,11 @@
             </div>
 
             <div class="flex flex-col justify-between items-end">
+              <!-- CORREGIDO: Usamos getItemPrice(item) en escritorio -->
               <p
                 class="text-lg font-semibold leading-normal hidden md:block text-text-dark"
               >
-                {{ item.product.price | currency : "EUR" }}
+                {{ getItemPrice(item) | currency : "EUR" }}
               </p>
               <button
                 (click)="removeItem(item.id)"

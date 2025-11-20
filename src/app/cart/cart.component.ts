@@ -1,4 +1,3 @@
-// src/app/cart/cart.component.ts
 import {
   Component,
   OnInit,
@@ -14,14 +13,14 @@ import { OrderService } from "../core/services/order.service";
 import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
-import { FormsModule } from "@angular/forms"; // Necesario para [(ngModel)] en los radio buttons
+import { FormsModule } from "@angular/forms";
 
 type ShippingMethod = "standard" | "express";
 
 @Component({
   selector: "app-cart",
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule], // Agregamos FormsModule
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: "./cart.component.html",
   styleUrls: [],
 })
@@ -34,28 +33,35 @@ export class CartComponent implements OnInit {
   public isLoadingAddresses = signal(true);
   public selectedAddressId = signal<number | null>(null);
 
-  // --- NUEVO: Estado del método de envío ---
   public selectedShipping: WritableSignal<ShippingMethod> = signal("standard");
 
-  // 1. TOTAL PRODUCTOS (PVP con IVA)
-  // Este valor lo usamos para calcular si el envío es gratis (> 50€)
+  // --- MÉTODO IMPORTANTE PARA EL PRECIO ---
+  public getItemPrice(item: CartItem): number {
+    // Prioridad: Precio de variante > Precio de producto
+    if (item.variant && item.variant.price) {
+      return Number(item.variant.price);
+    }
+    return Number(item.product.price);
+  }
+
+  // 1. TOTAL PRODUCTOS (Usando getItemPrice)
   public productsTotal: Signal<number> = computed(() => {
     return this.cartItems().reduce((sum, item) => {
-      return sum + Number(item.product.price) * item.quantity;
+      return sum + this.getItemPrice(item) * item.quantity;
     }, 0);
   });
 
-  // 2. BASE IMPONIBLE (Productos / 1.21)
+  // 2. BASE IMPONIBLE
   public subtotal: Signal<number> = computed(() => {
     return this.productsTotal() / 1.21;
   });
 
-  // 3. IVA (Productos - Base)
+  // 3. IVA
   public taxes: Signal<number> = computed(() => {
     return this.productsTotal() - this.subtotal();
   });
 
-  // --- NUEVO: Cálculo del Costo de Envío ---
+  // --- COSTO ENVÍO ---
   public shippingCost: Signal<number> = computed(() => {
     const method = this.selectedShipping();
     const totalProducts = this.productsTotal();
@@ -63,12 +69,11 @@ export class CartComponent implements OnInit {
     if (method === "express") {
       return 7.95;
     } else {
-      // Lógica Estándar: Gratis si supera 50€, si no 4.95€
       return totalProducts >= 50 ? 0 : 4.95;
     }
   });
 
-  // 4. GRAN TOTAL (Productos + Envío)
+  // 4. GRAN TOTAL
   public total: Signal<number> = computed(() => {
     return this.productsTotal() + this.shippingCost();
   });
@@ -170,7 +175,6 @@ export class CartComponent implements OnInit {
 
     this.isLoading.set(true);
 
-    // TODO: Deberías enviar también this.selectedShipping() al backend si guardas el método de envío en la orden.
     this.orderService.createOrder(addressId).subscribe({
       next: (response) => {
         window.location.href = response.checkoutUrl;
