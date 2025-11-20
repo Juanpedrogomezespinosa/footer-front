@@ -5,18 +5,14 @@ import { Observable } from "rxjs";
 import { ProductApiResponse } from "./product.service";
 import { UserAddress } from "./user.service";
 
-// --- ¡INTERFAZ ELIMINADA! ---
-// Ya no enviamos esta información desde el frontend.
-// export interface OrderItemInput { ... }
-
-// Interfaz para la respuesta de /checkout de tu backend
+// Interfaz para la respuesta de /checkout
 export interface CreateOrderResponse {
   message: string;
   orderId: number;
-  checkoutUrl: string; // <-- La URL de Stripe
+  checkoutUrl: string;
 }
 
-// Interfaz para los detalles de una orden (para la página de confirmación)
+// Interfaz para los detalles de una orden
 export interface OrderDetails {
   id: number;
   status: string;
@@ -25,9 +21,6 @@ export interface OrderDetails {
   OrderItems: {
     quantity: number;
     price: number;
-    // Esta interfaz probablemente necesite un refactor
-    // para usar la nueva 'CartItem' (product + variant),
-    // pero de momento lo dejamos para que compile.
     Product: ProductApiResponse;
   }[];
   Address: UserAddress;
@@ -37,28 +30,25 @@ export interface OrderDetails {
   providedIn: "root",
 })
 export class OrderService {
-  // La ruta base correcta según tu orderRoutes.js
   private readonly apiUrl = "http://localhost:3000/api/orders";
 
   constructor(private http: HttpClient) {}
 
   /**
-   * --- ¡¡¡MÉTODO CORREGIDO!!! ---
-   * Llama al backend para crear una orden y obtener la sesión de Stripe
-   * Backend: POST /api/orders/checkout
+   * Crea una orden
    */
   createOrder(
-    addressId: number // <-- 1. Solo pedimos el addressId
+    addressId: number,
+    shippingMethod: string = "standard"
   ): Observable<CreateOrderResponse> {
-    // 2. ENVIAMOS SOLO el 'addressId'
     return this.http.post<CreateOrderResponse>(`${this.apiUrl}/checkout`, {
       addressId,
+      shippingMethod,
     });
   }
 
   /**
    * Obtiene una orden específica por su ID
-   * Backend: GET /api/orders/:id
    */
   getOrderById(orderId: number): Observable<OrderDetails> {
     return this.http.get<OrderDetails>(`${this.apiUrl}/${orderId}`);
@@ -66,9 +56,16 @@ export class OrderService {
 
   /**
    * Obtiene el historial de pedidos del usuario
-   * Backend: GET /api/orders/history
    */
   getOrderHistory(): Observable<{ orders: OrderDetails[] }> {
     return this.http.get<{ orders: OrderDetails[] }>(`${this.apiUrl}/history`);
+  }
+
+  /**
+   * --- ¡NUEVO! ---
+   * Cancela un pedido.
+   */
+  cancelOrder(orderId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${orderId}/cancel`, {});
   }
 }

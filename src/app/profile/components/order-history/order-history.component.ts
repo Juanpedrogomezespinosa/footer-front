@@ -1,4 +1,3 @@
-// src/app/profile/components/order-history/order-history.component.ts
 import { Component, OnInit } from "@angular/core";
 import {
   CommonModule,
@@ -28,6 +27,11 @@ export class OrderHistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.loading = true;
     this.orders$ = this.orderService.getOrderHistory().pipe(
       tap(() => {
         this.loading = false;
@@ -40,6 +44,30 @@ export class OrderHistoryComponent implements OnInit {
         return of(null);
       })
     );
+  }
+
+  /**
+   * Cancela un pedido si el usuario confirma.
+   */
+  onCancelOrder(orderId: number): void {
+    if (
+      confirm(
+        "¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer."
+      )
+    ) {
+      this.orderService.cancelOrder(orderId).subscribe({
+        next: () => {
+          this.toastService.showSuccess("Pedido cancelado correctamente.");
+          this.loadOrders(); // Recargamos la lista para ver el cambio de estado
+        },
+        error: (err) => {
+          console.error("Error cancelando pedido:", err);
+          this.toastService.showError(
+            err.error?.message || "Error al cancelar el pedido."
+          );
+        },
+      });
+    }
   }
 
   // --- HELPER: Calcular Total de Productos (Precio x Cantidad) ---

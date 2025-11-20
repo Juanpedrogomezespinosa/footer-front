@@ -46,9 +46,22 @@
                 {{ order.createdAt | date : "dd/MM/yyyy 'a las' HH:mm" }}
               </p>
             </div>
-            <div class="mt-2 md:mt-0 text-left md:text-right">
+            <div
+              class="mt-2 md:mt-0 text-left md:text-right flex items-center gap-3 justify-end"
+            >
+              <!-- Botón de Cancelar (Solo visible si pendiente o pagado) -->
+              <button
+                *ngIf="
+                  order.status === 'pendiente' || order.status === 'pagado'
+                "
+                (click)="onCancelOrder(order.id)"
+                class="text-xs font-medium text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors"
+              >
+                Cancelar Pedido
+              </button>
+
               <span
-                class="text-xs font-medium px-3 py-1 rounded-full block w-fit ml-auto mb-1"
+                class="text-xs font-medium px-3 py-1 rounded-full block w-fit"
                 [ngClass]="{
                   'bg-green-100 text-green-800': order.status === 'entregado',
                   'bg-blue-100 text-blue-800': order.status === 'enviado',
