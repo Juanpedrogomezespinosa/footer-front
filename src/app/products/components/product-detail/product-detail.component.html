@@ -12,9 +12,11 @@
       <li><span class="select-none">/</span></li>
 
       <li>
+        <!-- CORRECCIÓN AQUÍ: Usamos routerLink array para path params -->
+        <!-- Antes: [queryParams]="{ category: prod.category }" -->
+        <!-- Ahora: ['/products', 'category', prod.category] -->
         <a
-          [routerLink]="['/products']"
-          [queryParams]="{ category: prod.category }"
+          [routerLink]="['/products', 'category', prod.category]"
           class="hover:text-secondary transition-colors capitalize"
         >
           {{ prod.category }}
