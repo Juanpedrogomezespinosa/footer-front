@@ -1,30 +1,42 @@
 <div class="p-4 bg-white rounded-2xl shadow-md w-full max-w-md">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">Filtrar productos</h3>
+  <h3 class="text-xl font-semibold text-gray-800 mb-4 font-sans">
+    Filtrar productos
+  </h3>
 
   <div class="mb-4">
     <button
       (click)="resetFilters()"
-      class="w-full py-2 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75"
+      class="w-full py-2 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 font-sans text-sm"
     >
       Limpiar Filtros
     </button>
   </div>
 
-  <div class="mb-6" *ngFor="let filter of filters">
-    <p class="text-gray-700 font-medium mb-2">{{ filter.label }}</p>
+  <div
+    class="mb-6 border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+    *ngFor="let filter of filters"
+  >
+    <p class="text-gray-800 font-medium mb-3 font-sans text-base">
+      {{ filter.label }}
+    </p>
+
     <div class="flex flex-col gap-2">
       <label
         *ngFor="let option of filter.options; trackBy: trackByFn"
-        class="flex items-center gap-2 cursor-pointer select-none"
+        class="flex items-center gap-3 cursor-pointer select-none group hover:bg-gray-50 p-1 rounded transition-colors"
       >
         <input
           type="checkbox"
           [value]="option"
           (change)="onFilterChange(filter.key, $event)"
           [checked]="selectedFilters[filter.key].includes(option) || false"
-          class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-secondary focus:ring-offset-1"
+          class="w-4 h-4 text-secondary border-gray-300 rounded focus:ring-secondary focus:ring-offset-1 cursor-pointer"
         />
-        <span class="text-gray-700">{{ option }}</span>
+        <span
+          class="text-gray-600 text-sm group-hover:text-gray-900 transition-colors"
+        >
+          {{ option }}
+        </span>
       </label>
     </div>
   </div>

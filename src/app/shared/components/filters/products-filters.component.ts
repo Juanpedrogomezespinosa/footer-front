@@ -15,8 +15,6 @@ export class ProductsFiltersComponent {
   public filtersChanged: EventEmitter<Record<string, string[]>> =
     new EventEmitter<Record<string, string[]>>();
 
-  // --- 'sortChanged' ELIMINADO ---
-
   // Estado interno de filtros seleccionados
   public selectedFilters: Record<string, string[]> = {
     brand: [],
@@ -26,7 +24,7 @@ export class ProductsFiltersComponent {
     color: [],
   };
 
-  // Lista de filtros y opciones (puedes cargarla externamente si lo prefieres)
+  // Lista de filtros actualizada con tu estrategia de negocio
   public filters: Array<{
     key: string;
     label: string;
@@ -35,27 +33,46 @@ export class ProductsFiltersComponent {
     {
       key: "material",
       label: "Material",
-      options: ["Algodón", "Lana", "Cuero", "Sintético"],
+      options: ["Algodón", "Sintético", "Tela", "Cuero", "Lana", "Woven"],
     },
     {
       key: "gender",
       label: "Género",
-      options: ["Hombre", "Mujer", "Unisex"],
+      options: ["Unisex", "Hombre", "Mujer"],
     },
     {
       key: "brand",
       label: "Marca",
-      options: ["Nike", "Adidas", "Puma", "Reebok"],
+      options: [
+        "Adidas",
+        "Nike",
+        "Jordan",
+        "New Era",
+        "Puma",
+        "Under Armour",
+        "Asics",
+        "Fila",
+        "Converse",
+        "New Balance",
+      ],
     },
     {
       key: "color",
       label: "Color",
-      options: ["Rojo", "Azul", "Verde", "Negro", "Blanco"],
+      options: [
+        "Negro",
+        "Blanco",
+        "Azul",
+        "Amarillo",
+        "Rojo",
+        "Verde",
+        "Morado",
+      ],
     },
     {
       key: "season",
       label: "Temporada",
-      options: ["Verano", "Invierno", "Primavera", "Otoño"],
+      options: ["N/A", "Verano", "Invierno"],
     },
   ];
 
@@ -64,6 +81,7 @@ export class ProductsFiltersComponent {
     const inputElement = event.target as HTMLInputElement;
     const value = inputElement.value;
 
+    // Copiamos el array actual para mantener la inmutabilidad
     let currentValues = [...(this.selectedFilters[key] || [])];
 
     if (inputElement.checked) {
@@ -74,6 +92,7 @@ export class ProductsFiltersComponent {
       currentValues = currentValues.filter((v: string) => v !== value);
     }
 
+    // Actualizamos el estado y emitimos
     this.selectedFilters = {
       ...this.selectedFilters,
       [key]: currentValues,
@@ -82,9 +101,7 @@ export class ProductsFiltersComponent {
     this.filtersChanged.emit({ ...this.selectedFilters });
   }
 
-  // --- 'onSortChange' ELIMINADO ---
-
-  // Función de rastreo (trackBy)
+  // Función de rastreo (trackBy) para optimizar el renderizado del DOM
   public trackByFn(index: number, option: string): string {
     return option;
   }
