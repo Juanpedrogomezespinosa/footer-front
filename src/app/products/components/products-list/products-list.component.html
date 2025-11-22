@@ -1,4 +1,3 @@
-<!-- Botón flotante para abrir filtros (Visible siempre, como pediste) -->
 <button
   #filterButton
   [class.hidden]="isMobileMenuOpen()"
@@ -21,7 +20,6 @@
 </button>
 
 <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- CABECERA -->
   <div
     id="product-list-header"
     class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-gray-200"
@@ -36,8 +34,6 @@
     </div>
 
     <div class="mt-4 md:mt-0 flex items-center gap-4">
-      <!-- Botón de filtros en cabecera (Opcional, pero útil en desktop si no quieres sidebar fijo) -->
-
       <select
         id="sort"
         [value]="selectedSort"
@@ -51,12 +47,7 @@
     </div>
   </div>
 
-  <!-- GRID DE PRODUCTOS (OCUPA TODO EL ANCHO, SIN SIDEBAR) -->
   <div>
-    <!-- 
-      --- GRID AJUSTADO A LA HOMEPAGE ---
-      Usamos lg:grid-cols-4 para replicar exactamente el tamaño de la home.
-    -->
     <div
       *ngIf="products() && products().length > 0; else noProducts"
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -67,7 +58,6 @@
       ></app-product-card>
     </div>
 
-    <!-- Paginación -->
     <div
       *ngIf="totalPages() > 1"
       class="flex justify-center items-center gap-2 mt-16 pt-8 border-t border-gray-200"
@@ -130,7 +120,6 @@
   </div>
 </div>
 
-<!-- Estado vacío -->
 <ng-template #noProducts>
   <div
     class="text-center py-24 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200"
@@ -165,8 +154,6 @@
   </div>
 </ng-template>
 
-<!-- Sidebar de filtros (MODAL DESLIZANTE) -->
-<!-- Este sidebar aparece SIEMPRE que showFilters es true, tanto en móvil como en desktop -->
 <div
   *ngIf="showFilters"
   class="fixed inset-0 z-50"

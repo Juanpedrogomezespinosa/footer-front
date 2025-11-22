@@ -200,16 +200,16 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
-          // --- CORRECCIÓN: Mapeo completo para cumplir la interfaz Product ---
+          // CORRECCIÓN AQUÍ: Eliminada la lógica de precio falso (< 80 ? +20)
           const mappedProducts: Product[] = response.products.map(
             (product: ProductApiResponse) => ({
               id: product.id,
               name: product.name,
               price: Number(product.price),
-              oldPrice:
-                Number(product.price) < 80
-                  ? Number(product.price) + 20
-                  : undefined,
+              // Ahora usa el discountPrice real que viene del Backend
+              oldPrice: product.discountPrice
+                ? Number(product.discountPrice)
+                : undefined,
               image: product.image,
               brand: product.brand,
               category: product.category,
@@ -220,14 +220,11 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
               material: product.material || null,
               gender: product.gender || "unisex",
 
-              // --- CAMPOS AÑADIDOS PARA EVITAR ERROR TS2322 ---
-              // Inicializamos estos campos como vacíos porque en el listado
-              // no necesitamos el detalle de variantes, pero el tipo lo exige.
+              // Campos para cumplir la interfaz estricta
               availableColors: [],
               imagesByColor: {},
               variantsByColor: {},
               siblings: [],
-              // -----------------------------------------------
             })
           );
 
