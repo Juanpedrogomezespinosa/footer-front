@@ -1,11 +1,8 @@
-<!-- home.component.html -->
-
 <main class="flex-1">
   <div class="px-4 sm:px-6 lg:px-10 py-5">
     <div
       class="layout-content-container flex flex-col max-w-7xl flex-1 mx-auto"
     >
-      <!-- Hero / Banner -->
       <section class="w-full">
         <div
           class="flex min-h-[60vh] max-h-[720px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-center justify-center text-center px-6 py-10 md:px-10"
@@ -14,7 +11,7 @@
                 rgba(255, 255, 255, 0) 0%,
                 rgba(0, 0, 0, 0.4) 100%
               ),
-              url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVMksMGDvWZohawoS7CoJQEBNNxS9NIelVfosWG618kBjbCNhUAdEIj1zec8hqh1rYR_I9ttVXgmmb1cfQe5O1g26ffCTkGZDAl42mtsTZoaWf4P4EZqC7hzciPaooCnm0Ypgk5aA0FgrTdRgahD8ToBYb56ECGr4zb-p5cctyqx0sxV9vAous8oW271L9NqX2IkAoVvlsufyoYCU6dWuZ9u5bNmVWYS5KbcVs1RBvabJ52Oo4gk0rOLV6a4hu-hLXS0cDIP9bd02G');
+              url('assets/images/banners/home-page/home-hero.png');
           "
         >
           <div class="flex flex-col gap-4 text-center items-center max-w-3xl">
@@ -38,7 +35,6 @@
         </div>
       </section>
 
-      <!-- Categorías Destacadas -->
       <section class="mt-16">
         <h2
           class="text-primary text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
@@ -48,12 +44,11 @@
         <div
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 mt-4"
         >
-          <!-- Categoría 1 -->
           <a
             [routerLink]="['/products/category/zapatillas']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
-              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDAHg5NeSib40O6SoEw1-V_f4kIH74TSd2jEvMpkLMY9w49rf4efvn-hMlhk52NKXVz0cR-VJVeW78ZokFEVKtaCUX2QHDbMv07XYaXp7fyTTxoenFrDWMqq6bS6fDbIwHw7vefoiU4i6BQqDMGMkBfaz62Rf4BKSL2RPmKo8_q_E2pzKt5CIowbTw5VLHQxpcbK3oxWzeOXl9t9eN8-upx7gTFKLcyulBIAUOm_kVtH2KPwkEdeCC6r3FXvMyimAQ1HOlaRzbnCs0n');
+              background-image: url('assets/images/ui/home-page/category-sneakers.png');
             "
           >
             <div
@@ -72,12 +67,11 @@
               </p>
             </div>
           </a>
-          <!-- Categoría 2 -->
           <a
             [routerLink]="['/products/category/ropa']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
-              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBL-SW9mpiE40XDVuJ2jyy3n-DGEjUkdhKC0M9bIDA4E-vfCt6kAWfV-TAkDPQ0f4IuVF6a7pDJcv8INP_pd-YsNRuVKmxWdmxNrmuv-nmC9TcfqrgL9mzYuRKkCt8B1Djge8Qoldz7DHwczrjXwQEieCYxV9BjPC6CVwoLTAHJ7kx52KsN4x-3hNYyPPftkQc_pUaktzeyg6doCYoRxHHfkwB4pwOsNKudcPBD_jR8Uxat5p1emnfEXz-gVCx4cTqOAzchBx_1QXSL');
+              background-image: url('assets/images/ui/home-page/category-clothing.png');
             "
           >
             <div
@@ -94,12 +88,11 @@
               </p>
             </div>
           </a>
-          <!-- Categoría 3 -->
           <a
             [routerLink]="['/products/category/complementos']"
             class="bg-cover bg-center flex flex-col rounded-xl justify-end aspect-[4/3] group overflow-hidden relative"
             style="
-              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHNC6ia8b39mW7sMkf39D3s4EQ70c3v8OuHrSdZnyKdYO0ueeUbwPu0kYFwPEs-PQz97T19XSxIIeo0wjtNBFKUZjNbZeDDS3ZlctqHrIL9RRPhykCmYFCknFvRou9ETqeGHTsoEBCkiiKx5clBErM3ssFSEo2qSN7OctGXeMWqxLdvV7GPP0LbgVWa4xAzso0aJjOQQWTPzjvKabWhak1rdhjTfjYkWMXHKR22sxyo84R4xFzG50Z04l8DB7OmxKnsu8mnVcBtEoj');
+              background-image: url('assets/images/ui/home-page/category-accessories.png');
             "
           >
             <div
@@ -121,7 +114,6 @@
         </div>
       </section>
 
-      <!-- Novedades -->
       <section class="mt-16">
         <h2
           class="text-primary text-3xl font-bold leading-tight tracking-[-0.015em] text-center"
@@ -141,15 +133,10 @@
             *ngFor="let product of latestProducts"
             class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-lg"
           >
-            <!-- Ruta corregida a /products/product/:id -->
             <a
               [routerLink]="['/products', 'product', product.id]"
               class="aspect-h-4 aspect-w-3 bg-gray-200"
             >
-              <!-- 
-                --- 👇 CORRECCIÓN DEFINITIVA DE LA IMAGEN ---
-                Cambiado de 'product.images?.[0]?.imageUrl' a 'product.image'
-              -->
               <img
                 [src]="getFullImagePath(product.image)"
                 (error)="getPlaceholderImage($event)"
@@ -172,7 +159,6 @@
             <div
               class="absolute inset-x-0 bottom-0 flex translate-y-full justify-center transition-transform duration-300 group-hover:translate-y-0"
             >
-              <!-- Ruta corregida a /products/product/:id -->
               <a
                 [routerLink]="['/products', 'product', product.id]"
                 class="w-full bg-secondary text-white py-3 text-sm font-bold hover:bg-secondary-dark transition-colors text-center"
