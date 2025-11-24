@@ -1,4 +1,3 @@
-// src/app/shared/components/toast/toast.component.ts
 import {
   Component,
   OnInit,

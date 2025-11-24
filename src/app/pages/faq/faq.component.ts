@@ -1,5 +1,3 @@
-// src/app/pages/faq/faq.component.ts
-
 import { Component } from "@angular/core";
 // 1. Quitar NgClass de esta línea
 import { CommonModule } from "@angular/common";

@@ -1,4 +1,3 @@
-// src/app/shared/components/filters/products-filters.component.ts
 import { Component, EventEmitter, Output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 

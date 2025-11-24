@@ -1,4 +1,3 @@
-// src/app/products/components/product-detail/product-detail.component.ts
 import { Component, OnInit, signal, computed } from "@angular/core";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
@@ -117,7 +116,6 @@ export class ProductDetailComponent implements OnInit {
           } else {
             foundProduct.oldPrice = undefined;
           }
-          // ------------------------------------------
 
           this.product.set(foundProduct);
           this.currentPrice.set(foundProduct.price); // Precio base inicial
@@ -321,9 +319,7 @@ export class ProductDetailComponent implements OnInit {
     this.isSizeGuideOpen.set(false);
   }
 
-  // --- ¡NUEVA FUNCIÓN! ---
   // Obtiene la URL de la primera imagen disponible para un color dado
-  // para usarla como miniatura en el selector.
   getColorThumbnail(color: string): string {
     const p = this.product();
     if (

@@ -16,7 +16,5 @@ export class ShippingComponent {
   trackOrder() {
     // Lógica futura para rastrear pedido
     console.log("Rastreando pedido:", this.trackingNumber);
-    // Aquí llamarías a un servicio, por ejemplo:
-    // this.orderService.track(this.trackingNumber).subscribe(...)
   }
 }

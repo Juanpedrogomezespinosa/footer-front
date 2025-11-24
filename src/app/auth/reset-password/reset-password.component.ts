@@ -1,4 +1,3 @@
-// src/app/auth/reset-password/reset-password.component.ts
 import { Component, OnInit, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
@@ -15,7 +14,7 @@ import { AuthService } from "app/core/services/auth.service";
 import { ToastService } from "app/core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
 
-// Validador de robustez (sin cambios)
+// Validador de robustez
 export function passwordStrengthValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;
@@ -39,7 +38,7 @@ export function passwordStrengthValidator(): ValidatorFn {
   };
 }
 
-// Validador de Coincidencia (sin cambios)
+// Validador de Coincidencia
 export function passwordMatchValidator(
   control: AbstractControl
 ): ValidationErrors | null {
@@ -74,7 +73,6 @@ export class ResetPasswordComponent implements OnInit {
   token: string | null = null;
   tokenError = signal<string | null>(null);
 
-  // --- 👇 PROPIEDAD AÑADIDA ---
   passwordFieldType = "password"; // Para controlar la visibilidad
 
   constructor(
@@ -137,7 +135,6 @@ export class ResetPasswordComponent implements OnInit {
       });
   }
 
-  // --- 👇 MÉTODO AÑADIDO ---
   /**
    * Cambia la visibilidad del campo de contraseña (texto/password)
    */

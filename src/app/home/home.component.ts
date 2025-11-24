@@ -1,5 +1,3 @@
-// src/app/home/home.component.ts
-
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
@@ -7,7 +5,7 @@ import { RouterModule } from "@angular/router";
 import {
   ProductService,
   PaginatedProductResponse,
-  Product, // Asumo que tu servicio exporta 'Product' (con 'image: string' en lugar de 'images: any[]')
+  Product,
 } from "../core/services/product.service";
 import { ToastService } from "../core/services/toast.service";
 
@@ -53,7 +51,6 @@ export class HomeComponent implements OnInit {
 
   /**
    * Construye la URL completa para la imagen del backend
-   * (Esta lógica es la misma de tu profile.component.ts)
    * @param imagePath La ruta relativa (ej: /uploads/img.png)
    */
   getFullImagePath(imagePath: string | undefined): string {
@@ -67,7 +64,6 @@ export class HomeComponent implements OnInit {
       return imagePath;
     }
 
-    // Asume que imagePath ya viene con "/uploads/" (ej: /uploads/img.png)
     return `${this.backendUrl}${imagePath}`;
   }
 

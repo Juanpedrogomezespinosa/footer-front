@@ -1,4 +1,3 @@
-// src/app/auth/components/login/login.component.ts
 import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
@@ -8,7 +7,7 @@ import {
   Validators,
   ValidatorFn,
   AbstractControl,
-  ValidationErrors, // Importar ValidationErrors
+  ValidationErrors,
 } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
 import {
@@ -17,7 +16,6 @@ import {
 } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 
-// --- 👇 NUEVO VALIDADOR DE CONTRASEÑA ---
 /**
  * Validador para la robustez de la contraseña.
  * Comprueba:
@@ -92,7 +90,7 @@ export class LoginComponent {
       password: ["", [Validators.required]],
     });
 
-    // Formulario de Registro (actualizado)
+    // Formulario de Registro
     this.registerForm = this.fb.group(
       {
         name: ["", Validators.required],
@@ -102,14 +100,13 @@ export class LoginComponent {
           "",
           [Validators.required, passwordStrengthValidator()], // Reemplaza minLength
         ],
-        // --- FIN DEL CAMBIO ---
         confirmPassword: ["", Validators.required],
       },
       { validators: passwordMatchValidator() } // Validador de coincidencia
     );
   }
 
-  // --- MÉTODOS DE LOGIN (Sin cambios) ---
+  // --- MÉTODOS DE LOGIN  ---
   onLoginSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -135,7 +132,7 @@ export class LoginComponent {
     });
   }
 
-  // --- MÉTODOS DE REGISTRO (Sin cambios) ---
+  // --- MÉTODOS DE REGISTRO  ---
   onRegisterSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -158,7 +155,7 @@ export class LoginComponent {
     });
   }
 
-  // --- MÉTODOS AUXILIARES (Sin cambios) ---
+  // --- MÉTODOS AUXILIARES  ---
   togglePasswordVisibility(): void {
     this.passwordFieldType =
       this.passwordFieldType === "password" ? "text" : "password";

@@ -1,4 +1,3 @@
-// src/app/error-pages/not-found/not-found.component.ts
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, Router } from "@angular/router"; // 1. Importar Router

@@ -1,4 +1,3 @@
-// src/app/core/services/order.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -62,7 +61,6 @@ export class OrderService {
   }
 
   /**
-   * --- ¡NUEVO! ---
    * Cancela un pedido.
    */
   cancelOrder(orderId: number): Observable<any> {

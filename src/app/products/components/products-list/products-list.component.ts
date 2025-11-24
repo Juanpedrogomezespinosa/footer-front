@@ -1,4 +1,3 @@
-// src/app/products/components/products-list/products-list.component.ts
 import {
   Component,
   signal,

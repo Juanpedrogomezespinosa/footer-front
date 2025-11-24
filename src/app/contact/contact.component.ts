@@ -1,5 +1,3 @@
-// src/app/contact/contact.component.ts
-
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import {
@@ -8,17 +6,13 @@ import {
 } from "../core/services/contact.service";
 import { ToastService } from "../core/services/toast.service";
 
-// --- ¡IMPORTACIONES CLAVE! ---
-import { CommonModule } from "@angular/common"; // Necesario para *ngIf
-import { ReactiveFormsModule } from "@angular/forms"; // Necesario para [formGroup]
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-contact",
-  standalone: true, // <-- Esto causa el "error", pero es la forma correcta
-  imports: [
-    CommonModule, // <-- Lo importamos aquí
-    ReactiveFormsModule, // <-- Lo importamos aquí
-  ],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: "./contact.component.html",
 })
 export class ContactComponent implements OnInit {

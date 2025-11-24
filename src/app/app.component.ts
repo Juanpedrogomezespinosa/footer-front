@@ -1,11 +1,10 @@
-// src/app/app.component.ts
-import { Component, OnInit } from "@angular/core"; // 1. Importar OnInit
-import { RouterOutlet, Router, NavigationEnd } from "@angular/router"; // 2. Importar Router y NavigationEnd
+import { Component, OnInit } from "@angular/core";
+import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { ToastComponent } from "./shared/components/toast/toast.component";
 import { NavbarComponent } from "./shared/components/navbar/navbar.component";
 import { FooterComponent } from "./shared/components/footer/footer.component";
 import { CommonModule } from "@angular/common";
-import { filter } from "rxjs/operators"; // 3. Importar filter
+import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-root",
@@ -21,15 +20,12 @@ import { filter } from "rxjs/operators"; // 3. Importar filter
   styleUrls: [],
 })
 export class AppComponent implements OnInit {
-  // 4. Implementar OnInit
   title = "footer-front";
 
-  // 5. Esta es ahora una propiedad normal, no un getter
   hideLayout: boolean = false;
 
   constructor(private router: Router) {}
 
-  // 6. Usamos ngOnInit para suscribirnos a los cambios de ruta
   ngOnInit() {
     this.router.events
       .pipe(
@@ -41,7 +37,6 @@ export class AppComponent implements OnInit {
         if (event instanceof NavigationEnd) {
           const currentRoute = event.urlAfterRedirects;
 
-          // 7. AÑADIMOS /admin a tu lógica
           this.hideLayout =
             currentRoute.includes("login") ||
             currentRoute.includes("register") ||
@@ -49,6 +44,4 @@ export class AppComponent implements OnInit {
         }
       });
   }
-
-  // 8. Eliminamos el getter 'get hideLayout()'
 }

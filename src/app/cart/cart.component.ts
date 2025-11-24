@@ -35,9 +35,9 @@ export class CartComponent implements OnInit {
 
   public selectedShipping: WritableSignal<ShippingMethod> = signal("standard");
 
-  // --- MÉTODO IMPORTANTE PARA EL PRECIO ---
+  // --- MÉTODO PARA EL PRECIO ---
   public getItemPrice(item: CartItem): number {
-    // Prioridad: Precio de variante > Precio de producto
+    // Precio de variante > Precio de producto
     if (item.variant && item.variant.price) {
       return Number(item.variant.price);
     }

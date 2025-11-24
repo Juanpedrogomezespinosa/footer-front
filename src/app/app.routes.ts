@@ -1,4 +1,3 @@
-// src/app/app.routes.ts
 import { Routes } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
 import { AdminGuard } from "./core/guards/admin.guard";
@@ -44,17 +43,14 @@ export const routes: Routes = [
       ),
     title: "Restablecer Contraseña",
   },
-  // --- 👇 NUEVA RUTA DE CALLBACK DE GOOGLE ---
   {
     path: "auth/callback",
-    // Esta será la ruta para el nuevo componente que crearemos
     loadComponent: () =>
       import("./auth/auth-callback/auth-callback.component").then(
         (m) => m.AuthCallbackComponent
       ),
     title: "Autenticando...",
   },
-  // --- FIN DE NUEVA RUTA ---
   {
     path: "profile",
     loadComponent: () =>

@@ -179,8 +179,6 @@ export class ProfileAddressesComponent implements OnInit {
    * Elimina una dirección
    */
   public onDeleteAddress(id: number): void {
-    // Aquí podrías (y deberías) añadir un modal de confirmación
-    // Por ahora, lo borramos directamente.
     this.userService.deleteAddress(id).subscribe({
       next: () => {
         this.toastService.showSuccess("Dirección eliminada.");

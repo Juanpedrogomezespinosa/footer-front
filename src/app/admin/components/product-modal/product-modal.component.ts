@@ -24,7 +24,6 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
   private categorySubscription: Subscription | null = null;
 
-  // Mapa para almacenar archivos por índice de grupo de color
   filesByColorIndex: Map<number, File[]> = new Map();
 
   currentCategory = signal<string>("");
@@ -75,7 +74,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   createColorGroup(): FormGroup {
     return this.fb.group({
       color: ["", Validators.required],
-      price: [0], // <-- AÑADIDO: Precio de la variante
+      price: [0],
       sizeStocks: this.fb.array(
         [this.createSizeStockGroup()],
         Validators.required

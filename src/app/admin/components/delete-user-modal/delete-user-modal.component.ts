@@ -1,4 +1,3 @@
-// src/app/admin/components/delete-user-modal/delete-user-modal.component.ts
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {

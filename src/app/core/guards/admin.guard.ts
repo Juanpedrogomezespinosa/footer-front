@@ -1,9 +1,8 @@
-// src/app/core/guards/admin.guard.ts
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
-import { AuthService } from "../services/auth.service"; // Importamos tu servicio
+import { AuthService } from "../services/auth.service";
 
 @Injectable({
   providedIn: "root",

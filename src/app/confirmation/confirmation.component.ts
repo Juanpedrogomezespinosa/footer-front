@@ -49,7 +49,6 @@ export class ConfirmationComponent implements OnInit {
       return;
     }
 
-    // --- 👇 ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
     // Usamos el OrderService (que llama a /api/orders/:id)
     // en lugar de una llamada http manual a la URL incorrecta.
     this.orderService.getOrderById(orderId).subscribe({
@@ -63,6 +62,5 @@ export class ConfirmationComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
-    // --- FIN DE LA CORRECCIÓN ---
   }
 }

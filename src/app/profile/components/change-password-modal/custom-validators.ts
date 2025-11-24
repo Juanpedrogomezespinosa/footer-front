@@ -1,8 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 /**
- * Validador personalizado para
- * confirmar que dos campos de contraseña coinciden.
+ * Validador para confirmar que dos campos de contraseña coinciden.
  */
 export const passwordMatchValidator: ValidatorFn = (
   control: AbstractControl

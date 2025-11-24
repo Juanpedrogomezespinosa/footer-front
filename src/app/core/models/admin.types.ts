@@ -1,5 +1,3 @@
-// src/app/core/models/admin.types.ts
-
 export interface DashboardStats {
   totalRevenue: StatCard;
   ordersToday: StatCard;
@@ -106,13 +104,12 @@ export interface AdminVariant {
   price?: number;
 }
 
-// --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
 export interface FullAdminProduct {
   id: number;
   name: string;
   description: string;
   price: string;
-  discountPrice?: string | null; // <--- ¡ESTO FALTABA!
+  discountPrice?: string | null;
   color: string;
   brand: string;
   category: string;

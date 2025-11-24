@@ -1,4 +1,3 @@
-// src/app/core/services/admin.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -10,7 +9,7 @@ import {
   AdminProductsResponse,
   FullAdminProduct,
   FullAdminOrder,
-  FullAdminUser, // <-- ¡Importado!
+  FullAdminUser,
 } from "../models/admin.types";
 
 // Interfaz para los filtros de producto
@@ -37,7 +36,6 @@ export class AdminService {
     return this.http.get<SalesGraph>(`${this.apiUrl}/stats/sales-graph`);
   }
 
-  // --- ¡MODIFICADO! ---
   getUsers(searchQuery?: string | null): Observable<AdminUser[]> {
     let params = new HttpParams();
     if (searchQuery) {
@@ -46,11 +44,9 @@ export class AdminService {
     return this.http.get<AdminUser[]>(`${this.apiUrl}/users`, { params });
   }
 
-  // --- ¡NUEVO! ---
   getAdminUserById(id: number): Observable<FullAdminUser> {
     return this.http.get<FullAdminUser>(`${this.apiUrl}/users/${id}`);
   }
-  // -------------
 
   getOrders(
     page: number = 1,

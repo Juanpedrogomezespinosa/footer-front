@@ -1,10 +1,10 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { productsRoutes } from "./products/products.routes";
-import { AuthGuard } from "./core/guards/auth.guard"; // <-- 1. IMPORTAR TU GUARD
+import { AuthGuard } from "./core/guards/auth.guard"; // <-- 1. IMPORTAR GUARD
 
 const routes: Routes = [
-  // --- AÑADIDA RUTA HOME ---
+  // ---  RUTA HOME ---
   {
     path: "home",
     loadComponent: () =>
@@ -29,7 +29,7 @@ const routes: Routes = [
       ),
   },
 
-  // --- 👇 AÑADIDAS RUTAS DE CARRITO Y CONFIRMACIÓN ---
+  // ---  RUTAS DE CARRITO Y CONFIRMACIÓN ---
   {
     path: "cart",
     loadComponent: () =>
@@ -44,16 +44,15 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuard], // Protegida
   },
-  // --- FIN DE RUTAS AÑADIDAS ---
 
   {
     path: "",
-    redirectTo: "home", // Redirige a home en lugar de products
+    redirectTo: "home",
     pathMatch: "full",
   },
   {
     path: "**",
-    redirectTo: "home", // Redirige a home en lugar de products
+    redirectTo: "home",
   },
 ];
 

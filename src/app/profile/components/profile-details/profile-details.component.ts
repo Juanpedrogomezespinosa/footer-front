@@ -14,14 +14,12 @@ import {
 } from "app/core/services/user.service";
 import { ToastService } from "app/core/services/toast.service";
 
-// --- 1. IMPORTAR EL NUEVO MODAL ---
 import { ChangePasswordModalComponent } from "../change-password-modal/change-password-modal.component";
 
 @Component({
   selector: "app-profile-details",
   standalone: true,
-  // --- 2. AÑADIR EL MODAL A LOS IMPORTS ---
-  // (Esto es correcto y es lo que causa el warning del linter)
+  // --- AÑADIR EL MODAL A LOS IMPORTS ---
   imports: [CommonModule, ReactiveFormsModule, ChangePasswordModalComponent],
   templateUrl: "./profile-details.component.html",
 })
@@ -31,7 +29,7 @@ export class ProfileDetailsComponent implements OnInit {
   public submitting: boolean = false;
   public loading: boolean = true;
 
-  // --- 3. AÑADIR ESTADO PARA EL MODAL ---
+  // --- AÑADIR ESTADO PARA EL MODAL ---
   public showPasswordModal: boolean = false;
 
   constructor(
@@ -83,7 +81,6 @@ export class ProfileDetailsComponent implements OnInit {
 
   /**
    * Envía los datos actualizados del formulario
-   * (Esta lógica ya estaba correcta, sin 'password')
    */
   public onSubmit(): void {
     if (this.profileForm.invalid || this.submitting) {
@@ -125,7 +122,7 @@ export class ProfileDetailsComponent implements OnInit {
     return this.profileForm.controls;
   }
 
-  // --- 4. NUEVOS MÉTODOS PARA MANEJAR EL MODAL ---
+  // --- NUEVOS MÉTODOS PARA MANEJAR EL MODAL ---
 
   /**
    * Abre el modal de cambio de contraseña

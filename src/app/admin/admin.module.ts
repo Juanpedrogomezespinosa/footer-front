@@ -1,4 +1,3 @@
-// src/app/admin/admin.module.ts
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
@@ -16,18 +15,15 @@ import { EditProductModalComponent } from "./components/edit-product-modal/edit-
 import { DeleteProductModalComponent } from "./components/delete-product-modal/delete-product-modal.component";
 import { OrderDetailsModalComponent } from "./components/order-details-modal/order-details-modal.component";
 import { StatusUpdateModalComponent } from "./components/status-update-modal/status-update-modal.component";
-import { DeleteUserModalComponent } from "./components/delete-user-modal/delete-user-modal.component"; // 1. Importar
+import { DeleteUserModalComponent } from "./components/delete-user-modal/delete-user-modal.component";
 
 @NgModule({
-  declarations: [
-    // Todos son standalone, así que 'declarations' está vacío
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),
     ReactiveFormsModule,
 
-    // Componentes Standalone
     DashboardComponent,
     AdminLayoutComponent,
     AdminProductsComponent,
@@ -38,7 +34,7 @@ import { DeleteUserModalComponent } from "./components/delete-user-modal/delete-
     DeleteProductModalComponent,
     OrderDetailsModalComponent,
     StatusUpdateModalComponent,
-    DeleteUserModalComponent, // 2. Añadir a imports
+    DeleteUserModalComponent,
   ],
 })
 export class AdminModule {}

@@ -1,9 +1,4 @@
-<!-- src/app/admin/dashboard/dashboard.component.html -->
 <div class="flex flex-col gap-8 max-w-7xl mx-auto">
-  <!-- 
-    Cabecera (MODIFICADA)
-    - flex-col en móvil, sm:flex-row en pantallas mayores
-  -->
   <div
     class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4"
   >
@@ -19,11 +14,7 @@
         ¡Bienvenido de nuevo, Admin! Aquí tienes un resumen de la actividad.
       </p>
     </div>
-    <!-- 
-      Botón (MODIFICADO)
-      - Añadido 'whitespace-nowrap' para evitar que el texto se parta.
-      - w-full en móvil y sm:w-auto en pantallas mayores.
-    -->
+
     <button
       (click)="openProductModal()"
       class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium h-10 hover:opacity-90 transition-opacity w-full sm:w-auto whitespace-nowrap"
@@ -32,7 +23,7 @@
     </button>
   </div>
 
-  <!-- Tarjetas (Sin cambios, ya eran responsive) -->
+  <!-- Tarjetas  -->
   <ng-container *ngIf="stats$ | async as stats; else loadingStats">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Tarjeta: Ingresos Totales -->
@@ -139,7 +130,7 @@
     </div>
   </ng-container>
 
-  <!-- Gráfica (Sin cambios) -->
+  <!-- Gráfica  -->
   <div
     *ngIf="salesGraphData$ | async as salesGraph"
     class="grid grid-cols-1 lg:grid-cols-3 gap-6"
@@ -183,7 +174,7 @@
     </div>
   </div>
 
-  <!-- Pedidos Recientes (Sin cambios) -->
+  <!-- Pedidos Recientes  -->
   <div
     *ngIf="recentOrders$ | async as ordersResponse; else loadingOrders"
     class="flex flex-col gap-4"

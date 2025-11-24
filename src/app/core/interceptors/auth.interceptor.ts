@@ -4,10 +4,10 @@ import {
   HttpInterceptor,
   HttpHandler,
   HttpRequest,
-  HttpErrorResponse, // Importar HttpErrorResponse
+  HttpErrorResponse,
 } from "@angular/common/http";
-import { Observable, throwError } from "rxjs"; // Importar throwError
-import { catchError } from "rxjs/operators"; // Importar catchError
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

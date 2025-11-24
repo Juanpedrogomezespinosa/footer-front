@@ -1,4 +1,3 @@
-// src/app/core/services/modal.service.ts
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { FullAdminProduct, FullAdminUser } from "../models/admin.types"; // <-- ¡Importado FullAdminUser!
@@ -74,12 +73,11 @@ export class ModalService {
   );
   userToDelete$ = this.userToDeleteSubject.asObservable();
 
-  // --- ¡¡¡NUEVO!!! Modal de DETALLES DE USUARIO ---
+  // --- Modal de DETALLES DE USUARIO ---
   private userDetailsModalSubject = new BehaviorSubject<boolean>(false);
   isUserDetailsModalOpen$ = this.userDetailsModalSubject.asObservable();
   private userToViewSubject = new BehaviorSubject<FullAdminUser | null>(null);
   userToView$ = this.userToViewSubject.asObservable();
-  // ---------------------------------------------
 
   constructor() {}
 
@@ -151,7 +149,7 @@ export class ModalService {
     this.userToDeleteSubject.next(null);
   }
 
-  // --- ¡¡¡NUEVOS!!! Métodos DETALLES DE USUARIO ---
+  // --- Métodos DETALLES DE USUARIO ---
   openUserDetailsModal(user: FullAdminUser) {
     this.userToViewSubject.next(user);
     this.userDetailsModalSubject.next(true);
@@ -160,5 +158,4 @@ export class ModalService {
     this.userDetailsModalSubject.next(false);
     this.userToViewSubject.next(null);
   }
-  // -----------------------------------------
 }

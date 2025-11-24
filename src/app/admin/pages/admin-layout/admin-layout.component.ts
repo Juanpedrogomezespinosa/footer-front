@@ -1,4 +1,3 @@
-// src/app/admin/pages/admin-layout/admin-layout.component.ts
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, Router } from "@angular/router";
@@ -14,8 +13,6 @@ import { StatusUpdateModalComponent } from "../../components/status-update-modal
 import { DeleteUserModalComponent } from "../../components/delete-user-modal/delete-user-modal.component";
 import { ProductDetailsModalComponent } from "../../components/product-details-modal/product-details-modal.component";
 
-// --- ¡¡¡RUTA DE IMPORTACIÓN CORREGIDA!!! ---
-// (Desde 'pages/admin-layout', subimos 2 niveles a 'admin', luego entramos a 'components')
 import { UserDetailsModalComponent } from "../../components/user-details-modal/user-details-modal.component";
 
 @Component({
@@ -26,12 +23,12 @@ import { UserDetailsModalComponent } from "../../components/user-details-modal/u
     RouterModule,
     ProductModalComponent,
     EditProductModalComponent,
-    ProductDetailsModalComponent, // <-- Modal de Detalles de Producto
+    ProductDetailsModalComponent,
     DeleteProductModalComponent,
     OrderDetailsModalComponent,
     StatusUpdateModalComponent,
     DeleteUserModalComponent,
-    UserDetailsModalComponent, // <-- ¡AÑADIDO!
+    UserDetailsModalComponent,
   ],
   templateUrl: "./admin-layout.component.html",
 })
@@ -39,12 +36,11 @@ export class AdminLayoutComponent {
   user$: Observable<User | null>;
   isProductModalOpen$: Observable<boolean>;
   isEditModalOpen$: Observable<boolean>;
-  isDetailsModalOpen$: Observable<boolean>; // Detalles de Producto
+  isDetailsModalOpen$: Observable<boolean>;
   isDeleteModalOpen$: Observable<boolean>;
   isOrderDetailsModalOpen$: Observable<boolean>;
   isStatusUpdateModalOpen$: Observable<boolean>;
   isDeleteUserModalOpen$: Observable<boolean>;
-  // --- ¡¡¡DECLARAR LA NUEVA VARIABLE!!! ---
   isUserDetailsModalOpen$: Observable<boolean>;
 
   isSidebarOpen = false;
@@ -62,7 +58,6 @@ export class AdminLayoutComponent {
     this.isOrderDetailsModalOpen$ = this.modalService.isOrderDetailsModalOpen$;
     this.isStatusUpdateModalOpen$ = this.modalService.isStatusUpdateModalOpen$;
     this.isDeleteUserModalOpen$ = this.modalService.isDeleteUserModalOpen$;
-    // --- ¡¡¡INICIALIZAR LA NUEVA VARIABLE!!! ---
     this.isUserDetailsModalOpen$ = this.modalService.isUserDetailsModalOpen$;
   }
 

@@ -1,11 +1,10 @@
-// src/app/admin/pages/admin-users/admin-users.component.ts
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AdminService } from "../../../core/services/admin.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { AuthService } from "../../../core/services/auth.service";
-import { AdminUser, FullAdminUser } from "../../../core/models/admin.types"; // <-- Importar FullAdminUser
-import { Observable, of, Subscription } from "rxjs"; // <-- Importar Subscription
+import { AdminUser, FullAdminUser } from "../../../core/models/admin.types";
+import { Observable, of, Subscription } from "rxjs";
 import {
   catchError,
   take,
@@ -15,19 +14,19 @@ import {
   distinctUntilChanged,
 } from "rxjs/operators";
 import { ModalService } from "../../../core/services/modal.service";
-import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms"; // <-- Importar Reactive Forms
+import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms";
 
 @Component({
   selector: "app-admin-users",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // <-- Añadir ReactiveFormsModule
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: "./admin-users.component.html",
 })
 export class AdminUsersComponent implements OnInit, OnDestroy {
   users$: Observable<AdminUser[]> = of([]);
   isLoading: boolean = true;
   currentAdminId: number | null = null;
-  filterForm: FormGroup; // <-- Para la búsqueda
+  filterForm: FormGroup;
   private filterSubscription: Subscription | null = null;
   private modalSubscription: Subscription | null = null;
 
@@ -36,13 +35,12 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private authService: AuthService,
     private modalService: ModalService,
-    private fb: FormBuilder // <-- Inyectar FormBuilder
+    private fb: FormBuilder
   ) {
     this.authService.user$.pipe(take(1)).subscribe((user) => {
       this.currentAdminId = user?.id || null;
     });
 
-    // Inicializar el formulario de búsqueda
     this.filterForm = this.fb.group({
       search: [""],
     });
@@ -51,7 +49,6 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadUsers();
 
-    // Escuchar el cierre del modal de ELIMINAR USUARIO para refrescar
     this.modalSubscription = this.modalService.isDeleteUserModalOpen$
       .pipe(
         skip(1),
@@ -61,16 +58,13 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
         this.loadUsers(this.filterForm.value.search); // Recargar con el filtro
       });
 
-    // --- ¡NUEVO! Escuchar el cierre del modal de DETALLES ---
-    // (No es estrictamente necesario ya que no edita, pero es buena práctica)
     this.modalService.isUserDetailsModalOpen$
       .pipe(
         skip(1),
         filter((isOpen) => !isOpen)
       )
-      .subscribe(); // No hacemos nada, pero mantenemos el patrón
+      .subscribe();
 
-    // --- ¡NUEVO! Escuchar los cambios en la búsqueda ---
     this.filterSubscription = this.filterForm
       .get("search")!
       .valueChanges.pipe(debounceTime(400), distinctUntilChanged())
@@ -85,9 +79,6 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.modalSubscription?.unsubscribe();
   }
 
-  /**
-   * Carga (o recarga) la lista de usuarios desde el servicio.
-   */
   loadUsers(searchQuery: string | null = null): void {
     this.isLoading = true;
     this.users$ = this.adminService.getUsers(searchQuery).pipe(
@@ -115,7 +106,6 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.modalService.openDeleteUserModal({ id: userId, username: username });
   }
 
-  // --- ¡¡¡NUEVA FUNCIÓN!!! ---
   /**
    * Obtiene los datos completos de un usuario y abre el modal de detalles.
    */

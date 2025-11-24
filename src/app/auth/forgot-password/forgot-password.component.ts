@@ -1,4 +1,3 @@
-// src/app/auth/forgot-password/forgot-password.component.ts
 import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {

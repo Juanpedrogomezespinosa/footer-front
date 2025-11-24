@@ -1,4 +1,3 @@
-// src/app/admin/components/edit-product-modal/edit-product-modal.component.ts
 import { Component, OnInit, OnDestroy, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
@@ -275,7 +274,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     return this.filesByColorIndex.get(index) || [];
   }
 
-  // --- CORRECCIÓN AQUÍ ---
   // Utilizamos 'any' en el array de retorno para evitar el error de tipado estricto
   // ya que sabemos que la propiedad variantColor existe en el objeto runtime.
   getExistingImagesForColor(index: number): any[] {
@@ -284,7 +282,6 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
     if (!this.product || !this.product.images) return [];
 
-    // Ahora TypeScript no se quejará porque tratamos img como any
     return this.product.images.filter(
       (img: any) =>
         img.variantColor === colorName && !this.imagesToDelete.includes(img.id)

@@ -12,7 +12,7 @@ import {
 } from "app/core/services/user.service";
 import { ToastService } from "app/core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
-import { passwordMatchValidator } from "./custom-validators"; // Importamos el validador
+import { passwordMatchValidator } from "./custom-validators";
 
 @Component({
   selector: "app-change-password-modal",

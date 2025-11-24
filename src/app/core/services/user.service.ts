@@ -17,7 +17,6 @@ export interface UserProfile {
 
 /**
  * Interfaz para la carga de actualización de perfil (solo texto).
- * --- 'password' ELIMINADO DE AQUÍ POR SEGURIDAD ---
  */
 export interface UpdateProfilePayload {
   username?: string;
@@ -28,7 +27,6 @@ export interface UpdateProfilePayload {
 }
 
 /**
- * --- ¡NUEVA INTERFAZ AÑADIDA! ---
  * Payload para el cambio de contraseña
  */
 export interface UpdatePasswordPayload {
@@ -37,7 +35,7 @@ export interface UpdatePasswordPayload {
 }
 
 // ----------------------------------------------------
-// --- INTERFACES DE DIRECCIONES (Sin cambios) ---
+// --- INTERFACES DE DIRECCIONES  ---
 // ----------------------------------------------------
 
 /**
@@ -98,7 +96,6 @@ export class UserService {
   }
 
   /**
-   * --- ¡NUEVO MÉTODO AÑADIDO! ---
    * Actualiza la contraseña del usuario de forma segura.
    * Llama a: PUT /api/users/profile/password
    */
@@ -123,7 +120,7 @@ export class UserService {
   }
 
   // ----------------------------------------------------
-  // --- MÉTODOS DE DIRECCIONES (Sin cambios) ---
+  // --- MÉTODOS DE DIRECCIONES ---
   // ----------------------------------------------------
 
   getAddresses(): Observable<UserAddress[]> {

@@ -1,8 +1,7 @@
-// src/app/core/services/auth.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
-import { jwtDecode } from "jwt-decode"; // <-- IMPORTAR jwt-decode
+import { jwtDecode } from "jwt-decode";
 
 // --- Interfaces de Autenticación ---
 export interface RegisterData {
@@ -106,13 +105,11 @@ export class AuthService {
     }
   }
 
-  // --- 👇 CAMBIO: Hecho 'public' para ser usado por el callback ---
   public handleLoginResponse(res: LoginResponse): void {
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user));
     this.userSubject.next(res.user);
   }
-  // --- FIN DEL CAMBIO ---
 
   forgotPassword(email: string): Observable<ForgotPasswordResponse> {
     return this.http.post<ForgotPasswordResponse>(
@@ -128,7 +125,6 @@ export class AuthService {
     );
   }
 
-  // --- 👇 NUEVO MÉTODO AÑADIDO ---
   /**
    * Maneja el token recibido de Google en la URL.
    * Decodifica el token (que ahora contiene al usuario) y lo guarda.
@@ -154,5 +150,4 @@ export class AuthService {
       return null;
     }
   }
-  // --- FIN DE NUEVO MÉTODO ---
 }

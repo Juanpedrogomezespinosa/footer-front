@@ -1,4 +1,3 @@
-// src/app/admin/pages/admin-products/admin-products.component.ts
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
@@ -88,7 +87,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
         this.loadProducts(this.productsResponse?.currentPage || 1);
       });
 
-    // --- ¡NUEVO LISTENER! ---
     // Escuchar el cierre del modal de DETALLES para refrescar
     this.modalService.isDetailsModalOpen$
       .pipe(
@@ -171,7 +169,6 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- ¡NUEVA FUNCIÓN! ---
   /**
    * Obtiene los datos completos de un producto y abre el modal de DETALLES.
    */

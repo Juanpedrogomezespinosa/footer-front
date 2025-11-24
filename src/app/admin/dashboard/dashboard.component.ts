@@ -1,4 +1,3 @@
-// src/app/admin/dashboard/dashboard.component.ts
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Observable } from "rxjs";
@@ -140,7 +139,6 @@ export class DashboardComponent implements OnInit {
     this.modalService.openProductModal();
   }
 
-  // --- ¡NUEVO MÉTODO AÑADIDO! ---
   /**
    * Abre el modal para ver los detalles de un pedido.
    */

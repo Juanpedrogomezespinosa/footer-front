@@ -1,4 +1,3 @@
-// src/app/core/services/product.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -34,7 +33,6 @@ export interface ProductApiResponse {
   name: string;
   description?: string;
   price: number;
-  // --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
   discountPrice?: number | null; // <--- ¡ESTO FALTABA!
   image?: string;
   averageRating?: number;

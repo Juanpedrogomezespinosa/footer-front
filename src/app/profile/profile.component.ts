@@ -1,4 +1,3 @@
-// src/app/profile/profile.component.ts
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { catchError, of, tap } from "rxjs";
@@ -23,7 +22,7 @@ export class ProfileComponent implements OnInit {
   public uploadingAvatar: boolean = false;
   public selectedAvatarPreview: string | ArrayBuffer | null = null;
   private selectedFile: File | null = null;
-  private readonly API_URL = "http://localhost:3000"; // URL base de tu backend
+  private readonly API_URL = "http://localhost:3000"; // URL base del backend
 
   constructor(
     private userService: UserService,
@@ -98,7 +97,7 @@ export class ProfileComponent implements OnInit {
   }
 
   // -------------------------------------------
-  // LÓGICA DE SUBIDA DE AVATAR (Se mantiene intacta)
+  // LÓGICA DE SUBIDA DE AVATAR
   // -------------------------------------------
 
   onFileSelect(event: Event): void {

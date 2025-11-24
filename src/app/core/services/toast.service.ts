@@ -1,4 +1,3 @@
-// src/app/core/services/toast.service.ts
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
 
@@ -25,12 +24,11 @@ export class ToastService {
     this.showToast("error", message);
   }
 
-  // --- MÉTODO QUE FALTABA (Soluciona tu error) ---
   showInfo(message: string) {
     this.showToast("info", message);
   }
 
-  // Ya que estamos, añadimos warning por si lo usas en el futuro
+  // añadimos warning
   showWarning(message: string) {
     this.showToast("warning", message);
   }
