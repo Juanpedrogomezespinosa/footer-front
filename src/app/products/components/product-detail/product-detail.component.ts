@@ -12,7 +12,7 @@ import {
 } from "app/core/services/product.service";
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
-import { AuthService } from "app/core/services/auth.service"; // <-- 1. IMPORTAR AUTH SERVICE
+import { AuthService } from "app/core/services/auth.service";
 
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
 
@@ -71,7 +71,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private cartService: CartService,
     private toastService: ToastService,
-    private authService: AuthService // <-- 2. INYECTAR EL SERVICIO DE AUTH
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -231,7 +231,6 @@ export class ProductDetailComponent implements OnInit {
     this.quantity.update((q) => (q > 1 ? q - 1 : 1));
   }
 
-  // --- 3. HELPER PARA VERIFICAR SESIÓN ---
   private requireLogin(): boolean {
     if (this.authService.isAuthenticated()) {
       return true;
@@ -241,8 +240,6 @@ export class ProductDetailComponent implements OnInit {
       "Debes iniciar sesión para realizar una compra."
     );
 
-    // --- CORRECCIÓN AQUÍ ---
-    // Antes: "/auth/login"  ->  Ahora: "/login"
     this.router.navigate(["/login"], {
       queryParams: { returnUrl: this.router.url },
     });
@@ -251,7 +248,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart(): void {
-    // Primero verificamos si el usuario está autenticado
     if (!this.requireLogin()) return;
 
     const variantId = this.selectedVariantId();
@@ -275,7 +271,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   buyNow(): void {
-    // Primero verificamos si el usuario está autenticado
     if (!this.requireLogin()) return;
 
     const variantId = this.selectedVariantId();
@@ -324,5 +319,23 @@ export class ProductDetailComponent implements OnInit {
 
   closeSizeGuide(): void {
     this.isSizeGuideOpen.set(false);
+  }
+
+  // --- ¡NUEVA FUNCIÓN! ---
+  // Obtiene la URL de la primera imagen disponible para un color dado
+  // para usarla como miniatura en el selector.
+  getColorThumbnail(color: string): string {
+    const p = this.product();
+    if (
+      !p ||
+      !p.imagesByColor ||
+      !p.imagesByColor[color] ||
+      p.imagesByColor[color].length === 0
+    ) {
+      // Si no hay imagen específica para el color, devuelve la default
+      return this.defaultImage;
+    }
+    // Devolvemos la primera imagen de ese color
+    return this.backendUrl + p.imagesByColor[color][0].imageUrl;
   }
 }
