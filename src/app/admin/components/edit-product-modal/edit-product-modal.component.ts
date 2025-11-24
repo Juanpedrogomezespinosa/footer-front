@@ -29,6 +29,8 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
 
   filesByColorIndex: Map<number, File[]> = new Map();
 
+  imagesToDelete: number[] = [];
+
   currentCategory = signal<string>("");
   clothingSizes = ["Talla Única", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   sneakerMin = 35;
@@ -44,7 +46,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
       name: ["", Validators.required],
       description: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      discountPrice: [null], // <-- AÑADIDO
+      discountPrice: [null],
       brand: ["", Validators.required],
       category: ["", Validators.required],
       gender: ["", Validators.required],
@@ -62,6 +64,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
           this.product = product;
           this.currentCategory.set(product.category);
           this.filesByColorIndex.clear();
+          this.imagesToDelete = [];
 
           this.productForm.patchValue({
             name: product.name,
@@ -69,7 +72,7 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
             price: parseFloat(product.price),
             discountPrice: product.discountPrice
               ? parseFloat(product.discountPrice)
-              : null, // <-- MAPEO
+              : null,
             brand: product.brand,
             category: product.category,
             gender: product.gender,
@@ -272,6 +275,28 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     return this.filesByColorIndex.get(index) || [];
   }
 
+  // --- CORRECCIÓN AQUÍ ---
+  // Utilizamos 'any' en el array de retorno para evitar el error de tipado estricto
+  // ya que sabemos que la propiedad variantColor existe en el objeto runtime.
+  getExistingImagesForColor(index: number): any[] {
+    const group = this.colorGroups.at(index);
+    const colorName = group.get("color")?.value;
+
+    if (!this.product || !this.product.images) return [];
+
+    // Ahora TypeScript no se quejará porque tratamos img como any
+    return this.product.images.filter(
+      (img: any) =>
+        img.variantColor === colorName && !this.imagesToDelete.includes(img.id)
+    );
+  }
+
+  deleteExistingImage(imageId: number): void {
+    if (!this.imagesToDelete.includes(imageId)) {
+      this.imagesToDelete.push(imageId);
+    }
+  }
+
   onSubmit(): void {
     if (this.productForm.invalid || !this.product) {
       this.toast.showError("Formulario inválido. Revisa las variantes.");
@@ -316,6 +341,10 @@ export class EditProductModalComponent implements OnInit, OnDestroy {
     });
 
     formData.append("variants", JSON.stringify(variantsForApi));
+
+    if (this.imagesToDelete.length > 0) {
+      formData.append("imagesToDelete", JSON.stringify(this.imagesToDelete));
+    }
 
     const imageMetadata: { filename: string; color: string }[] = [];
 
