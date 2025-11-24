@@ -62,7 +62,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   totalItems = signal(0);
   listTitle = signal("Todos los productos");
 
-  readonly itemsPerPage = 18;
+  readonly itemsPerPage = 16;
   selectedFilters: Record<string, string | string[]> = {};
   selectedSort: string = "";
   showFilters = false;
