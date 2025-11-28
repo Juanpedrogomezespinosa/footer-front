@@ -12,6 +12,7 @@ import { AuthService, User } from "../../../core/services/auth.service";
 import { trigger, transition, style, animate } from "@angular/animations";
 import { UiStateService } from "../../../core/services/ui-state.service";
 import { Subscription } from "rxjs";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-navbar",
@@ -51,7 +52,9 @@ export class NavbarComponent implements OnDestroy {
   public searchActiveDesktop = false;
   public searchTerm = "";
 
-  private readonly API_URL = "http://localhost:3000";
+  // Eliminamos '/api' para que la URL base de imágenes sea correcta (ej: https://...com/uploads/foto.jpg)
+  private readonly API_URL = environment.apiUrl.replace("/api", "");
+
   private readonly DEFAULT_AVATAR_PLACEHOLDER =
     "https://placehold.co/100x100/60a5fa/FFFFFF?text=";
 

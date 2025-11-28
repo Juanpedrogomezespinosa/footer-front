@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { environment } from "../../../environments/environment";
 
 /**
  * Interfaz para representar los datos esenciales del usuario.
@@ -71,8 +72,8 @@ export type AddressPayload = Omit<
 })
 export class UserService {
   // Endpoints de la API
-  private apiUrl = "/api/users";
-  private addressesApiUrl = "/api/addresses";
+  private apiUrl = `${environment.apiUrl}/users`;
+  private addressesApiUrl = `${environment.apiUrl}/addresses`;
 
   constructor(private http: HttpClient) {}
 

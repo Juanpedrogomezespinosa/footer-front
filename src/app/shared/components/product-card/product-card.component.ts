@@ -1,15 +1,15 @@
 import { Component, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
-import { Product } from "app/core/services/product.service";
-import { CartService } from "app/core/services/cart.service";
-import { ToastService } from "app/core/services/toast.service";
+import { Product } from "../../../core/services/product.service";
+import { CartService } from "../../../core/services/cart.service";
+import { ToastService } from "../../../core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-product-card",
   standalone: true,
-  // Añadimos RouterLink a los imports
   imports: [CommonModule, RouterLink],
   templateUrl: "./product-card.component.html",
   styleUrls: [],
@@ -17,7 +17,9 @@ import { HttpErrorResponse } from "@angular/common/http";
 export class ProductCardComponent {
   @Input() product!: Product;
 
-  backendUrl: string = "http://localhost:3000";
+  // Quitamos '/api' para obtener la raíz del backend (para imágenes)
+  backendUrl: string = environment.apiUrl.replace("/api", "");
+
   defaultImage: string =
     "https://placehold.co/400x400/f0f0f0/6C757D?text=Footer";
 
@@ -28,7 +30,6 @@ export class ProductCardComponent {
   ) {}
 
   isComplexProduct(): boolean {
-    // Productos que sabemos que requieren seleccionar talla
     return (
       this.product.category === "zapatillas" || this.product.category === "ropa"
     );
@@ -57,9 +58,7 @@ export class ProductCardComponent {
   }
 
   addToCart(event: MouseEvent): void {
-    // Detiene el clic para que no se propague al div padre
     event.stopPropagation();
-
     this.goToProductDetail();
   }
 }

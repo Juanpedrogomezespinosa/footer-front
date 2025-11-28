@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { jwtDecode } from "jwt-decode";
+import { environment } from "../../../environments/environment";
 
 // --- Interfaces de Autenticación ---
 export interface RegisterData {
@@ -44,7 +45,9 @@ export interface ResetPasswordData {
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.userSubject.asObservable();
-  private backendUrl = "http://localhost:3000/api/auth";
+
+  // Cambiamos la URL fija por la variable de entorno
+  private backendUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {
     const token = localStorage.getItem("token");
@@ -136,7 +139,6 @@ export class AuthService {
       localStorage.setItem("token", token);
 
       // 2. Decodificar el token para obtener el payload del usuario
-      // (El payload es el objeto User gracias a nuestro 'generateToken' del backend)
       const userPayload = jwtDecode<User>(token);
 
       // 3. Guardar el usuario en localStorage y en el BehaviorSubject

@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { ProductApiResponse } from "./product.service";
 import { UserAddress } from "./user.service";
+import { environment } from "../../../environments/environment";
 
 // Interfaz para la respuesta de /checkout
 export interface CreateOrderResponse {
@@ -29,7 +30,7 @@ export interface OrderDetails {
   providedIn: "root",
 })
 export class OrderService {
-  private readonly apiUrl = "http://localhost:3000/api/orders";
+  private readonly apiUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient) {}
 

@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { environment } from "../../../environments/environment";
 
 // Buena práctica: definir la forma de los datos
 export interface ContactFormData {
@@ -15,7 +16,7 @@ export interface ContactFormData {
 })
 export class ContactService {
   // La URL del endpoint de backend que creamos
-  private apiUrl = "/api/contact";
+  private apiUrl = `${environment.apiUrl}/contact`;
 
   constructor(private http: HttpClient) {}
 

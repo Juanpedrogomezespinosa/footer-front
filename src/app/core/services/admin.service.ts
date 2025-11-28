@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { environment } from "../../../environments/environment";
 import {
   AdminOrdersResponse,
   AdminUser,
@@ -23,9 +24,10 @@ export interface ProductFilters {
   providedIn: "root",
 })
 export class AdminService {
-  private apiUrl = "/api/admin"; // <-- Ruta de Admin
-  private productsApiUrl = "/api/products";
-  private ordersApiUrl = "/api/orders"; // <-- Ruta de Usuario
+  // Usamos environment para que cambie automáticamente entre local y Render
+  private apiUrl = `${environment.apiUrl}/admin`;
+  private productsApiUrl = `${environment.apiUrl}/products`;
+  private ordersApiUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient) {}
 

@@ -49,7 +49,6 @@
             <div
               class="mt-2 md:mt-0 text-left md:text-right flex items-center gap-3 justify-end"
             >
-              <!-- Botón de Cancelar (Solo visible si pendiente o pagado) -->
               <button
                 *ngIf="
                   order.status === 'pendiente' || order.status === 'pagado'
@@ -70,7 +69,6 @@
                   'bg-red-100 text-red-800': order.status === 'cancelado'
                 }"
               >
-                <!-- Lógica de texto amigable -->
                 <ng-container [ngSwitch]="order.status">
                   <ng-container *ngSwitchCase="'pagado'"
                     >Preparando</ng-container
@@ -92,7 +90,7 @@
               class="flex items-center gap-4"
             >
               <img
-                [src]="'http://localhost:3000' + item.Product.image"
+                [src]="'https://footer-back.onrender.com' + item.Product.image"
                 [alt]="item.Product.name"
                 class="size-16 rounded-lg object-cover border border-gray-100"
                 onerror="this.src='https://placehold.co/150x150/f0f0f0/6C757D?text=IMG'"

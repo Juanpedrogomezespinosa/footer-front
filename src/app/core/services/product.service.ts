@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
+// Importamos el environment para que cambie la URL automáticamente según estemos en local o prod
+import { environment } from "../../../environments/environment";
 
 // Interfaz para los "hermanos" (otros colores como productos distintos)
 export interface ProductSibling {
@@ -33,7 +35,7 @@ export interface ProductApiResponse {
   name: string;
   description?: string;
   price: number;
-  discountPrice?: number | null; // <--- ¡ESTO FALTABA!
+  discountPrice?: number | null;
   image?: string;
   averageRating?: number;
   ratingCount?: number;
@@ -73,7 +75,10 @@ export interface PaginatedProductResponse {
   providedIn: "root",
 })
 export class ProductService {
-  private readonly apiUrl = "http://localhost:3000/api/products";
+  // Usamos la variable del entorno.
+  // En local será: http://localhost:3000/api/products
+  // En prod será: https://footer-back.onrender.com/api/products
+  private readonly apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private httpClient: HttpClient) {}
 
