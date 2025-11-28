@@ -1,18 +1,10 @@
 ---
-
 ### 2. README para el FRONTEND (`footer-front`)
 
 Este README se centra en la experiencia de usuario, el diseño y Angular.
 
 ```markdown
 # 👟 Footer - Tienda Online (Frontend)
-
-![Angular](https://img.shields.io/badge/Angular-17%2B-dd0031) ![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Vercel](https://img.shields.io/badge/Vercel-Deployed-black)
-
-**Footer** es la interfaz de usuario para una tienda de moda urbana moderna y responsiva. Desarrollada con las últimas versiones de Angular, ofrece una experiencia de compra fluida, rápida y atractiva.
-
-🔗 **Ver Demo en Vivo:** [https://footer-front.vercel.app](https://footer-front.vercel.app)
-
 ---
 
 ## 🎨 Características y Diseño
