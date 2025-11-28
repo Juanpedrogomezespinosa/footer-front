@@ -14,6 +14,7 @@ import { UserService, UserAddress } from "../core/services/user.service";
 import { ToastService } from "../core/services/toast.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
+import { environment } from "../../environments/environment";
 
 type ShippingMethod = "standard" | "express";
 
@@ -34,6 +35,9 @@ export class CartComponent implements OnInit {
   public selectedAddressId = signal<number | null>(null);
 
   public selectedShipping: WritableSignal<ShippingMethod> = signal("standard");
+
+  // URL dinámica para imágenes
+  private backendUrl = environment.apiUrl.replace("/api", "");
 
   // --- MÉTODO PARA EL PRECIO ---
   public getItemPrice(item: CartItem): number {
@@ -189,7 +193,14 @@ export class CartComponent implements OnInit {
 
   getProductImage(imageName: string | undefined | null): string {
     if (imageName) {
-      return `http://localhost:3000${imageName}`;
+      // Corrección para imágenes
+      if (imageName.includes("localhost:3000")) {
+        return imageName.replace("http://localhost:3000", this.backendUrl);
+      }
+      if (imageName.startsWith("http")) {
+        return imageName;
+      }
+      return `${this.backendUrl}${imageName}`;
     }
     return `https://placehold.co/400x400/eeeeee/aaaaaa?text=Producto`;
   }

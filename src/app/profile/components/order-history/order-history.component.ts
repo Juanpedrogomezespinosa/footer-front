@@ -6,9 +6,13 @@ import {
   TitleCasePipe,
 } from "@angular/common";
 import { Observable, catchError, of, tap } from "rxjs";
-import { OrderDetails, OrderService } from "app/core/services/order.service";
-import { ToastService } from "app/core/services/toast.service";
+import {
+  OrderDetails,
+  OrderService,
+} from "../../../core/services/order.service";
+import { ToastService } from "../../../core/services/toast.service";
 import { RouterModule } from "@angular/router";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-order-history",
@@ -20,6 +24,9 @@ export class OrderHistoryComponent implements OnInit {
   public orders$: Observable<{ orders: OrderDetails[] } | null> | undefined;
   public loading: boolean = true;
   public error: string | null = null;
+
+  // URL base dinámica para las imágenes (sin el /api)
+  private backendUrl = environment.apiUrl.replace("/api", "");
 
   constructor(
     private orderService: OrderService,
@@ -96,5 +103,29 @@ export class OrderHistoryComponent implements OnInit {
   getTax(order: any): number {
     const productsTotal = this.getProductsTotal(order);
     return productsTotal - productsTotal / 1.21;
+  }
+
+  /**
+   * Genera la URL segura de la imagen del producto.
+   * Maneja URLs de localhost heredadas y rutas relativas.
+   */
+  getProductImageUrl(imagePath: string | undefined | null): string {
+    // 1. Si es nulo o indefinido, devolvemos placeholder
+    if (!imagePath) {
+      return "https://placehold.co/150x150/f0f0f0/6C757D?text=IMG";
+    }
+
+    // 2. Si viene guardada como localhost (base de datos antigua), la corregimos a producción
+    if (imagePath.includes("localhost:3000")) {
+      return imagePath.replace("http://localhost:3000", this.backendUrl);
+    }
+
+    // 3. Si ya es una URL web completa (https://...), la dejamos igual
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+
+    // 4. Si es ruta relativa (/uploads/...), le pegamos el dominio del backend actual
+    return `${this.backendUrl}${imagePath}`;
   }
 }

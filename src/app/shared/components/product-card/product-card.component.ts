@@ -17,7 +17,7 @@ import { environment } from "../../../../environments/environment";
 export class ProductCardComponent {
   @Input() product!: Product;
 
-  // Quitamos '/api' para obtener la raíz del backend (para imágenes)
+  // URL dinámica: quitamos '/api' para obtener la raíz del backend (para imágenes)
   backendUrl: string = environment.apiUrl.replace("/api", "");
 
   defaultImage: string =
@@ -37,6 +37,18 @@ export class ProductCardComponent {
 
   getProductImage(): string {
     if (this.product.image && this.product.image.trim() !== "") {
+      // SI la imagen ya viene con http://localhost, la reemplazamos por la de producción
+      if (this.product.image.includes("localhost:3000")) {
+        return this.product.image.replace(
+          "http://localhost:3000",
+          this.backendUrl
+        );
+      }
+      // Si la imagen es una URL externa (ej: https://...), la devolvemos tal cual
+      if (this.product.image.startsWith("http")) {
+        return this.product.image;
+      }
+      // Si es relativa (/uploads/...), le pegamos la URL del backend
       return `${this.backendUrl}${this.product.image}`;
     } else {
       return this.defaultImage;

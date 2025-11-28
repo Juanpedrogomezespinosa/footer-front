@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
+import { environment } from "../../environments/environment";
 
 import {
   ProductService,
@@ -17,7 +18,8 @@ import { ToastService } from "../core/services/toast.service";
   styleUrls: [],
 })
 export class HomeComponent implements OnInit {
-  private backendUrl = "http://localhost:3000";
+  // URL dinámica
+  private backendUrl = environment.apiUrl.replace("/api", "");
 
   categories = ["Zapatillas", "Ropa", "Complementos"];
   latestProducts: Product[] = [];
@@ -59,6 +61,10 @@ export class HomeComponent implements OnInit {
 
     if (!imagePath) {
       return placeholder;
+    }
+    // Corrección para localhost
+    if (imagePath.includes("localhost:3000")) {
+      return imagePath.replace("http://localhost:3000", this.backendUrl);
     }
     if (imagePath.startsWith("http")) {
       return imagePath;

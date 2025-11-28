@@ -12,6 +12,7 @@ import {
 import { CartService } from "app/core/services/cart.service";
 import { ToastService } from "app/core/services/toast.service";
 import { AuthService } from "app/core/services/auth.service";
+import { environment } from "../../../../environments/environment";
 
 import { RelatedProductsComponent } from "app/shared/components/related-products/related-products.component";
 
@@ -61,7 +62,8 @@ export class ProductDetailComponent implements OnInit {
 
   siblings = signal<ProductSibling[]>([]);
 
-  backendUrl = "http://localhost:3000";
+  // URL dinámica
+  backendUrl = environment.apiUrl.replace("/api", "");
   defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=No+Image";
 
   constructor(
@@ -110,7 +112,6 @@ export class ProductDetailComponent implements OnInit {
     this.productService.getProductById(productId).subscribe({
       next: (foundProduct: ProductApiResponse) => {
         if (foundProduct) {
-          // --- CAMBIO LÓGICO: Usamos discountPrice ---
           if (foundProduct.discountPrice) {
             foundProduct.oldPrice = Number(foundProduct.discountPrice);
           } else {
@@ -156,13 +157,26 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getProductImage(): string {
+    let url = "";
     if (this.selectedImageUrl()) {
-      return `${this.backendUrl}${this.selectedImageUrl()}`;
+      url = this.selectedImageUrl();
+    } else {
+      const images = this.currentImages();
+      if (images && images.length > 0) {
+        url = images[0].imageUrl;
+      }
     }
-    const images = this.currentImages();
-    if (images && images.length > 0) {
-      return `${this.backendUrl}${images[0].imageUrl}`;
+
+    if (url) {
+      if (url.includes("localhost:3000")) {
+        return url.replace("http://localhost:3000", this.backendUrl);
+      }
+      if (url.startsWith("http")) {
+        return url;
+      }
+      return `${this.backendUrl}${url}`;
     }
+
     return this.defaultImage;
   }
 
@@ -204,7 +218,6 @@ export class ProductDetailComponent implements OnInit {
     this.availableSizes.set([...new Set(sizes)]);
 
     // 3. ACTUALIZAR PRECIO
-    // Buscamos si alguna variante de este color tiene un precio específico distinto de 0
     const variantWithPrice = variantsForColor.find(
       (v) => v.price && v.price > 0
     );
@@ -212,7 +225,6 @@ export class ProductDetailComponent implements OnInit {
     if (variantWithPrice) {
       this.currentPrice.set(variantWithPrice.price!);
     } else {
-      // Si no tiene precio específico, volvemos al precio base del producto padre
       this.currentPrice.set(product.price);
     }
   }
@@ -319,7 +331,6 @@ export class ProductDetailComponent implements OnInit {
     this.isSizeGuideOpen.set(false);
   }
 
-  // Obtiene la URL de la primera imagen disponible para un color dado
   getColorThumbnail(color: string): string {
     const p = this.product();
     if (
@@ -328,10 +339,14 @@ export class ProductDetailComponent implements OnInit {
       !p.imagesByColor[color] ||
       p.imagesByColor[color].length === 0
     ) {
-      // Si no hay imagen específica para el color, devuelve la default
       return this.defaultImage;
     }
-    // Devolvemos la primera imagen de ese color
-    return this.backendUrl + p.imagesByColor[color][0].imageUrl;
+    // Lógica para corregir URL en miniaturas de colores
+    let url = p.imagesByColor[color][0].imageUrl;
+    if (url.includes("localhost:3000")) {
+      return url.replace("http://localhost:3000", this.backendUrl);
+    }
+    if (url.startsWith("http")) return url;
+    return this.backendUrl + url;
   }
 }

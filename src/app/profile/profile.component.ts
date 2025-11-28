@@ -1,15 +1,16 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { catchError, of, tap } from "rxjs";
-import { Router, RouterModule } from "@angular/router"; // Importar RouterModule
+import { Router, RouterModule } from "@angular/router";
 import { UserProfile, UserService } from "app/core/services/user.service";
 import { AuthService } from "app/core/services/auth.service";
 import { ToastService } from "app/core/services/toast.service";
+import { environment } from "../../environments/environment";
 
 @Component({
   selector: "app-profile",
   standalone: true,
-  imports: [CommonModule, RouterModule], // Quitar ReactiveFormsModule, Añadir RouterModule
+  imports: [CommonModule, RouterModule],
   templateUrl: "./profile.component.html",
   styleUrls: [],
 })
@@ -22,7 +23,9 @@ export class ProfileComponent implements OnInit {
   public uploadingAvatar: boolean = false;
   public selectedAvatarPreview: string | ArrayBuffer | null = null;
   private selectedFile: File | null = null;
-  private readonly API_URL = "http://localhost:3000"; // URL base del backend
+
+  // URL dinámica
+  private readonly API_URL = environment.apiUrl.replace("/api", "");
 
   constructor(
     private userService: UserService,
@@ -68,12 +71,22 @@ export class ProfileComponent implements OnInit {
   // Getter para el avatar (con lógica de previsualización)
   public get avatarStyle(): { [key: string]: string } {
     if (this.selectedAvatarPreview) {
-      return { "background-image": `url('${this.selectedAvatarPreview}')` };
+      return {
+        "background-image": `url('${this.selectedAvatarPreview}')`,
+      };
     }
 
     if (this.user?.avatarUrl) {
+      let url = this.user.avatarUrl;
+      // Corrección URL avatar
+      if (url.includes("localhost:3000")) {
+        url = url.replace("http://localhost:3000", this.API_URL);
+      } else if (!url.startsWith("http")) {
+        url = `${this.API_URL}${url}`;
+      }
+
       return {
-        "background-image": `url('${this.API_URL}${this.user.avatarUrl}')`,
+        "background-image": `url('${url}')`,
       };
     }
 
