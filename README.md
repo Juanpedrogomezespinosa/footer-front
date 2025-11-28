@@ -1,148 +1,119 @@
-footer-front/
-├── angular/ # Otra carpeta que no es parte del build (posiblemente error o carpeta auxiliar)
-├── node_modules/ # Generada por npm
-├── public/ # No utilizada por Angular por defecto
-├── src/
-│ ├── app/
-│ │ ├── admin/
-│ │ │ └── admin.module.ts
-│ ├── auth/ # Módulo de autenticación (login, register)
-│ │ ├── components/
-│ │ │ ├── auth-page/
-│ │ │ │ ├── auth-page.component.ts
-│ │ │ │ ├── auth-page.component.html
-│ │ │ │ └── auth-page.component.scss
-│ │ │ ├── login/
-│ │ │ │ ├── login.component.ts
-│ │ │ │ ├── login.component.html
-│ │ │ │ └── login.component.scss
-│ │ │ └── register/
-│ │ │ ├── register.component.ts
-│ │ │ ├── register.component.html
-│ │ │ └── register.component.scss
-│ │ ├── auth.module.ts
-│ │ └── auth.routes.ts
-│ ├── cart/ # Módulo del carrito
-│ │ ├── cart.component.ts
-│ │ ├── cart.component.html
-│ │ ├── cart.component.scss
-│ │ └── cart.module.ts
-│ ├── checkout/ # Módulo de pago
-│ │ ├── checkout.component.ts
-│ │ ├── checkout.component.html
-│ │ ├── checkout.component.scss
-│ │ └── checkout.module.ts
-│ ├── core/ # Lógica global reutilizable
-│ │ ├── guards/
-│ │ │ ├── auth.guard.ts
-│ │ │ ├── admin.guard.ts
-│ │ ├── interceptors/
-│ │ │ ├── auth.interceptor.ts
-│ │ ├── services/
-│ │ │ ├── auth.service.ts
-│ │ │ ├── cart.service.ts
-│ │ │ ├── order.service.ts
-│ │ │ ├── product.service.ts
-│ │ │ ├── user.service.ts
-│ │ │ └── toast.service.ts
-│ │ ├── core.module.ts
-│ │ ├── orders/ # Historial de pedidos
-│ │ │ ├── orders.component.ts
-│ │ │ ├── orders.component.html
-│ │ │ ├── orders.component.scss
-│ │ │ └── orders.module.ts
-│ │ ├── profile/ # Perfil de usuario
-│ │ │ ├── profile.component.ts
-│ │ │ ├── profile.component.html
-│ │ │ ├── profile.component.scss
-│ │ │ └── profile.module.ts
-│ │ ├── products/
-│ │ │ ├── components/
-│ │ │ │ └── product-list/
-│ │ │ │ └── products-list.component.html
-│ │ │ │ └── products-list.component.scss
-│ │ │ │ └── products-list.component.ts
-│ │ │ │ └── product-detail/
-│ │ │ │ └── product-detail.component.html
-│ │ │ │ └── product-detail.component.scss
-│ │ │ │ └── product-detail.component.ts
-│ │ │ ├── products.module.ts
-│ │ │ └── products.routes.ts
-│ │ ├── error-pages/ # Páginas como 404
-│ │ │ ├── not-found/
-│ │ │ │ ├── not-found.component.ts
-│ │ │ │ ├── not-found.component.html
-│ │ │ │ └── not-found.component.scss
-│ │ │ └── error-pages.module.ts
-│ │ ├── shared/
-│ │ │ ├── components/
-│ │ │ │ ├── filters/
-│ │ │ │ │ ├── products-filters.component.html
-│ │ │ │ │ ├── products-filters.component.scss
-│ │ │ │ │ ├── products-filters.component.spec.ts
-│ │ │ │ │ └── products-filters.component.ts
-│ │ │ │ ├── footer/
-│ │ │ │ │ ├── footer.component.html
-│ │ │ │ │ ├── footer.component.scss
-│ │ │ │ │ └── footer.component.ts
-│ │ │ │ ├── navbar/
-│ │ │ │ │ ├── navbar.component.html
-│ │ │ │ │ ├── navbar.component.scss
-│ │ │ │ │ └── navbar.component.ts
-│ │ │ │ └── product-card/
-│ │ │ │ ├── product-card.component.html
-│ │ │ │ ├── product-card.component.scss
-│ │ │ │ └── product-card.component.ts
-│ │ │ │ └── toast/
-│ │ │ │ ├── toast.component.html
-│ │ │ │ ├── toast.component.scss
-│ │ │ │ └── toast.component.ts
-│ │ │ ├── pipes/
-│ │ │ └── shared.module.ts
-│ │ ├── app.component.html
-│ │ ├── app.component.scss
-│ │ ├── app.component.spec.ts
-│ │ ├── app.component.ts
-│ │ └── app.routes.ts
-│ │ └── app.module.ts
-│ │ ├── app-routing.module.ts
-│ ├── assets/
-│ │ ├── icons/
-│ │ │ ├── agregar-carrito.png
-│ │ │ ├── agregar-carrito.svg
-│ │ │ ├── carrito.png
-│ │ │ ├── carrito.svg
-│ │ │ ├── eliminar-carrito.png
-│ │ │ ├── eliminar-carrito.svg
-│ │ │ ├── login.png
-│ │ │ ├── login.svg
-│ │ │ ├── logout.png
-│ │ │ ├── logout.svg
-│ │ │ ├── lupa.png
-│ │ │ ├── lupa.svg
-│ │ │ ├── menu.png
-│ │ │ ├── ocultar.svg
-│ │ │ └── perfil.png
-│ │ │ └── puntos.svg
-│ │ │ └── star-empty.svg
-│ │ │ └── star-full.svg
-│ │ │ └── star-half.svg
-│ │ │ └── ver.svg
-│ │ ├── products/ # Vacía actualmente
-│ │ ├── footer-logo.png
-│ │ └── logo-negro.png
-│ │ └── logo-negro.png
-│ │ └── logo-recortado.png
-│ ├── index.html
-│ ├── main.ts
-│ └── styles.scss
-├── .env
-├── .gitignore
-├── angular.json
-├── package-lock.json
-├── package.json
-├── README.md
-├── tsconfig.app.json
-├── tsconfig.json
-└── tsconfig.spec.json
-└── proxy.conf.json
+---
+
+### 2. README para el FRONTEND (`footer-front`)
+
+Este README se centra en la experiencia de usuario, el diseño y Angular.
+
+```markdown
+# 👟 Footer - Tienda Online (Frontend)
+
+![Angular](https://img.shields.io/badge/Angular-17%2B-dd0031) ![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Vercel](https://img.shields.io/badge/Vercel-Deployed-black)
+
+**Footer** es la interfaz de usuario para una tienda de moda urbana moderna y responsiva. Desarrollada con las últimas versiones de Angular, ofrece una experiencia de compra fluida, rápida y atractiva.
+
+🔗 **Ver Demo en Vivo:** [https://footer-front.vercel.app](https://footer-front.vercel.app)
+
+---
+
+## 🎨 Características y Diseño
+
+- **Diseño Responsive:** Adaptado perfectamente a Móvil, Tablet y Escritorio gracias a **Tailwind CSS**.
+- **Navegación Fluida:** SPA (Single Page Application) para una experiencia sin recargas.
+- **Gestión de Estado:** Servicios reactivos con RxJS para carrito y autenticación.
+- **Componentes Reutilizables:** Arquitectura modular (Cards, Modales, Tablas, Toasts).
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- **Framework:** Angular 17+
+- **Estilos:** Tailwind CSS + SCSS
+- **Conexión API:** HttpClient + Interceptores
+- **Seguridad:** Guards (AuthGuard, AdminGuard) y JWT Handling
+- **Despliegue:** Vercel
+
+---
+
+## ✨ Funcionalidades del Cliente
+
+### 🛍️ Experiencia de Compra
+
+- Catálogo de productos con filtros dinámicos (Categoría, Precio, Talla).
+- Buscador en tiempo real.
+- Detalle de producto con selección de variantes y galería de imágenes.
+- Carrito de compras persistente.
+
+### 👤 Área de Usuario
+
+- Login y Registro (incluyendo Google Auth).
+- Historial de pedidos con estados en tiempo real.
+- Gestión de perfil y direcciones de envío.
+- Posibilidad de cancelar pedidos pendientes.
+
+### 🛡️ Área de Administración (Panel Dashboard)
+
+- Gestión completa de productos (Crear, Editar, Eliminar).
+- Visualización de usuarios registrados.
+- Gráficos de ventas y estadísticas (Próximamente).
+
+---
+
+## 🚀 Instalación y Desarrollo
+
+1.  **Clonar el repositorio:**
+
+    ```bash
+    git clone [https://github.com/Juanpedrogomezespinosa/footer-front.git](https://github.com/Juanpedrogomezespinosa/footer-front.git)
+    cd footer-front
+    ```
+
+2.  **Instalar dependencias:**
+
+    ```bash
+    npm install
+    ```
+
+3.  **Configurar Entorno:**
+    El proyecto ya incluye la configuración para desarrollo y producción en `src/environments/`.
+
+    - **Local:** Apunta a `http://localhost:3000`
+    - **Prod:** Apunta a `https://footer-back.onrender.com`
+
+4.  **Ejecutar servidor de desarrollo:**
+    ```bash
+    ng serve
+    ```
+    Abre tu navegador en `http://localhost:4200/`.
+
+---
+
+## 📂 Estructura del Proyecto
+
+El proyecto sigue una arquitectura modular escalable:
+
+```bash
+src/app/
+├── auth/           # Módulos de Login y Registro
+├── core/           # Servicios Singleton, Guards e Interceptores
+├── shared/         # Componentes UI reutilizables (Navbar, Footer, Cards)
+├── pages/          # Vistas principales (Home, About, FAQ)
+├── products/       # Lógica de catálogo y detalle
+├── cart/           # Gestión del carrito
+├── checkout/       # Proceso de pago
+├── admin/          # Panel de administración (Lazy Loaded)
+└── profile/        # Área personal del usuario
+
+✒️ Autor
+Juan Pedro Gómez Espinosa - GitHub
+
+
+---
+
+### ¿Cómo ponerlos?
+
+1.  Ve a tu proyecto **backend** en VS Code, abre el archivo `README.md`, borra todo lo que haya y pega el contenido del **Bloque 1**.
+2.  Ve a tu proyecto **frontend**, abre `README.md`, borra todo y pega el contenido del **Bloque 2**.
+3.  Haz un `git add`, `git commit` y `git push` en ambos.
+
+¡Verás qué cambio dan tus repositorios en GitHub! Parecerán proyectos de una empresa real. 🚀
+```
