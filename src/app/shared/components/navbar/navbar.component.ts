@@ -52,7 +52,7 @@ export class NavbarComponent implements OnDestroy {
   public searchActiveDesktop = false;
   public searchTerm = "";
 
-  // Eliminamos '/api' para que la URL base de imágenes sea correcta (ej: https://...com/uploads/foto.jpg)
+  // API URL base para archivos legacy (locales) que no empiecen por http
   private readonly API_URL = environment.apiUrl.replace("/api", "");
 
   private readonly DEFAULT_AVATAR_PLACEHOLDER =
@@ -93,11 +93,19 @@ export class NavbarComponent implements OnDestroy {
     }
 
     if (user.avatarUrl) {
+      // Si la URL ya es absoluta (ej: Cloudinary), la usamos tal cual
       if (user.avatarUrl.startsWith("http")) {
         return user.avatarUrl;
       } else {
-        const fullUrl = `${this.API_URL}${user.avatarUrl}`;
-        return fullUrl;
+        // Si es una ruta relativa (archivos antiguos locales), le pegamos el dominio
+        // Aseguramos que no haya doble barra
+        const baseUrl = this.API_URL.endsWith("/")
+          ? this.API_URL.slice(0, -1)
+          : this.API_URL;
+        const relativePath = user.avatarUrl.startsWith("/")
+          ? user.avatarUrl
+          : `/${user.avatarUrl}`;
+        return `${baseUrl}${relativePath}`;
       }
     }
 
