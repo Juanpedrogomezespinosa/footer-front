@@ -62,8 +62,11 @@ export class ProductDetailComponent implements OnInit {
 
   siblings = signal<ProductSibling[]>([]);
 
-  // URL dinámica
-  backendUrl = environment.apiUrl.replace("/api", "");
+  // CORRECCIÓN: Variable pública y sin guion bajo para que el HTML la lea
+  public backendUrl: string = environment.apiUrl
+    .replace("/api", "")
+    .replace(/\/$/, "");
+
   defaultImage = "https://placehold.co/600x600/f0f0f0/6C757D?text=No+Image";
 
   constructor(
@@ -156,6 +159,22 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  // CORRECCIÓN: Método público para usar en el HTML (miniaturas)
+  public resolveUrl(url: string): string {
+    if (!url || url.trim() === "") return this.defaultImage;
+
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      if (url.includes("localhost:3000")) {
+        return url.replace("http://localhost:3000", this.backendUrl);
+      }
+      return url;
+    }
+
+    // Evita dobles barras
+    const separator = url.startsWith("/") ? "" : "/";
+    return `${this.backendUrl}${separator}${url}`;
+  }
+
   getProductImage(): string {
     let url = "";
     if (this.selectedImageUrl()) {
@@ -166,18 +185,7 @@ export class ProductDetailComponent implements OnInit {
         url = images[0].imageUrl;
       }
     }
-
-    if (url) {
-      if (url.includes("localhost:3000")) {
-        return url.replace("http://localhost:3000", this.backendUrl);
-      }
-      if (url.startsWith("http")) {
-        return url;
-      }
-      return `${this.backendUrl}${url}`;
-    }
-
-    return this.defaultImage;
+    return this.resolveUrl(url);
   }
 
   selectImage(imageUrl: string | undefined): void {
@@ -185,7 +193,10 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getPlaceholderImage(event: Event) {
-    (event.target as HTMLImageElement).src = this.defaultImage;
+    const target = event.target as HTMLImageElement;
+    if (target.src !== this.defaultImage) {
+      target.src = this.defaultImage;
+    }
   }
 
   selectColor(color: string): void {
@@ -341,12 +352,7 @@ export class ProductDetailComponent implements OnInit {
     ) {
       return this.defaultImage;
     }
-    // Lógica para corregir URL en miniaturas de colores
-    let url = p.imagesByColor[color][0].imageUrl;
-    if (url.includes("localhost:3000")) {
-      return url.replace("http://localhost:3000", this.backendUrl);
-    }
-    if (url.startsWith("http")) return url;
-    return this.backendUrl + url;
+    // Usamos el helper method público
+    return this.resolveUrl(p.imagesByColor[color][0].imageUrl);
   }
 }

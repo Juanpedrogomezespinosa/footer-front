@@ -4,7 +4,6 @@ import { Router, RouterLink } from "@angular/router";
 import { Product } from "../../../core/services/product.service";
 import { CartService } from "../../../core/services/cart.service";
 import { ToastService } from "../../../core/services/toast.service";
-import { HttpErrorResponse } from "@angular/common/http";
 import { environment } from "../../../../environments/environment";
 
 @Component({
@@ -17,11 +16,13 @@ import { environment } from "../../../../environments/environment";
 export class ProductCardComponent {
   @Input() product!: Product;
 
-  // URL dinámica: quitamos '/api' para obtener la raíz del backend (para imágenes)
-  backendUrl: string = environment.apiUrl.replace("/api", "");
+  // URL base del backend sin '/api' y asegurando que no tenga barra final
+  private _backendUrl: string = environment.apiUrl
+    .replace("/api", "")
+    .replace(/\/$/, "");
 
   defaultImage: string =
-    "https://placehold.co/400x400/f0f0f0/6C757D?text=Footer";
+    "https://placehold.co/400x400/f0f0f0/6C757D?text=No+Image";
 
   constructor(
     private router: Router,
@@ -36,29 +37,34 @@ export class ProductCardComponent {
   }
 
   getProductImage(): string {
-    if (this.product.image && this.product.image.trim() !== "") {
-      // SI la imagen ya viene con http://localhost, la reemplazamos por la de producción
-      if (this.product.image.includes("localhost:3000")) {
-        return this.product.image.replace(
-          "http://localhost:3000",
-          this.backendUrl
-        );
-      }
-      // Si la imagen es una URL externa (ej: https://...), la devolvemos tal cual
-      if (this.product.image.startsWith("http")) {
-        return this.product.image;
-      }
-      // Si es relativa (/uploads/...), le pegamos la URL del backend
-      return `${this.backendUrl}${this.product.image}`;
-    } else {
+    const image = this.product.image;
+
+    if (!image || image.trim() === "") {
       return this.defaultImage;
     }
+
+    // 1. Si es una URL absoluta (Cloudinary, S3, o externa), devolverla tal cual.
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      // Corrección específica para imágenes antiguas que apuntaban a localhost
+      if (image.includes("localhost:3000")) {
+        return image.replace("http://localhost:3000", this._backendUrl);
+      }
+      return image;
+    }
+
+    // 2. Si es una ruta relativa, asegurarnos de construir bien la URL del backend
+    // Evitar dobles barras // o falta de barra
+    const separator = image.startsWith("/") ? "" : "/";
+    return `${this._backendUrl}${separator}${image}`;
   }
 
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
-    console.error("Error al cargar la imagen:", target.src);
-    target.src = this.defaultImage;
+    // Evitamos bucle infinito si la imagen por defecto también falla
+    if (target.src !== this.defaultImage) {
+      console.warn("Error cargando imagen, usando placeholder:", target.src);
+      target.src = this.defaultImage;
+    }
   }
 
   goToProductDetail(): void {

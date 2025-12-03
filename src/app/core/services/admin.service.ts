@@ -64,7 +64,6 @@ export class AdminService {
 
   /**
    * Obtiene la lista de productos con paginación y filtros.
-   * GET /api/products
    */
   getProducts(
     page: number = 1,
@@ -91,14 +90,18 @@ export class AdminService {
   }
 
   createProduct(productData: FormData): Observable<any> {
+    // Angular maneja automáticamente el Content-Type: multipart/form-data
     return this.http.post<any>(this.productsApiUrl, productData);
   }
+
   getProductById(id: number): Observable<FullAdminProduct> {
     return this.http.get<FullAdminProduct>(`${this.productsApiUrl}/${id}`);
   }
+
   updateProduct(id: number, productData: any): Observable<any> {
     return this.http.put<any>(`${this.productsApiUrl}/${id}`, productData);
   }
+
   deleteProduct(id: number): Observable<any> {
     return this.http.delete<any>(`${this.productsApiUrl}/${id}`);
   }

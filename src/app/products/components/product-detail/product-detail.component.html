@@ -70,7 +70,7 @@
             [attr.aria-label]="'Ver imagen ' + (image.displayOrder + 1)"
           >
             <img
-              [src]="backendUrl + image.imageUrl"
+              [src]="resolveUrl(image.imageUrl)"
               (error)="getPlaceholderImage($event)"
               [alt]="prod.name + ' vista ' + (image.displayOrder + 1)"
               class="w-full h-full object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-105"
