@@ -15,6 +15,7 @@ import { environment } from "../../../../environments/environment";
 })
 export class ProductCardComponent {
   @Input() product!: Product;
+  @Input() index: number = -1; // Recibimos el índice para controlar la prioridad de carga
 
   // URL base del backend sin '/api' y asegurando que no tenga barra final
   private _backendUrl: string = environment.apiUrl
@@ -37,23 +38,32 @@ export class ProductCardComponent {
   }
 
   getProductImage(): string {
-    const image = this.product.image;
+    let image = this.product.image;
 
     if (!image || image.trim() === "") {
       return this.defaultImage;
     }
 
-    // 1. Si es una URL absoluta (Cloudinary, S3, o externa), devolverla tal cual.
+    // 1. Si es una URL absoluta (Cloudinary, S3, o externa)
     if (image.startsWith("http://") || image.startsWith("https://")) {
       // Corrección específica para imágenes antiguas que apuntaban a localhost
       if (image.includes("localhost:3000")) {
-        return image.replace("http://localhost:3000", this._backendUrl);
+        image = image.replace("http://localhost:3000", this._backendUrl);
       }
+
+      // OPTIMIZACIÓN CLOUDINARY:
+      // Si la URL es de Cloudinary, inyectamos parámetros para reducir peso y cambiar formato a WebP
+      // f_auto: Formato óptimo (WebP/AVIF)
+      // q_auto: Calidad óptima (equilibrio peso/calidad)
+      // w_400: Redimensionar a 400px de ancho (suficiente para la tarjeta)
+      if (image.includes("cloudinary.com") && image.includes("/upload/")) {
+        return image.replace("/upload/", "/upload/f_auto,q_auto,w_400/");
+      }
+
       return image;
     }
 
     // 2. Si es una ruta relativa, asegurarnos de construir bien la URL del backend
-    // Evitar dobles barras // o falta de barra
     const separator = image.startsWith("/") ? "" : "/";
     return `${this._backendUrl}${separator}${image}`;
   }

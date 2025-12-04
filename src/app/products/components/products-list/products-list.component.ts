@@ -55,6 +55,9 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   private currentCategory: string | null = null;
   private currentSearchTerm: string | null = null;
 
+  // Estado de carga para evitar "flash" de contenido vacío y mostrar Skeletons
+  isLoading = signal<boolean>(true);
+
   products = signal<Product[]>([]);
   currentPage = signal(1);
   totalPages = signal(1);
@@ -183,6 +186,9 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchProducts(): void {
+    // 1. Activamos la carga para mostrar el Skeleton
+    this.isLoading.set(true);
+
     const page = this.currentPage();
     const sort = this.selectedSort;
     const filters = { ...this.selectedFilters };
@@ -199,13 +205,11 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
       .getProducts(page, this.itemsPerPage, filters, sort)
       .subscribe({
         next: (response) => {
-          // CORRECCIÓN AQUÍ: Eliminada la lógica de precio falso (< 80 ? +20)
           const mappedProducts: Product[] = response.products.map(
             (product: ProductApiResponse) => ({
               id: product.id,
               name: product.name,
               price: Number(product.price),
-              // Ahora usa el discountPrice real que viene del Backend
               oldPrice: product.discountPrice
                 ? Number(product.discountPrice)
                 : undefined,
@@ -218,8 +222,6 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
               color: product.color || "",
               material: product.material || null,
               gender: product.gender || "unisex",
-
-              // Campos para cumplir la interfaz estricta
               availableColors: [],
               imagesByColor: {},
               variantsByColor: {},
@@ -230,11 +232,16 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
           this.products.set(mappedProducts);
           this.totalPages.set(response.totalPages);
           this.totalItems.set(response.totalItems);
+
+          // 2. Desactivamos la carga para mostrar los productos
+          this.isLoading.set(false);
         },
         error: (error) => {
           console.error("Error al cargar los productos:", error);
           this.products.set([]);
           this.totalItems.set(0);
+          // Desactivar carga también en error para mostrar mensaje "No productos"
+          this.isLoading.set(false);
         },
       });
   }
