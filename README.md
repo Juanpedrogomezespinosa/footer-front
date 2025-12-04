@@ -1,56 +1,53 @@
----
-### 2. README para el FRONTEND (`footer-front`)
+# 👟 Footer Frontend - Tienda Online SPA
 
-Este README se centra en la experiencia de usuario, el diseño y Angular.
+![Angular](https://img.shields.io/badge/Angular-19.x-DD0031?style=for-the-badge&logo=angular&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![RxJS](https://img.shields.io/badge/RxJS-Reactive-B7178C?style=for-the-badge&logo=reactivex&logoColor=white) ![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-```markdown
-# 👟 Footer - Tienda Online (Frontend)
----
+**Footer Frontend** es la interfaz de usuario moderna y reactiva para el ecosistema de comercio electrónico Footer. Desarrollada como una **SPA (Single Page Application)**, ofrece una experiencia de compra fluida, un panel de administración con métricas visuales y un diseño totalmente adaptativo.
 
-## 🎨 Características y Diseño
-
-- **Diseño Responsive:** Adaptado perfectamente a Móvil, Tablet y Escritorio gracias a **Tailwind CSS**.
-- **Navegación Fluida:** SPA (Single Page Application) para una experiencia sin recargas.
-- **Gestión de Estado:** Servicios reactivos con RxJS para carrito y autenticación.
-- **Componentes Reutilizables:** Arquitectura modular (Cards, Modales, Tablas, Toasts).
+🔗 **Demo Desplegada:** [https://tu-url-de-vercel.app](https://tu-url-de-vercel.app)
+🔗 **Backend Repo:** [https://github.com/Juanpedrogomezespinosa/footer-back](https://github.com/Juanpedrogomezespinosa/footer-back)
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework:** Angular 17+
-- **Estilos:** Tailwind CSS + SCSS
-- **Conexión API:** HttpClient + Interceptores
-- **Seguridad:** Guards (AuthGuard, AdminGuard) y JWT Handling
-- **Despliegue:** Vercel
+Basado en la última versión estable del framework:
+
+- **Core:** Angular 19+ (Stand-alone Components)
+- **Estilos:** Tailwind CSS 3 + PostCSS
+- **Gestión de Estado & Async:** RxJS (Observables, Subjects)
+- **Gráficos & Métricas:** Chart.js + ng2-charts
+- **Seguridad:** JWT Decode + Angular Guards
+- **UI Kit:** Angular CDK (Component Dev Kit)
 
 ---
 
-## ✨ Funcionalidades del Cliente
+## ✨ Funcionalidades Principales
 
-### 🛍️ Experiencia de Compra
+### 🛍️ Experiencia de Usuario (Cliente)
 
-- Catálogo de productos con filtros dinámicos (Categoría, Precio, Talla).
-- Buscador en tiempo real.
-- Detalle de producto con selección de variantes y galería de imágenes.
-- Carrito de compras persistente.
+- **Catálogo Interactivo:** Filtros dinámicos de productos, paginación y búsqueda en tiempo real.
+- **Carrito Persistente:** Lógica reactiva que mantiene los productos seleccionados incluso al recargar.
+- **Responsive Design:** Diseño "Mobile-First" optimizado para cualquier tamaño de pantalla.
+- **Gestión de Perfil:** Edición de datos personales y visualización de historial de pedidos.
 
-### 👤 Área de Usuario
+### 📊 Panel de Administración (Dashboard)
 
-- Login y Registro (incluyendo Google Auth).
-- Historial de pedidos con estados en tiempo real.
-- Gestión de perfil y direcciones de envío.
-- Posibilidad de cancelar pedidos pendientes.
+- **Visualización de Datos:** Gráficos interactivos de ventas y stock usando **Chart.js**.
+- **Gestión de Inventario:** CRUD completo de productos con subida de imágenes.
+- **Control de Usuarios:** Vista de clientes registrados y roles.
 
-### 🛡️ Área de Administración (Panel Dashboard)
+### 🔐 Arquitectura y Seguridad
 
-- Gestión completa de productos (Crear, Editar, Eliminar).
-- Visualización de usuarios registrados.
-- Gráficos de ventas y estadísticas (Próximamente).
+- **Interceptors:** Manejo automático de tokens JWT en cada petición HTTP.
+- **Guards:** Protección de rutas (`AuthGuard`, `AdminGuard`) para prevenir accesos no autorizados.
+- **Proxy Config:** Configuración para evitar problemas de CORS durante el desarrollo local.
 
 ---
 
-## 🚀 Instalación y Desarrollo
+## 🚀 Instalación y Desarrollo Local
+
+Sigue estos pasos para levantar la interfaz en tu máquina:
 
 1.  **Clonar el repositorio:**
 
@@ -66,46 +63,57 @@ Este README se centra en la experiencia de usuario, el diseño y Angular.
     ```
 
 3.  **Configurar Entorno:**
-    El proyecto ya incluye la configuración para desarrollo y producción en `src/environments/`.
+    El proyecto incluye archivos de entorno en `src/environments/`. Asegúrate de que `environment.ts` apunte a tu API local o remota.
 
-    - **Local:** Apunta a `http://localhost:3000`
-    - **Prod:** Apunta a `https://footer-back.onrender.com`
-
-4.  **Ejecutar servidor de desarrollo:**
-    ```bash
-    ng serve
+    ```typescript
+    // src/environments/environment.ts
+    export const environment = {
+      production: false,
+      apiUrl: 'http://localhost:3000/api'
+    };
     ```
-    Abre tu navegador en `http://localhost:4200/`.
+
+4.  **Arrancar el servidor de desarrollo:**
+    El proyecto usa una configuración de proxy para conectar con el backend localmente:
+
+    ```bash
+    npm start
+    ```
+    *(Este comando ejecuta `ng serve --proxy-config proxy.conf.json`)*.
+
+    Accede a la aplicación en: `http://localhost:4200/`
 
 ---
 
 ## 📂 Estructura del Proyecto
 
-El proyecto sigue una arquitectura modular escalable:
+Arquitectura modular basada en características (Feature-based):
 
 ```bash
 src/app/
-├── auth/           # Módulos de Login y Registro
-├── core/           # Servicios Singleton, Guards e Interceptores
-├── shared/         # Componentes UI reutilizables (Navbar, Footer, Cards)
-├── pages/          # Vistas principales (Home, About, FAQ)
-├── products/       # Lógica de catálogo y detalle
-├── cart/           # Gestión del carrito
-├── checkout/       # Proceso de pago
-├── admin/          # Panel de administración (Lazy Loaded)
-└── profile/        # Área personal del usuario
+├── core/           # Servicios Singleton, Interceptores, Guards
+├── shared/         # Componentes UI reutilizables (Botones, Inputs, Cards)
+├── auth/           # Módulos de Login, Registro y Recuperación
+├── features/       # Vistas principales
+│   ├── products/   # Catálogo y detalle
+│   ├── cart/       # Carrito y Checkout
+│   └── dashboard/  # Panel Admin con Gráficos
+├── layouts/        # Estructuras base (Navbar, Footer, Sidebar)
+└── assets/         # Imágenes y recursos estáticos
+
+
+
+☁️ Despliegue
+El frontend está optimizado para despliegue continuo (CI/CD):
+
+Plataforma: Vercel / Netlify
+
+Build Command: ng build --configuration production
+
+Output Directory: dist/footer-frontend/browser
 
 ✒️ Autor
-Juan Pedro Gómez Espinosa - GitHub
+Juan Pedro Gómez Espinosa
 
 
----
-
-### ¿Cómo ponerlos?
-
-1.  Ve a tu proyecto **backend** en VS Code, abre el archivo `README.md`, borra todo lo que haya y pega el contenido del **Bloque 1**.
-2.  Ve a tu proyecto **frontend**, abre `README.md`, borra todo y pega el contenido del **Bloque 2**.
-3.  Haz un `git add`, `git commit` y `git push` en ambos.
-
-¡Verás qué cambio dan tus repositorios en GitHub! Parecerán proyectos de una empresa real. 🚀
-```
+Hecho con ❤️, Angular 19 y mucho café ☕
